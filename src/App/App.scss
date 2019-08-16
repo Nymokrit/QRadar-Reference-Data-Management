@@ -1,0 +1,1156 @@
+$primary-hover: #a2b5ce;
+$qradar-main: #1d3649;
+$qradar-buttons: #4178be;
+$primary: $qradar-buttons;
+$qradar-buttons-50: #4178be50;
+$qradar-buttons-hover: darken($qradar-buttons, 10%);
+$qradar-buttons-white-hover: darken(white, 10%);
+$qradar-button-delete: #da1e28;
+$qradar-button-delete-hover: darken($qradar-button-delete, 10%);
+
+$cep-force:#0530ad;
+$cep: #0062ff;
+$lst:#054719;
+$bb:#da1e28;
+$rule: #750e13;
+$fontDisabled: lightgray;
+
+$delete: $qradar-button-delete;
+$delete-hover: darken($delete, 10%);
+$success: green;
+$add: $qradar-buttons;
+$add-hover: darken($add, 10%);
+$bulk: darken($add, 10%);
+$bulk-hover: darken($bulk, 10%);
+$export: darken($add, 20%);
+$export-hover: darken($export, 10%);
+$import: darken($add, 20%);
+$import-hover: darken($import, 10%);
+$close: #999;
+$close-hover: darken($close, 20%);
+
+@import "~bootstrap/scss/bootstrap";
+
+html {
+    border-top: 1px solid $qradar-buttons;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    font-size: 0.95rem;
+    line-height: 1.2rem;
+    font-family: "IBM Helvetica Neue", "Helvetica Neue", Helvetica, Arial, Roboto, sans-serif;
+}
+
+main {
+    height: calc(100% - 30px);
+    position: relative;
+}
+
+nav {
+    width: 100%;
+    height: 30px;
+    background-color: white;
+    border-bottom: 1px solid $qradar-buttons;
+    padding-left: 6px;
+}
+
+.row {
+    margin: 0px;
+}
+
+.col {
+    padding: 0px;
+}
+
+.container-fluid,
+.content {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    padding: 0px;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.section-header {
+    font-size: 1.1rem;
+    font-weight: 550;
+}
+
+.page-link {
+    border-radius: 0px !important;
+    border-top: none;
+    border-bottom: none;
+    color: $qradar-buttons;
+
+    &:hover {
+        color: $qradar-buttons;
+    }
+
+    &:focus,
+    &:active {
+        box-shadow: 0 0 0 0.1rem $qradar-buttons-50 !important;
+    }
+}
+
+.page-item.active .page-link {
+    background: $qradar-buttons;
+    color: white;
+    border: 0px;
+
+    &:hover {
+        background: $qradar-buttons-hover;
+    }
+}
+
+// Search Bar in React Bootstrap Table
+.form-control {
+    border-radius: 0px !important;
+
+    &:focus,
+    &:active {
+        border-color: $qradar-buttons;
+        box-shadow: 0 0 0 0.1rem $qradar-buttons-50 !important;
+    }
+}
+
+.section {
+    transition: all 0.2s linear;
+    padding: 0px;
+
+
+    &.section-filter {
+        position: relative;
+        height: 100%;
+        border-right: 1px solid $qradar-buttons;
+        overflow-y: auto;
+    }
+
+    &.section-content {
+        height: 100%;
+        // overflow: hidden;
+
+        .section-lists {
+            // overflow-y: auto;
+            // height: 100%;
+            transition: height 0.2s ease-in-out;
+
+            .list-cards {
+                width: 100%;
+
+                .card {
+                    border-radius: 0;
+                    border: 0;
+
+                    .card-header {
+                        background: white;
+                        border-radius: 0;
+                        border: 0;
+                    }
+
+                    .card-body {
+                        border-radius: 0;
+                        border: 0;
+                        padding-bottom: 1.6rem;
+                    }
+                }
+            }
+        }
+
+        .section-details {
+            height: 100%;
+            overflow-y: hidden;
+            position: relative;
+        }
+    }
+
+    &.section-graph {
+        // background-color: $qradar-main;
+        border-left: 1px solid $qradar-buttons;
+        height: 100%;
+        width: 100%;
+        font-weight: bold;
+
+        .error {
+            padding-top: 40%;
+        }
+
+        .graph-help {
+            width: 100%;
+            height: 100%;
+            display: inline-flex;
+
+            .graph-help-text {
+                margin: auto;
+
+                td {
+                    padding-right: 20px;
+                    vertical-align: top;
+                }
+            }
+        }
+
+        &.full-width {
+            // width: calc(100vw - 66%);
+            width: 100%;
+        }
+
+        &.zero-width {
+            flex: 0;
+            padding: 0;
+            max-width: 0px;
+            width: 0;
+        }
+    }
+}
+
+.error-alert {
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 80%;
+    height: fit-content;
+
+    background-color: #3d3d3d;
+    border: none;
+    border-left: 7px solid $delete;
+    color: white;
+    border-radius: 0;
+
+    .error-alert-message {
+        margin: 0.1rem;
+    }
+
+}
+
+/* for 'create rule' button */
+.show>.btn-secondary.dropdown-toggle {
+    background: $qradar-buttons;
+
+    &:focus {
+        box-shadow: 0 0 0 0.1rem $qradar-buttons;
+        outline: none;
+    }
+}
+
+.btn {
+    all: unset;
+
+    &-secondary {
+        all: unset;
+    }
+
+    &-default {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 1.5;
+        border-radius: 0px;
+        font-size: 0.875rem;
+        z-index: 100;
+        transition: all 0.21s linear;
+        font-weight: bold;
+        min-width: 30px;
+        min-height: 30px;
+        border: none;
+    }
+
+    &-create {
+        color: black;
+        background-color: inherit;
+        min-height: unset;
+        min-width: unset;
+        padding-right: 2px;
+        position: absolute;
+        right: 0px;
+        height: 0px;
+        top: -1px;
+
+        &:focus,
+        &:active {
+            outline: none;
+        }
+    }
+
+    &-delete {
+        position: absolute;
+        background: $qradar-button-delete;
+        border-color: $qradar-button-delete;
+        width: 150px;
+        color: white;
+
+        &:hover {
+            background: $qradar-button-delete-hover;
+            border-color: $qradar-button-delete-hover;
+        }
+
+        &:focus,
+        &:active {
+            box-shadow: 0 0 0 0.1rem $qradar-button-delete;
+            outline: none;
+        }
+    }
+
+    &-nav {
+        position: relative;
+        background-color: inherit;
+        color: $qradar-buttons;
+        font-weight: bold;
+        min-height: 29px;
+        font-size: 0.7rem;
+        padding-left: 0px;
+        margin-left: 10px;
+        padding-right: 18px;
+
+        &:hover {
+            // background: $qradar-buttons-white-hover;
+
+            &::before {
+                //font-weight: bold;
+                background-color: #5aaafa;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                max-width: 32px;
+                height: 4px;
+                content: '';
+            }
+        }
+
+        &-active {
+            &::before {
+                //font-weight: bold;
+                background-color: #5aaafa;
+                transition: 0.3s cubic-bezier(0.1, 0.6, 0.15, 1) 0s all;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                max-width: 32px;
+                height: 4px;
+                content: '';
+            }
+        }
+
+        &:focus,
+        &:active {
+            box-shadow: inherit;
+            border: none;
+            outline: none;
+        }
+    }
+
+    &-popup {
+        // position: absolute;
+        margin-right: 1rem;
+        width: 150px;
+        background-color: $qradar-buttons;
+        // border: 1px solid $qradar-buttons;
+        color: white;
+
+        &:hover {
+            background: $qradar-buttons-hover;
+            border-color: $qradar-buttons-hover;
+            color: white;
+        }
+
+        &:focus,
+        &:active {
+            box-shadow: 0 0 0 0.1rem $qradar-buttons-50;
+            outline: none;
+        }
+    }
+
+    &-layout {
+        position: absolute;
+        border: 1px solid $qradar-buttons;
+        background-color: white;
+        color: $qradar-buttons;
+        z-index: 101;
+        min-width: 30px;
+        min-height: 30px;
+
+        &:hover {
+            background: $qradar-buttons-white-hover;
+        }
+    }
+
+    &-graph-options {
+        width: 150px;
+    }
+
+    &-inner-table {
+        background-color: $qradar-buttons;
+        border: 1px solid $qradar-buttons;
+        color: white;
+        position: inherit;
+        font-size: 0.7rem;
+        margin: auto;
+        padding: 5px;
+        width: 25px;
+    }
+
+    &-reload {
+        background: inherit;
+        color: $qradar-buttons;
+        right: 0px;
+        float: right;
+        min-height: 29px;
+
+        &:hover {
+            font-weight: bold;
+        }
+
+        &:focus,
+        &:active {
+            background-color: inherit;
+            box-shadow: none;
+            border: none;
+        }
+    }
+
+    &-add-inner-keys {
+        min-width: unset;
+        color: white;
+        padding-left: 4px;
+        padding-right: 4px;
+        font-size: 1rem;
+        font-weight: normal;
+        background-color: $qradar-buttons;
+
+        &:hover {
+            background-color: $qradar-buttons-hover;
+        }
+
+        &:focus,
+        &:active {
+            box-shadow: 0 0 0 0.1rem $qradar-buttons;
+            outline: none;
+        }
+    }
+
+    &-table-settings {
+        float: right;
+        margin: 5px;
+        margin-left: 20px;
+        color: $qradar-buttons;
+
+        button {
+            &:hover {
+                background: unset;
+                color: unset;
+            }
+
+            &:active,
+            &:focus {
+                background: unset !important;
+                color: unset !important;
+                box-shadow: unset !important;
+            }
+        }
+    }
+
+    &-ref-data {
+        min-width: 150px;
+        color: white;
+        margin-right: 10px;
+        margin-bottom: 10px;
+
+        &.btn-add {
+            background-color: $add;
+
+            &:hover {
+                background-color: $add-hover;
+            }
+        }
+
+        &-input {
+            color: white;
+            min-width: 100px;
+
+            &.btn-save {
+                background-color: $add;
+
+                &:hover {
+                    background-color: $add-hover;
+                }
+            }
+
+            &.btn-close {
+                background-color: $close;
+
+                &:hover {
+                    background-color: $close-hover;
+                }
+            }
+        }
+
+        &.btn-delete-data {
+            background-color: $delete;
+
+            &:hover {
+                background-color: $delete-hover;
+            }
+
+            &:focus,
+            &:active {
+                box-shadow: 0 0 0 0.1rem $delete;
+                outline: none;
+            }
+        }
+
+        &.btn-delete-subitem {
+            min-width: unset;
+            width: 30px;
+            font-size: 1rem;
+            background-color: $delete;
+
+            &:hover {
+                background-color: $delete-hover;
+            }
+
+            &:focus,
+            &:active {
+                box-shadow: 0 0 0 0.1rem $delete;
+                outline: none;
+            }
+        }
+
+        &.btn-bulk {
+            background-color: $bulk;
+
+            &:hover {
+                background-color: $bulk-hover;
+            }
+        }
+
+        &.btn-export {
+            background-color: $export;
+
+            &:hover {
+                background-color: $export-hover;
+            }
+        }
+
+        &.btn-import {
+            background-color: $import;
+
+            &:hover {
+                background-color: $import-hover;
+            }
+        }
+    }
+
+
+
+    i {
+        vertical-align: middle;
+    }
+
+    &-left {
+        left: 10px;
+    }
+
+    &-top {
+        top: 10px;
+
+        &-second {
+            top: 50px;
+        }
+    }
+
+    &-right {
+        right: 10px;
+
+        &-second {
+            right: 120px;
+        }
+    }
+
+    &-bottom {
+        bottom: 10px;
+    }
+
+    &-graph-right {
+        right: 12px;
+    }
+
+    &-filter-left {
+        left: 12px;
+    }
+}
+
+.file-upload {
+    input[type="file"] {
+        display: none;
+    }
+
+    .btn-import {
+        background-color: $qradar-buttons;
+        color: white;
+        width: 150px;
+        line-height: 2rem;
+
+        &:hover {
+            background-color: $qradar-buttons-hover;
+        }
+    }
+
+    .file-name {
+        margin-left: 10px;
+    }
+}
+
+.inner-keys-inputs {
+    margin-bottom: 10px;
+
+    button {
+        border-radius: 0;
+        height: calc(1.5em + 0.75rem + 2px);
+    }
+}
+
+.search-label {
+    float: right;
+    position: relative;
+
+    &::after {
+        content: "/re/";
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        color: gray;
+    }
+
+    input {
+        height: 30px;
+    }
+}
+
+.dependencies-modal {
+    &-card-header {
+        font-weight: bold;
+        background-color: white;
+    }
+
+    .btn-close {
+        background: $qradar-buttons;
+        color: white;
+        float: right;
+
+        &:hover {
+            background: $qradar-buttons-hover;
+        }
+    }
+}
+
+.badge-default {
+    //background-color: $qradar-buttons;
+    // color: white;
+    background-color: inherit;
+    color: black;
+}
+
+.rule-wizard-frame {
+    background: url('../../public/loading-indicator.gif') no-repeat;
+    background-position: center;
+    width: 800px;
+    height: 750px;
+}
+
+.loading {
+    background: url('../../public/loading-indicator.gif') no-repeat;
+    background-position: center;
+    height: 100px;
+}
+
+.rule-wizard-modal {
+    max-width: 800px !important;
+}
+
+.vis-tooltip {
+    position: absolute !important;
+    color: black;
+    // font-weight: bold;
+    background: #EEE;
+    padding: 3px 8px 3px 8px;
+    // border-radius: 0.5rem;
+    font-size: 0.85rem;
+
+    .enabled {
+        color: green;
+    }
+
+    .disabled {
+        color: red;
+    }
+}
+
+.error {
+    &.error-details {
+        margin: auto;
+        width: 60%;
+
+        th {
+            width: 140px;
+            vertical-align: top;
+        }
+
+        td {
+            font-weight: normal;
+        }
+    }
+}
+
+.react-bootstrap-table-page-btns-ul {
+    float: right;
+}
+
+.react-bootstrap-table-pagination {
+    .dropdown-toggle {
+        padding: 0.1rem 0.75rem;
+        color: $qradar-buttons;
+        font-weight: normal;
+        background: white;
+        border: 1px solid $qradar-buttons !important;
+        // height: 32px;
+
+        &:hover {
+            background-color: $qradar-buttons-white-hover;
+            color: $qradar-buttons;
+        }
+
+        &:active,
+        &:focus {
+            color: $qradar-buttons !important;
+            background-color: white !important;
+            border: 1px solid $qradar-buttons !important;
+            box-shadow: 0 0 0 0.1rem $qradar-buttons-50 !important;
+        }
+    }
+
+    >div {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    &-list {
+        padding: 0px;
+    }
+}
+
+.table th,
+.table td {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.react-bootstrap-table {
+    thead {
+        tr {
+            th:first-child {
+                width: 10px;
+            }
+
+            th {
+                border-right: none;
+                border-left: none;
+                // background-color: lightgray;
+                vertical-align: middle;
+            }
+        }
+    }
+
+    td {
+        vertical-align: middle;
+        border-right: none;
+        border-left: none;
+    }
+
+    .reset-expansion-style {
+        background-color: #f8f8f8;
+
+        &:hover {
+            background-color: #f8f8f8;
+        }
+    }
+
+    .inner-table {
+        padding-top: 12px;
+        padding-bottom: 0px;
+
+        tr:hover {
+            background-color: inherit;
+        }
+    }
+
+    input {
+
+        &[type="checkbox"],
+        &[type="radio"] {
+            display: none;
+        }
+    }
+
+    input:checked[type="radio"]+label::before {
+        background: radial-gradient(white 30%, transparent 30%);
+        background-color: $qradar-buttons;
+    }
+
+    input[type="radio"]+label {
+        &::before {
+            content: '';
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 1px solid #777677;
+            border-radius: 50%;
+            background-position: center;
+            vertical-align: bottom;
+            background-color: white;
+        }
+    }
+}
+
+.header-cep {
+    color: $cep-force;
+}
+
+.header-lst {
+    color: $lst;
+}
+
+.header-rules {
+    color: $bb;
+}
+
+
+// Chrome only:
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.spinning>svg {
+    /* The animation part: */
+    animation-name: spin;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+div.vis-network div.vis-navigation div.vis-button:hover {
+    box-shadow: 0 0 3px 3px $qradar-buttons-white-hover !important;
+}
+
+div.vis-network div.vis-navigation div.vis-button {
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+}
+
+#popup .list-group-item {
+    color: $qradar-buttons;
+    font-weight: bold;
+    font-size: 0.7rem;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-radius: unset;
+}
+
+.table-filter {
+    border-radius: 0px;
+    padding: 5px;
+    font-size: 0.85rem;
+    width: 175px;
+
+    .table-filter-input {
+        align-items: center;
+        margin: 2px;
+    }
+}
+
+.graph-filter-options {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+
+    &-input {
+        font-size: 0.8rem;
+    }
+}
+
+.input-checkbox {
+    input {
+        display: none;
+    }
+
+    label {
+        vertical-align: middle;
+        margin-bottom: 0rem;
+
+        &::before {
+            margin-right: 5px;
+            vertical-align: -13%;
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border: 1px solid $qradar-buttons;
+        }
+    }
+
+    input:checked+label::before {
+        background: url('../../public/check-mark.png') no-repeat;
+        background-position: center;
+        background-color: $qradar-buttons;
+    }
+}
+
+$primary-hover: #dee2e6;
+$qradar-main: #1d3649;
+$primary: $qradar-main;
+
+$primary-hover: #a2b5ce;
+$qradar-main: #1d3649;
+$qradar-buttons: #4178be;
+$qradar-buttons-50: #0062ff50;
+$qradar-buttons-hover: #264a60;
+$qradar-buttons-white-hover: #e9ecef;
+
+$cep-force:#0530ad;
+$cep: #0062ff;
+$lst:#054719;
+$bb:#da1e28;
+$rule: #750e13;
+$fontDisabled: lightgray;
+
+$delete: #da1e28;
+$delete-hover: #750e13;
+$success: #0062ff;
+$add: #0062ff;
+$add-hover: #264a60;
+$bulk: #054ada;
+$export: #0530ad;
+
+
+#content {
+    padding: 10px;
+}
+
+.ref-data {
+    &-meta-data {
+        margin-bottom: 10px;
+
+        &-title {
+            font-weight: bold;
+        }
+    }
+
+    &-dependents {
+        margin-top: 5px;
+
+        li {
+            padding: 8px;
+            padding-left: 15px;
+        }
+
+        & &-title {
+            border-radius: 0px;
+            font-weight: bold;
+        }
+
+        & &-entry {
+            border-radius: 0px;
+        }
+    }
+
+    &-create-entry-element {
+        margin-bottom: 10px;
+    }
+
+    .error-alert {
+        margin: auto;
+        width: 60%;
+        z-index: 1000;
+
+        .error-alert-message {
+            margin: 0.1rem;
+        }
+    }
+
+    .react-bootstrap-table {
+
+        input:checked[type="checkbox"]+label::before {
+            background: url('../../public/check-mark.png') no-repeat;
+            background-position: center;
+            background-color: $qradar-buttons;
+        }
+
+        input[type="checkbox"]+label {
+            margin: 3px;
+
+            &::before {
+                content: '';
+                display: inline-block;
+                width: 15px;
+                height: 15px;
+                background-color: white;
+                border: 1px solid $qradar-buttons;
+                border-radius: 0px;
+            }
+        }
+    }
+}
+
+.ref-data-input-modal-entry {
+    margin-top: 10px;
+}
+
+.search {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.ref-data-menu {
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+    z-index: 100;
+    font-size: 0.95em;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 20px;
+
+    &-search-wrapper {
+        margin-top: 27px;
+        position: relative;
+
+        &::after {
+            content: "/re/";
+            position: absolute;
+            top: 7px;
+            right: 12px;
+            color: gray;
+        }
+    }
+
+    &-search {
+        border: 1px solid #ced4da;
+        width: 100%;
+        height: calc(1.5em + 0.375rem + 2px);
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-clip: padding-box;
+        border-radius: 0px !important;
+
+        &:active,
+        &:focus {
+            border-radius: 0px !important;
+            border: 1px solid $qradar-buttons;
+            box-shadow: 0 0 0 0.1rem $qradar-buttons-50 !important;
+        }
+    }
+
+    &-title {
+        margin-top: 20px;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: 1rem;
+        border-bottom: 1px solid #4178be50;
+        padding: 0px;
+        padding-left: 5px;
+        width: 100%;
+        background-color: white;
+        position: relative;
+        cursor: pointer;
+
+        >svg {
+            margin-right: 5px;
+        }
+    }
+
+    &-entry {
+        word-break: break-all;
+        // border-bottom: 1px solid $qradar-buttons-50;
+        padding: 0.25rem 0rem;
+        line-height: 1.2rem;
+        display: grid;
+        grid-template-columns: 20px 1fr;
+        align-items: center;
+
+        &-icon {
+            grid-column: 1;
+            grid-row: 1;
+            margin-right: 10px;
+            padding-left: 5px;
+        }
+
+        &-name {
+            grid-column: 2;
+            grid-row: 1;
+            padding-left: 5px;
+        }
+
+        &-badge {
+            grid-column: 3;
+            grid-row: 1;
+            // margin-left: 10px;
+        }
+
+        &:active {
+            background-color: $qradar-buttons;
+            border-color: $qradar-buttons;
+            z-index: 1;
+            // border: none;
+        }
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+            border-color: rgba(0, 0, 0, 0.075);
+            box-shadow: none;
+            z-index: 1;
+            // border: none;
+            cursor: pointer;
+        }
+    }
+}

@@ -1,0 +1,51 @@
+{
+	"_id": "074f919060a2f2dea33e365fc0c5e039",
+	"doc": {
+		"extension_manifest": {
+			"locale": {
+				"en-US": {
+					"extension.name": "Dependency Manager Lite",
+					"extension.long.description": "The Dependency Viewer Lite application aims at supporting common tuning tasks by providing simple visualizations to display dependencies between CEPs, Log Source Types and Rules. \nMain questions this application tries to answer are:\n\n1. Which other rules depend on a certain rule or building block?\n2. Which rules use a specific CEP?\n3. For which Log Source Types are specific CEPs defined?\n4. Do we have similiar CEPs with different names for different Log Source Types, that we might want to merge into a single CEP?\n5. Which rules depend on the existence of specific Reference Data Entries?\n\nTo efficiently support in dealing with these tasks, it provides options to directly search rules, CEPs and LSTs, edit/create/delete rules, search for events that triggered specific rules or contain data for specific CEPs, create/delete/edit reference data and more.\n\n\nIt requires QRadar 7.3.2 patch 2 to fully work. With lower versions, loading rules will fail. Using the Reference Data Management function and the CEP/LST dependency viewer should still work"
+				}
+			},
+			"extension_name": "extension.name",
+			"extension_long_description": "extension.long.description",
+			"supported_language_set": [
+				"en-US"
+			],
+			"min_qradar_version": "7.3.2",
+			"version": "1.0.3",
+			"authored_by": "IBM Security Services",
+			"authored_by_email": "michael.essigke1@ibm.com",
+			"package_size": "6124079",
+            "extension_hub":
+            {
+                "tags":
+                {
+                    "contents":
+                    {
+                    "Custom List": 0,
+                    "Dashboard": 0,
+                    "Reports": 0,
+                    "Saved Search": 0,
+                    "FGroup": 0,
+                    "FGroup Type": 0,
+                    "Custom Rule": 0,
+                    "Custom Properties": 0,
+                    "Log Sources": 0,
+                    "Log Source Type": 0,
+                    "Log Source Category": 0,
+                    "Log Source Extension": 0,
+                    "Custom QidMap Entries": 0,
+                    "Reference Data Collection": 0,
+                    "Historical Correlation profile": 0,
+                    "Custom Functions": 0,
+                    "Custom Actions": 0,
+                    "Application": 1,
+                    "Other": 0
+                    }
+                }
+            }
+		}
+	}
+}
