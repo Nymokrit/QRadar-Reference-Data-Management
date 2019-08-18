@@ -2,7 +2,7 @@ export const sets = {
     name: { value: '', type: 'text', label: 'Reference Set Name', help: 'Required: The name of the Set to be created. Must not exist already', },
     element_type: { value: 'ALN', type: 'select', label: 'Element Type', options: ['ALN', 'NUM', 'IP', 'PORT', 'ALNIC', 'DATE',], help: 'Required: The data type of the values in the new Set', },
     timeout_type: { value: 'UNKNOWN', type: 'select', label: 'Timeout Type', options: ['UNKNOWN', 'FIRST_SEEN', 'LAST_SEEN',], help: 'Optional: The value based on which new data expires from the Set', },
-    time_to_live: { type: 'date', options: ['mons', 'days', 'hours', 'minutes', 'seconds'], value: '', label: 'Time to Live', help: 'Optional: If given, the entries of the set expire. Input format like \'1 days\', or \'12 hours\'', },
+    time_to_live: { type: 'date', options: ['mons', 'days', 'hours', 'minutes', 'seconds',], value: '', label: 'Time to Live', help: 'Optional: If given, the entries of the set expire. Input format like \'1 days\', or \'12 hours\'', },
 };
 
 export const maps = {

@@ -9,13 +9,13 @@
         <installed_by>x2essigke4pa</installed_by>
         <task_status>COMPLETED</task_status>
         <memory>200</memory>
-        <manifest>{&quot;name&quot;:&quot;Dependency Viewer Lite&quot;,&quot;description&quot;:&quot;Application to visualize dependencies between CEPs, Rules and LSTs&quot;,&quot;version&quot;:&quot;0.3&quot;,&quot;uuid&quot;:&quot;cafebabe78-9abc-def0-1234-56789abcdef0&quot;,&quot;resources&quot;:{&quot;memory&quot;:200},&quot;app_id&quot;:2405,&quot;console_ip&quot;:&quot;148.191.202.101&quot;,&quot;areas&quot;:[{&quot;text&quot;:&quot;Dependency Viewer Lite&quot;,&quot;description&quot;:&quot;Application to easily visualize dependencies between CEPs, Rules and LSTs&quot;,&quot;url&quot;:&quot;index&quot;}]}</manifest>
+        <manifest>{&quot;name&quot;:&quot;Reference Data Management&quot;,&quot;description&quot;:&quot;Application to visualize Reference Data&quot;,&quot;version&quot;:&quot;0.3&quot;,&quot;uuid&quot;:&quot;cafebabe78-9abc-def0-1234-56789abcdef0&quot;,&quot;resources&quot;:{&quot;memory&quot;:200},&quot;app_id&quot;:2405,&quot;console_ip&quot;:&quot;148.191.202.101&quot;,&quot;areas&quot;:[{&quot;text&quot;:&quot;Dependency Viewer Lite&quot;,&quot;description&quot;:&quot;Application to easily visualize Reference Data&quot;,&quot;url&quot;:&quot;index&quot;}]}</manifest>
         <description>Application to manage rule data</description>
         <task_id>416596</task_id>
         <ootb_install>false</ootb_install>
         <zip_source_file_path>/store/qapp/2404/2404.zip</zip_source_file_path>
         <image_repo>qapp/2404:0.3-20190506082725</image_repo>
-        <name>Dependency Viewer</name>
+        <name>Reference Data Management</name>
         <installed_on>1557130360750</installed_on>
         <id>2405</id>
         <cpu_share>0.1</cpu_share>

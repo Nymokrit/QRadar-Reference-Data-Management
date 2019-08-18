@@ -2,7 +2,6 @@ import React from 'react';
 import { ListGroupItem, ListGroup } from 'reactstrap';
 
 function ReferenceDataDependents(props) {
-    // do Stuff
     let dependentRules;
     if (props.dependents && props.dependents.length > 0)
         dependentRules = props.dependents.map(dependent => (

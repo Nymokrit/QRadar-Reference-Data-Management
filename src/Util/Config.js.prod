@@ -1,5 +1,5 @@
 const Config = {
-    apiRoot: 'api',
+    apiRoot: '/api',
     refDataApi: '/reference_data/',
     rulesApi: 'analytics/',
     ruleWizardBase: '/console/core/jsp/WizardFrame.jsp?action=edit&appName=qradar&pageId=rulewizard&ruleId=',

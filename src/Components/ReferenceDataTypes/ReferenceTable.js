@@ -56,7 +56,7 @@ class ReferenceTable extends Component {
             }
         }
 
-        const entryDefinition = { 'outer_key': { label: this.state.metaData.key_label || 'Key', value: '', type: 'text', }, ...inners, source: { label: 'Comment', value: '' } };
+        const entryDefinition = { 'outer_key': { label: this.state.metaData.key_label || 'Key', value: '', type: 'text', }, ...inners, source: { label: 'Comment', value: '', }, };
 
         this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: entryDefinition, });
     }
@@ -95,7 +95,7 @@ class ReferenceTable extends Component {
         for (const key in entry) {
             // Entries[key] not set === no value for this key needs to be saved
             if (!entry[key].value) continue;
-            response = await this.addInnerItem({ key: outer_key, }, { key: { value: key, }, value: { value: entry[key].value, }, source: { value: source } }, true);
+            response = await this.addInnerItem({ key: outer_key, }, { key: { value: key, }, value: { value: entry[key].value, }, source: { value: source, }, }, true);
         }
 
         this.updateMetaData(response);
@@ -134,9 +134,9 @@ class ReferenceTable extends Component {
         const value = entries.value.value;
         const source = entries.source.value || RefDataHelper.defaultEntryComment;
 
-        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { outer_key: outer_key, inner_key: inner_key, value: value, source: source });
+        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { outer_key: outer_key, inner_key: inner_key, value: value, source: source, });
 
-        const updateData = this.updateData(this.state.allEntries, { outer_key: outer_key, inner_key: inner_key, value: value, source: source }, true);
+        const updateData = this.updateData(this.state.allEntries, { outer_key: outer_key, inner_key: inner_key, value: value, source: source, }, true);
 
         if (response.error) {
             this.props.showError(response.message);
@@ -203,9 +203,9 @@ class ReferenceTable extends Component {
                 if (isAdd) {
                     // If the inner key is not yet defined for that specific outer key, we can simply add it
                     if (indexOfInnerKey === -1)
-                        updateData[indexOfOuterKey].values.push({ outer_key: entries.outer_key, key: entries.inner_key, value: entries.value, id: entries.inner_key, source: entries.source });
+                        updateData[indexOfOuterKey].values.push({ outer_key: entries.outer_key, key: entries.inner_key, value: entries.value, id: entries.inner_key, source: entries.source, });
                     else
-                        updateData[indexOfInnerKey].values[indexOfInnerKey] = { outer_key: entries.outer_key, key: entries.inner_key, value: entries.value, id: entries.inner_key, source: entries.source };
+                        updateData[indexOfInnerKey].values[indexOfInnerKey] = { outer_key: entries.outer_key, key: entries.inner_key, value: entries.value, id: entries.inner_key, source: entries.source, };
                 }
                 else updateData[indexOfOuterKey].values.splice(indexOfInnerKey, 1);
             }

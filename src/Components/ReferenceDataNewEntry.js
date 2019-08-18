@@ -145,17 +145,17 @@ class TimeInput extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { label: '', type: 'days' }
+        this.state = { label: '', type: 'days', };
     }
 
     handleChange(event, target) {
-        let newState = ''
+        let newState = '';
         if (target === 'label') {
             newState = event.target.value + ' ' + this.state.type;
-            this.setState({ label: event.target.value });
+            this.setState({ label: event.target.value, });
         } else if (target === 'type') {
             newState = this.state.label + ' ' + event.target.value;
-            this.setState({ type: event.target.value });
+            this.setState({ type: event.target.value, });
         }
 
         this.props.setValue(newState);

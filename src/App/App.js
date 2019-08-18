@@ -5,7 +5,7 @@ console.fail = msg => console.log(`%c${msg}`, failure);
 
 
 import React, { Component } from 'react';
-import { Modal, Alert, } from 'reactstrap';
+import { Modal, Alert } from 'reactstrap';
 import axios from 'axios';
 import querystring from 'querystring';
 

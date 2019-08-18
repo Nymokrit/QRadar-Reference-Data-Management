@@ -2,14 +2,14 @@
     "uuid": "cafebabe78-9abc-def0-1234-56789abcdef0",
     "areas": [{
         "url": "index",
-        "text": "Dependency Viewer",
-        "description": "View and Manage dependencies between Rules, CEPs and LSTs",
-        "id": "DependencyViewerLite"
+        "text": "Reference Data Management",
+        "description": "View and manage Reference Data",
+        "id": "ReferenceDataManagement"
     }],
-    "description": "Application to view and Manage dependencies between Rules, CEPs and LSTs",
+    "description": "Application to view and manage Reference Data",
     "resources": {
         "memory": 200
     }, 
-    "name": "Dependency Viewer Lite",
+    "name": "Reference Data Management",
     "version": "1.0.3"
 }

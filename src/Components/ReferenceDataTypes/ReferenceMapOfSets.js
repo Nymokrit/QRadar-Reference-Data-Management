@@ -83,7 +83,7 @@ class ReferenceMapOfSets extends Component {
 
         const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
         if (response) {
-            const updateData = this.updateData(this.state.allEntries, { key: key, values: values, source: RefDataHelper.defaultEntryComment }, true, true);
+            const updateData = this.updateData(this.state.allEntries, { key: key, values: values, source: RefDataHelper.defaultEntryComment, }, true, true);
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
@@ -117,7 +117,7 @@ class ReferenceMapOfSets extends Component {
     }
 
     async addInnerItem(key, entry) {
-        const parsedEntry = { value: entry['value'].value, key: key.key, source: entry['source'].value || RefDataHelper.defaultEntryComment };
+        const parsedEntry = { value: entry['value'].value, key: key.key, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
 
         const indexOfKey = this.state.allEntries.findIndex((value) => (value.key === key.key));
         if (this.state.allEntries[indexOfKey].values.findIndex((value) => (value.value === entry['value'].value)) !== -1) {
@@ -170,14 +170,14 @@ class ReferenceMapOfSets extends Component {
                 if (indexOfKey === -1) {
                     // if no, we can add all values but we remove duplicates first
                     let values = [...new Set(entries.values),];
-                    values = values.map((value) => ({ value: value, id: value, key: entries.key, source: entries.source }));
+                    values = values.map((value) => ({ value: value, id: value, key: entries.key, source: entries.source, }));
                     updateData.push({ key: entries.key, values: values, id: entries.key, });
                 } else {
                     // if yes, we need to check each inner value if it already exists
                     for (const value of entries.values) {
                         const indexOfValue = updateData[indexOfKey].values.findIndex((inner) => (inner.value === value));
                         // if no, we can add it to the table
-                        if (indexOfValue === -1) updateData[indexOfKey].values.push({ value: value, id: value, key: entries.key, source: entries.source });
+                        if (indexOfValue === -1) updateData[indexOfKey].values.push({ value: value, id: value, key: entries.key, source: entries.source, });
                         // if yes, we skip it
                     }
                 }
@@ -192,7 +192,7 @@ class ReferenceMapOfSets extends Component {
                 console.log('Something went wrong, couldn\'t find index of outer key in table when trying to delete inner key');
             } else {
                 if (isAdd) {
-                    updateData[indexOfKey].values.push({ value: entries.value, id: entries.value, key: entries.key, source: entries.source });
+                    updateData[indexOfKey].values.push({ value: entries.value, id: entries.value, key: entries.key, source: entries.source, });
                 }
                 else updateData[indexOfKey].values = updateData[indexOfKey].values.filter(e => e.value !== entries.value);
             }

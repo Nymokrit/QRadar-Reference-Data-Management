@@ -88,7 +88,7 @@ class ReferenceMap extends Component {
             return;
         }
         this.props.toggleLoading();
-        const parsedEntry = { key: entry['key'].value, value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment };
+        const parsedEntry = { key: entry['key'].value, value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
 
         const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, parsedEntry);
         const updateData = this.updateData(this.state.allEntries, parsedEntry, true);
@@ -141,7 +141,7 @@ class ReferenceMap extends Component {
         for (const pair of pairs) {
             const [key, value,] = pair.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
             data[key] = value;
-            newData.push({ key: key, value: value, id: key, source: RefDataHelper.defaultEntryComment });
+            newData.push({ key: key, value: value, id: key, source: RefDataHelper.defaultEntryComment, });
         }
 
         // We remove duplicate keys but keep the newest key=value pair
@@ -179,7 +179,7 @@ class ReferenceMap extends Component {
 
     updateData(currentState, value, isAdd) {
         let updateData = currentState;
-        if (isAdd) updateData.push({ key: value.key, value: value.value, id: value.key, source: value.source });
+        if (isAdd) updateData.push({ key: value.key, value: value.value, id: value.key, source: value.source, });
         else updateData = updateData.filter(e => e.key !== value.key);
 
         updateData = updateData

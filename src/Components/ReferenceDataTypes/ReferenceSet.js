@@ -85,7 +85,7 @@ class ReferenceSet extends Component {
             return;
         }
         this.props.toggleLoading();
-        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment };
+        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
 
         const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, parsedEntry);
         const updateData = this.updateData(this.state.allEntries, parsedEntry, true);
@@ -129,7 +129,7 @@ class ReferenceSet extends Component {
             .map(value => value.trim()) // remove whitespace
             .filter(value => value); // remove empty values
         data = [...new Set(data),]; // remove duplicates
-        const newData = data.map(elem => ({ value: elem, id: elem, source: RefDataHelper.defaultEntryComment }));
+        const newData = data.map(elem => ({ value: elem, id: elem, source: RefDataHelper.defaultEntryComment, }));
         const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
 
         if (response.error) {
@@ -155,7 +155,7 @@ class ReferenceSet extends Component {
         if (isAdd) {
             const indexOfValue = updateData.findIndex((entry) => (value.value === entry.value));
             // value is not yet in ref set
-            if (indexOfValue === -1) updateData.push({ value: value.value, id: value.value, source: value.source });
+            if (indexOfValue === -1) updateData.push({ value: value.value, id: value.value, source: value.source, });
         }
         else updateData = updateData.filter(e => e.value !== value.value);
 

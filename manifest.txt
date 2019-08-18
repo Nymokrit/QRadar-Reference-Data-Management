@@ -4,8 +4,8 @@
 		"extension_manifest": {
 			"locale": {
 				"en-US": {
-					"extension.name": "Dependency Manager Lite",
-					"extension.long.description": "The Dependency Viewer Lite application aims at supporting common tuning tasks by providing simple visualizations to display dependencies between CEPs, Log Source Types and Rules. \nMain questions this application tries to answer are:\n\n1. Which other rules depend on a certain rule or building block?\n2. Which rules use a specific CEP?\n3. For which Log Source Types are specific CEPs defined?\n4. Do we have similiar CEPs with different names for different Log Source Types, that we might want to merge into a single CEP?\n5. Which rules depend on the existence of specific Reference Data Entries?\n\nTo efficiently support in dealing with these tasks, it provides options to directly search rules, CEPs and LSTs, edit/create/delete rules, search for events that triggered specific rules or contain data for specific CEPs, create/delete/edit reference data and more.\n\n\nIt requires QRadar 7.3.2 patch 2 to fully work. With lower versions, loading rules will fail. Using the Reference Data Management function and the CEP/LST dependency viewer should still work"
+					"extension.name": "Reference Data Management",
+					"extension.long.description": "The Reference Data Management Application aims at supporting the visualization and management of all types of Reference Data in QRadar."
 				}
 			},
 			"extension_name": "extension.name",
