@@ -1,5 +1,5 @@
 {
-    "uuid": "cafebabe78-9abc-def0-1234-56789abcdef0",
+    "uuid": "cafebabe78-9abc-def0-1234-56789abcffff",
     "areas": [{
         "url": "index",
         "text": "Reference Data Management",
@@ -8,7 +8,7 @@
     }],
     "description": "Application to view and manage Reference Data",
     "resources": {
-        "memory": 200
+        "memory": 100
     }, 
     "name": "Reference Data Management",
     "version": "1.0.3"

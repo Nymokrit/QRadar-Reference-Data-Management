@@ -6,7 +6,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory, { PaginationProvider } from 'react-bootstrap-table2-paginator';
 
 
-class ReferenceDataTable extends Component {
+class DataTable extends Component {
     constructor(props) {
         super(props);
 
@@ -19,7 +19,6 @@ class ReferenceDataTable extends Component {
     }
 
     clearSelection() {
-        console.log('Clear Selection');
         this.setState({ selected: [], });
     }
 
@@ -54,7 +53,7 @@ class ReferenceDataTable extends Component {
             expandColumnRenderer: ({ expanded, }) => (<FontAwesomeIcon icon={expanded ? 'minus' : 'plus'} />),
             renderer: row => (
                 <div className='inner-table'>
-                    <ReferenceDataTable
+                    <DataTable
                         innerTable={true}
                         parent={row}
                         data={row.values}
@@ -69,7 +68,7 @@ class ReferenceDataTable extends Component {
             ),
         };
 
-
+        const hidden = ['map_of_sets', 'table'].includes(this.props.type);
         const { SearchBar, } = Search;
         const contentTable = ({ paginationProps, paginationTableProps, }) => (
             <React.Fragment>
@@ -82,8 +81,8 @@ class ReferenceDataTable extends Component {
                     {toolkitprops => (
                         <React.Fragment>
                             {this.props.addItem && <button className='btn-default btn-ref-data btn-add' onClick={this.props.addItem}>Add Entry</button>}
-                            {this.props.bulkAddItem && <button className='btn-default btn-ref-data btn-bulk' onClick={this.props.bulkAddItem}>Bulk Add</button>}
-                            {this.props.importItems && <button className='btn-default btn-ref-data btn-import' onClick={this.props.importItems}>Import CSV</button>}
+                            {!hidden && this.props.bulkAddItem && <button className='btn-default btn-ref-data btn-bulk' onClick={this.props.bulkAddItem}>Bulk Add</button>}
+                            {!hidden && this.props.importItems && <button className='btn-default btn-ref-data btn-import' onClick={this.props.importItems}>Import CSV</button>}
                             {this.props.exportItems && <button className='btn-default btn-ref-data btn-export' onClick={this.props.exportItems}>Export CSV</button>}
                             {this.props.deleteItem && <button className='btn-default btn-ref-data btn-delete-data' onClick={this.props.deleteItem}>Delete Entry</button>}
                             {!this.props.innerTable && <SearchBar {...toolkitprops.searchProps} />}
@@ -133,4 +132,4 @@ class ReferenceDataTable extends Component {
     }
 }
 
-export default ReferenceDataTable;
+export default DataTable;

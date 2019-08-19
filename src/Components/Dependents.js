@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListGroupItem, ListGroup } from 'reactstrap';
 
-function ReferenceDataDependents(props) {
+function Dependents(props) {
     let dependentRules;
     if (props.dependents && props.dependents.length > 0)
         dependentRules = props.dependents.map(dependent => (
@@ -29,4 +29,4 @@ function ReferenceDataDependents(props) {
     );
 }
 
-export default ReferenceDataDependents;
+export default Dependents;

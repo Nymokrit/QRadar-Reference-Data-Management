@@ -74,6 +74,8 @@ export async function loadReferenceDataDependents(type, name, callback, skipWait
     const api = `/reference_data/${type}/${name}/dependents`;
     const method = 'GET', fields = 'status, id, message';
 
+    if (!name) return {};
+
     const response = await sendAPIRequest(method, api, { fields: fields, }, undefined, { 'Allow-hidden': true, });
     const status = response.status || 'CANCELLED'; // If the first request fails, we consider the status cancelled
 

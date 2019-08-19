@@ -1,74 +1,12 @@
-import React, { Component } from 'react';
-
-import ReferenceMetaData from '../ReferenceMetaData';
-import ReferenceDataTable from '../ReferenceDataTable';
-import ReferenceDataDependents from '../ReferenceDataDependents';
 import * as APIHelper from '../../Store/APIHelper';
 import * as RefDataHelper from '../RefDataHelper';
-import { referenceMapOfSetsTableColumns, referenceMapOfSetsInnerTableColumns } from '../../Definitions/TableColumnDefinitions';
-import InputModal from '../InputModal';
-import * as EntryDefinitions from '../../Definitions/ReferenceDataCreateEntryDefinitions';
+import ReferenceData from './ReferenceData';
 
-class ReferenceMapOfSets extends Component {
+class ReferenceMapOfSets extends ReferenceData {
     constructor(props) {
-        super(props);
-
-        this.state = {
-            selected: [],
-            innerSelected: {},
-            metaData: {},
-            allEntries: [],
-            tableData: [],
-            loaded: false,
-            searchText: '',
-            innerSearchText: '',
-            modalInputDefinition: {},
-        };
-
-        this.clearInnerSelection = {};
-
-        this.addItem = this.addItem.bind(this);
-        this.deleteItem = this.deleteItem.bind(this);
-        this.exportItems = this.exportItems.bind(this);
-        this.clickAddItem = this.clickAddItem.bind(this);
-        this.clickDeleteItem = this.clickDeleteItem.bind(this);
-
-        this.clickAddInnerItem = this.clickAddInnerItem.bind(this);
-        this.clickDeleteInnerItem = this.clickDeleteInnerItem.bind(this);
-
-        this.tableChanged = this.tableChanged.bind(this);
-
-        this.updateMetaData = RefDataHelper.updateMetaData.bind(this);
-        this.loadData = RefDataHelper.loadData.bind(this);
-        this.loadDependents = RefDataHelper.loadDependents.bind(this);
-        this.purgeData = RefDataHelper.purgeData.bind(this);
-        this.selectionChanged = RefDataHelper.selectionChanged.bind(this);
-        this.innerSelectionChanged = RefDataHelper.innerSelectionChanged.bind(this);
-
-        this.loadData(this.props.api);
+        super(props, 'map_of_sets');
     }
 
-    clickAddItem() {
-        this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: EntryDefinitions.mapOfSetsAddKey, });
-    }
-
-    clickDeleteItem() {
-        this.deleteItem(this.state.selected);
-        this.setState({ selected: [], });
-        this.clearSelection();
-    }
-
-    clickAddInnerItem(key) {
-        this.setState({ showInputModal: true, modalSave: (e) => this.addInnerItem(key, e), modalInputDefinition: EntryDefinitions.mapOfSetsAddItem, });
-    }
-
-    clickDeleteInnerItem(key) {
-        this.deleteInnerItem(key, this.state.innerSelected[key.key]);
-        const selection = this.state.innerSelected;
-        selection[key.key] = [];
-        this.setState({ innerSelected: selection, });
-        this.clearInnerSelection[key.key]();
-    }
 
     // Entry should consist of an JS Object of the form {value: 'someVal'}
     async addItem(entry) {
@@ -228,90 +166,23 @@ class ReferenceMapOfSets extends Component {
         RefDataHelper.download(this.props.name, entries, true, false);
     }
 
-    tableChanged(type, options) {
-        let allEntries = this.state.allEntries;
-        let searchText = this.state.searchText;
-        if (type === 'search' && options) searchText = options.searchText;
-        if (type === 'new' && options) allEntries = options;
+    testValue(entry, searchText, isRegexSearch) {
+        let matches = false;
+        if (isRegexSearch) matches = entry.key.match(searchText);
+        else matches = entry.key.toLowerCase().includes(searchText.toLowerCase());
 
-        const tableData = [];
-        let isRegexSearch = false;
-        try { // Check if the current expression can be parsed as regex, if not, we try string matching
-            searchText = new RegExp(searchText, 'gi');
-            isRegexSearch = true;
-        } catch (e) { }
+        // if we found the string as part of a key, we add the entry
+        if (matches) return true;
+        // if we didn't find the string as key, let's try each value
+        else {
+            for (const value of entry.values) {
+                if (isRegexSearch) matches = value.value.match(searchText);
+                else matches = value.value.toLowerCase().includes(searchText.toLowerCase());
 
-        for (const entry of allEntries) {
-            let matches = false;
-            if (isRegexSearch) matches = entry.key.match(searchText);
-            else matches = entry.key.toLowerCase().includes(searchText.toLowerCase());
-
-            // if we found the string as part of a key, we add the entry
-            if (matches) tableData.push(entry);
-            // if we didn't find the string as key, let's try each value
-            else {
-                for (const value of entry.values) {
-                    if (isRegexSearch) matches = value.value.match(searchText);
-                    else matches = value.value.toLowerCase().includes(searchText.toLowerCase());
-
-                    if (matches) {
-                        tableData.push(entry);
-                        break;
-                    }
-                }
+                if (matches) return true;
             }
         }
-        this.setState({ tableData: tableData, searchText: searchText, allEntries: allEntries, });
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                <InputModal
-                    modal={this.state.showInputModal}
-                    save={this.state.modalSave}
-                    entries={JSON.parse(JSON.stringify(this.state.modalInputDefinition))}
-                    toggle={(e) => this.setState(prevState => ({ showInputModal: !prevState.showInputModal, }))}
-                />
-                <ReferenceMetaData
-                    data={this.state.metaData}
-                    typeLabel={'Map of Sets'}
-                    deleteEntry={this.props.deleteEntry}
-                    purgeData={this.purgeData}
-                />
-                {this.state.loaded ?
-                    <ReferenceDataTable
-                        tableChanged={this.tableChanged}
-                        data={this.state.tableData}
-                        columns={referenceMapOfSetsTableColumns}
-                        addItem={this.clickAddItem}
-                        exportItems={this.exportItems}
-                        deleteItem={this.clickDeleteItem}
-                        searchText={this.state.searchText}
-
-                        selectionChanged={this.selectionChanged}
-                        selectionClearedCallback={(f) => this.clearSelection = f}
-
-                        expandable={true}
-                        extendableColumns={referenceMapOfSetsInnerTableColumns}
-                        addInnerItem={this.clickAddInnerItem}
-                        deleteInnerItem={this.clickDeleteInnerItem}
-                        innerSearchText={this.state.innerSearchText}
-                        innerSelectionChanged={this.innerSelectionChanged}
-                        innerSelectionClearedCallback={(key, f) => this.clearInnerSelection[key] = f}
-                    />
-                    :
-                    <div className='loading'></div>
-                }
-                {this.state.dependentsLoaded ?
-                    <ReferenceDataDependents
-                        dependents={this.state.dependents}
-                    />
-                    :
-                    <div className='loading'></div>
-                }
-            </React.Fragment>
-        );
+        return false;
     }
 }
 

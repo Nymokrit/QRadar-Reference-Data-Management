@@ -14,18 +14,17 @@ import 'react-splitter-layout/lib/index.css';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faChevronDown, faChevronRight, faChevronLeft, faExpand, faCompress, faExternalLinkAlt, faCheck, faTimes, faSyncAlt, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faTrash, faQuestionCircle, faCog } from '@fortawesome/free-solid-svg-icons';
-library.add(faChevronDown, faChevronRight, faChevronLeft, faTrash, faExpand, faCompress, faExternalLinkAlt, faCheck, faTimes, faSyncAlt, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog);
+import { faChevronRight, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faChevronDown, faTrash } from '@fortawesome/free-solid-svg-icons';
+library.add(faChevronRight, faChevronDown, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faTrash);
 
 import './App.scss';
 
-
-import ReferenceDataList from '../Components/ReferenceDataList';
+import Sidebar from '../Components/Sidebar';
 import ReferenceSet from '../Components/ReferenceDataTypes/ReferenceSet';
 import ReferenceMap from '../Components/ReferenceDataTypes/ReferenceMap';
 import ReferenceMapOfSets from '../Components/ReferenceDataTypes/ReferenceMapOfSets';
 import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
-import ReferenceDataNewEntry from '../Components/ReferenceDataNewEntry';
+import NewEntry from '../Components/NewEntry';
 import Config from '../Util/Config';
 import * as APIHelper from '../Store/APIHelper';
 import DataStore from '../Store/DataStore';
@@ -47,11 +46,6 @@ class App extends Component {
     this.deleteEntry = this.deleteEntry.bind(this);
     this.toggleLoading = this.toggleLoading.bind(this);
     this.showError = this.showError.bind(this);
-
-    this.showEditRuleModal = this.showEditRuleModal.bind(this);
-    this.closeRuleModal = this.closeRuleModal.bind(this);
-    this.showError = this.showError.bind(this);
-
   }
 
 
@@ -70,62 +64,6 @@ class App extends Component {
     document.getElementsByClassName('section-lists')[0].scrollTop = 0;
     const messages = Array.isArray(message) ? message : [message,];
     this.setState({ displayError: true, errorMessages: messages, });
-  }
-
-  /**
-   * Close the edit rule modal without making any changes to the underlying data (i.e. don't reload rules etc.)
-   * @param {Event} e 
-   */
-  closeRuleModal(e) { this.setState(prevState => ({ editRuleModalOpen: false, })); }
-
-  /**
-   * Display the default QRadar Rule Editor Wizard and register handlers for the Finish/Close Buttons
-   * @param {Object} rule The rule which is supposed to be updated. We only care for an Object that hasOwnProperty('ruleID')
-   */
-  showEditRuleModal(rule, type, closeAndUpdateCallback, closeCallback) {
-    let id;
-    if (rule) {
-      id = rule.ruleID;
-      closeAndUpdateCallback = this.closeRuleModalAndUpdate;
-      closeCallback = this.closeRuleModal;
-    }
-    if (!this.state.editRuleModalOpen) {
-      // Display the modal
-      this.setState(prevState => ({ editRuleModalOpen: true, }));
-      // Then wait until it has actually been opened
-      const waitForModalToOpen = setInterval(() => {
-        if (window.frames['rulesWindow'] !== undefined) {
-          // When it has been opened, try to load the editor wizard. If the id is defined, we open the edit modal, otherwise the new rule wizard
-          if (id)
-            window.frames['rulesWindow'].location.href = Config.ruleWizardBase + id;
-          else
-            window.frames['rulesWindow'].location.href = Config.newRuleWizardBase + type;
-          clearInterval(waitForModalToOpen);
-          let counter = 0;
-          const tryRegisterListeners = setInterval(() => {
-            try {
-              // we try to register a new listener to the finish and close buttons of the frame
-              const navFrame = document.getElementById('ruleWizardFrame').contentDocument.getElementById('navigation').contentDocument;
-              // on finish, details may have changed and we need to update rule data
-              navFrame.getElementById('finishButton').addEventListener('click', closeCallback);
-              // on close, we don't need to update anything and can simply close the modeal
-              navFrame.getElementById('closeButton').addEventListener('click', closeCallback);
-              // if this works, we can clear the interval
-              clearInterval(tryRegisterListeners);
-            } catch (err) {
-              // if registering listeners didn't work, we try again in one second
-              if (counter++ >= 20) { // we only try 20 times
-                clearInterval(tryRegisterListeners); // if after ten tries we fail, we will not try again (prevent memory leaks);
-                console.log('Something went wrong with registering the close handlers for the frame. Frame can be closed by clicking in the window background');
-                console.log(err);
-              }
-            }
-          }, 1000);
-        }
-      }, 100);
-    } else {
-      this.closeRuleModal();
-    }
   }
 
   refreshSidebar() { // needs to be refactored
@@ -174,11 +112,11 @@ class App extends Component {
     await axios.post(Config.apiRoot + Config.refDataApi + this.state.createNewReferenceEntryType + '?' + querystring.stringify(mappedEntries), {}, { headers: Config.axiosHeaders, });
 
     const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
+    DataStore.currentRefDataEntry = { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, };
     this.setState({
       createNew: false,
       atHome: false,
     });
-    DataStore.currentRefDataEntry = { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, };
 
     this.refreshSidebar();
   }
@@ -221,7 +159,7 @@ class App extends Component {
       <SplitterLayout
         secondaryInitialSize={84}
         percentage>
-        <ReferenceDataList
+        <Sidebar
           menuItemAction={this.menuItemClicked}
           refreshData={this.state.refreshData}
           updateOverviewData={this.updateOverviewData}
@@ -246,7 +184,7 @@ class App extends Component {
             <div className='loading'></div>
           </Modal >
           {this.state.createNew ?
-            <ReferenceDataNewEntry
+            <NewEntry
               type={this.state.createNewReferenceEntryType}
               save={this.entryCreated}
             />

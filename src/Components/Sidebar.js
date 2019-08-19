@@ -8,7 +8,7 @@ import DataStore from '../Store/DataStore';
 /*
 Register MenuItemListener by adding a callback to props['menuItemAction']
 */
-class ReferenceDataList extends Component {
+class Sidebar extends Component {
 
     constructor(props) {
         super(props);
@@ -68,6 +68,7 @@ class ReferenceDataList extends Component {
         data[key].nodes = {}; // Clear 'old' node data
         data[key].size = response.length;
         data[key].datatype = key.replace(/_/g, ' ');
+        response.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
         response.forEach(element => {
             const newEntry = { label: element.name, size: element.number_of_elements, datatype: key, key: key + '/' + element.name, };
             data[key].nodes[element.name] = newEntry;
@@ -126,4 +127,4 @@ class ReferenceDataList extends Component {
     }
 }
 
-export default ReferenceDataList;
+export default Sidebar;

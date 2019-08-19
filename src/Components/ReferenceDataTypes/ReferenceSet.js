@@ -1,62 +1,10 @@
-import React, { Component } from 'react';
-
-import ReferenceMetaData from '../ReferenceMetaData';
-import ReferenceDataTable from '../ReferenceDataTable';
-import ReferenceDataDependents from '../ReferenceDataDependents';
 import * as APIHelper from '../../Store/APIHelper';
 import * as RefDataHelper from '../RefDataHelper';
-import { referenceSetTableColumns } from '../../Definitions/TableColumnDefinitions';
-import InputModal from '../InputModal';
-import * as EntryDefinitions from '../../Definitions/ReferenceDataCreateEntryDefinitions';
+import ReferenceData from './ReferenceData';
 
-class ReferenceSet extends Component {
+class ReferenceSet extends ReferenceData {
     constructor(props) {
-        super(props);
-
-        this.state = {
-            selected: [],
-            metaData: {},
-            allEntries: [],
-            tableData: [],
-            loaded: false,
-            searchText: '',
-            modalInputDefinition: {},
-        };
-
-        this.addItem = this.addItem.bind(this);
-        this.deleteItem = this.deleteItem.bind(this);
-        this.bulkAddItems = this.bulkAddItems.bind(this);
-        this.importItems = this.importItems.bind(this);
-        this.exportItems = this.exportItems.bind(this);
-
-        this.clickAddItem = this.clickAddItem.bind(this);
-        this.clickDeleteItem = this.clickDeleteItem.bind(this);
-        this.clickBulkAddItem = this.clickBulkAddItem.bind(this);
-        this.clickImportItems = this.clickImportItems.bind(this);
-        this.tableChanged = this.tableChanged.bind(this);
-
-        this.updateMetaData = RefDataHelper.updateMetaData.bind(this);
-        this.loadData = RefDataHelper.loadData.bind(this);
-        this.loadDependents = RefDataHelper.loadDependents.bind(this);
-        this.purgeData = RefDataHelper.purgeData.bind(this);
-        this.selectionChanged = RefDataHelper.selectionChanged.bind(this);
-
-        this.loadData(this.props.api);
-    }
-
-    clickAddItem() {
-        this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: EntryDefinitions.setAddItem, });
-    }
-    clickDeleteItem() {
-        this.deleteItem(this.state.selected);
-        this.setState({ selected: [], });
-        this.clearSelection();
-    }
-    clickBulkAddItem() {
-        this.setState({ showInputModal: true, modalSave: this.bulkAddItems, modalInputDefinition: EntryDefinitions.setBulkAddItems, });
-    }
-    clickImportItems() {
-        this.setState({ showInputModal: true, modalSave: this.importItems, modalInputDefinition: EntryDefinitions.setImportItems, });
+        super(props, 'set');
     }
 
     async importItems(entries) {
@@ -84,20 +32,11 @@ class ReferenceSet extends Component {
             this.props.showError('Cannot add an empty value');
             return;
         }
-        this.props.toggleLoading();
         const parsedEntry = { value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
 
-        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, parsedEntry);
-        const updateData = this.updateData(this.state.allEntries, parsedEntry, true);
-
-        if (response.error) {
-            this.props.showError(response.message);
-        } else {
-            this.tableChanged('new', updateData);
-            this.updateMetaData(response);
-        }
-        this.props.toggleLoading();
+        super.addItem(parsedEntry);
     }
+
     // Entries should be an array containing the values to be deleted
     async deleteItem(entries) {
         if (!entries || !entries.length) return;
@@ -175,73 +114,13 @@ class ReferenceSet extends Component {
         return data;
     }
 
-    tableChanged(type, options) {
-        let allEntries = this.state.allEntries;
-        let searchText = this.state.searchText;
-        if (type === 'search' && options) searchText = options.searchText;
-        if (type === 'new' && options) allEntries = options;
+    testValue(entry, searchText, isRegexSearch) {
+        if (!entry.value) return false;
+        let matches = false;
+        if (isRegexSearch) matches = entry.value.match(searchText);
+        else matches = entry.value.toLowerCase().includes(searchText.toLowerCase());
 
-        const tableData = [];
-        let isRegexSearch = false;
-        try { // Check if the current expression can be parsed as regex, if not, we try string matching
-            searchText = new RegExp(searchText, 'gi');
-            isRegexSearch = true;
-        } catch (e) { }
-
-        for (const entry of allEntries) {
-            if (!entry.value) continue;
-            let matches = false;
-            if (isRegexSearch) matches = entry.value.match(searchText);
-            else matches = entry.value.toLowerCase().includes(searchText.toLowerCase());
-
-            if (matches) tableData.push(entry);
-        }
-        this.setState({ tableData: tableData, searchText: searchText, allEntries: allEntries, });
-    }
-
-
-    render() {
-        return (
-            <React.Fragment>
-                <InputModal
-                    modal={this.state.showInputModal}
-                    save={this.state.modalSave}
-                    entries={JSON.parse(JSON.stringify(this.state.modalInputDefinition))}
-                    toggle={(e) => this.setState(prevState => ({ showInputModal: !prevState.showInputModal, }))}
-                />
-                <ReferenceMetaData
-                    data={this.state.metaData}
-                    typeLabel={'Set'}
-                    deleteEntry={this.props.deleteEntry}
-                    purgeData={this.purgeData}
-                />
-                {this.state.loaded ?
-                    <ReferenceDataTable
-                        tableChanged={this.tableChanged}
-                        data={this.state.tableData}
-                        columns={referenceSetTableColumns}
-                        addItem={this.clickAddItem}
-                        bulkAddItem={this.clickBulkAddItem}
-                        importItems={this.clickImportItems}
-                        exportItems={this.exportItems}
-                        deleteItem={this.clickDeleteItem}
-                        searchText={this.state.searchText}
-
-                        selectionChanged={this.selectionChanged}
-                        selectionClearedCallback={(f) => this.clearSelection = f}
-                    />
-                    :
-                    <div className='loading'></div>
-                }
-                {this.state.dependentsLoaded ?
-                    <ReferenceDataDependents
-                        dependents={this.state.dependents}
-                    />
-                    :
-                    <div className='loading'></div>
-                }
-            </React.Fragment>
-        );
+        return matches;
     }
 }
 

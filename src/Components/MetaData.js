@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import { ListGroupItem, ListGroup, Badge } from 'reactstrap';
 import * as Formatters from '../Util/Formatters';
 
-class ReferenceMetaData extends Component {
+class MetaData extends Component {
+    lookup = { 'map': 'Map', 'set': 'Set', 'map_of_sets': 'Map of Sets', 'table': 'Table' };
+    
     render() {
         return (
             <React.Fragment>
-                <button className='btn-default btn-delete btn-right btn-top' onClick={this.props.deleteEntry}>Delete {this.props.typeLabel || 'Data'}</button>
+                <button className='btn-default btn-delete btn-right btn-top' onClick={this.props.deleteEntry}>Delete {this.lookup[this.props.typeLabel] || 'Data'}</button>
                 <button className='btn-default btn-delete btn-right btn-top-second' onClick={this.props.purgeData}>Clear Data</button>
                 <div className='row ref-data-meta-data'>
                     <ListGroup flush>
@@ -23,4 +25,4 @@ class ReferenceMetaData extends Component {
     }
 }
 
-export default ReferenceMetaData;
+export default MetaData;

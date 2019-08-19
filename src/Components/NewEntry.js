@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import * as EntryDefinitions from '../Definitions/ReferenceDataCreateEntryDefinitions';
 
-class ReferenceDataNewEntry extends Component {
+class NewEntry extends Component {
     constructor(props) {
         super(props);
 
@@ -186,4 +186,4 @@ class TimeInput extends Component {
     }
 }
 
-export default ReferenceDataNewEntry;
+export default NewEntry;
