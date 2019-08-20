@@ -1,5 +1,3 @@
-import * as APIHelper from './APIHelper';
-
 class DataStore {
     static hasLoaded = false;
 
@@ -11,6 +9,7 @@ class DataStore {
             'map_of_sets': { key: 'map_of_sets', label: 'Reference Map of Sets', nodes: {}, isOpen: false, },
             'tables': { key: 'tables', label: 'Reference Tables', nodes: {}, isOpen: false, },
         };
+        DataStore.allRefData = [];
         DataStore.currentRefDataEntry = {};
         DataStore.hasLoaded = true;
 

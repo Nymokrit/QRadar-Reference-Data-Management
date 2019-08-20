@@ -6,11 +6,13 @@ console.fail = msg => console.log(`%c${msg}`, failure);
 
 import React, { Component } from 'react';
 import { Modal, Alert } from 'reactstrap';
-import axios from 'axios';
-import querystring from 'querystring';
 
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
+
+import BootstrapTable from 'react-bootstrap-table-next';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory, { PaginationProvider } from 'react-bootstrap-table2-paginator';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -19,13 +21,13 @@ library.add(faChevronRight, faChevronDown, faCheck, faTimes, faPlus, faMinus, fa
 
 import './App.scss';
 
+import { dataTableColumns } from '../Definitions/TableColumnDefinitions';
 import Sidebar from '../Components/Sidebar';
 import ReferenceSet from '../Components/ReferenceDataTypes/ReferenceSet';
 import ReferenceMap from '../Components/ReferenceDataTypes/ReferenceMap';
 import ReferenceMapOfSets from '../Components/ReferenceDataTypes/ReferenceMapOfSets';
 import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
-import Config from '../Util/Config';
 import * as APIHelper from '../Store/APIHelper';
 import DataStore from '../Store/DataStore';
 
@@ -37,9 +39,10 @@ class App extends Component {
 
     this.refDataMapping = { 'maps': ReferenceMap, 'sets': ReferenceSet, 'map_of_sets': ReferenceMapOfSets, 'tables': ReferenceTable, };
 
-    this.state = { refreshData: false, atHome: !(DataStore.currentRefDataEntry && DataStore.currentRefDataEntry.selectedEntryName), errorMessages: [], displayError: false, };
+    this.state = { allRefData: [], refreshData: false, atHome: !(DataStore.currentRefDataEntry && DataStore.currentRefDataEntry.selectedEntryName), errorMessages: [], displayError: false, };
 
     this.refreshSidebar = this.refreshSidebar.bind(this);
+    this.updateOverviewData = this.updateOverviewData.bind(this);
     this.menuItemClicked = this.menuItemClicked.bind(this);
     this.createEntry = this.createEntry.bind(this);
     this.entryCreated = this.entryCreated.bind(this);
@@ -109,7 +112,7 @@ class App extends Component {
       mappedEntries[key] = entries[key].value;
     }
 
-    await axios.post(Config.apiRoot + Config.refDataApi + this.state.createNewReferenceEntryType + '?' + querystring.stringify(mappedEntries), {}, { headers: Config.axiosHeaders, });
+    await APIHelper.createReferenceData(this.state.createNewReferenceEntryType, mappedEntries);
 
     const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
     DataStore.currentRefDataEntry = { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, };
@@ -152,6 +155,10 @@ class App extends Component {
     this.setState({ displayError: true, errorMessages: messages, });
   }
 
+  updateOverviewData() {
+    this.setState({ allRefData: DataStore.allRefData, });
+  }
+
   render() {
     // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
     const ReferenceDataComponent = this.refDataMapping[DataStore.currentRefDataEntry && DataStore.currentRefDataEntry.selectedEntryType];
@@ -189,18 +196,22 @@ class App extends Component {
               save={this.entryCreated}
             />
             :
-            !this.state.atHome &&
-            <ReferenceDataComponent
-              key={DataStore.currentRefDataEntry.selectedEntryAPI}
-              api={DataStore.currentRefDataEntry.selectedEntryAPI}
-              name={DataStore.currentRefDataEntry.selectedEntryName}
-              type={DataStore.currentRefDataEntry.selectedEntryType}
-              size={DataStore.currentRefDataEntry.selectedEntrySize}
-              deleteEntry={this.deleteEntry}
-              dataUpdated={this.refreshSidebar}
-              toggleLoading={this.toggleLoading}
-              showError={this.showError}
-            />
+            (this.state.atHome ?
+              <React.Fragment />
+              :
+              <ReferenceDataComponent
+                key={DataStore.currentRefDataEntry.selectedEntryAPI}
+                api={DataStore.currentRefDataEntry.selectedEntryAPI}
+                name={DataStore.currentRefDataEntry.selectedEntryName}
+                type={DataStore.currentRefDataEntry.selectedEntryType}
+                size={DataStore.currentRefDataEntry.selectedEntrySize}
+                deleteEntry={this.deleteEntry}
+                dataUpdated={this.refreshSidebar}
+                toggleLoading={this.toggleLoading}
+                showError={this.showError}
+              />
+
+            )
           }
         </div>
       </SplitterLayout>
@@ -212,8 +223,35 @@ class WelcomePage extends Component {
   icon = { maps: 'map', sets: 'ellipsis-h', map_of_sets: 'list-ul', tables: 'table', };
 
   render() {
+    const { SearchBar, } = Search;
+    const contentTable = ({ paginationProps, paginationTableProps, }) => (
+      <ToolkitProvider
+        keyField='id'
+        data={this.props.data}
+        columns={dataTableColumns}
+        search
+      >
+        {toolkitprops => (
+          <React.Fragment>
+            <button className='btn-default btn-ref-data btn-export' onClick={this.props.exportItems}>Export CSV</button>
+            <SearchBar {...toolkitprops.searchProps} />
+            <BootstrapTable
+              hover
+              keyField='name'
+              remote={{ search: true, }}
+              {...toolkitprops.baseProps}
+              {...paginationTableProps}
+            />
+          </React.Fragment>
+        )}
+      </ToolkitProvider>
+    );
+
     return (
       <React.Fragment>
+        <PaginationProvider pagination={paginationFactory()}>
+          {contentTable}
+        </PaginationProvider>
       </React.Fragment>
     );
   }

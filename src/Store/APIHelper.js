@@ -25,8 +25,6 @@ async function sendAPIRequest(method, path, query, data, headers) {
         });
     } catch (error) {
         console.fail(`Failed loading data from ${path}`);
-        // if it is a 'common' error, we retry the request once more.
-        // E.g. if we run into a timeout, that might be only a temporary network issue
         console.timeEnd(`${method} ${path}`);
         if (!error.response || !error.response.data) return { error: error, message: 'Failed performing the requested network operation', };
         else return { error: error, message: error.response.data.message, };
@@ -41,16 +39,18 @@ export async function checkTaskStatus(taskAPI, initialResponse, callback, isDepe
     let response = initialResponse;
     let status = initialResponse.status;
 
+    let counter = 0;
     const waitForTaskToComplete = setInterval(async () => {
-        if (status === 'CANCELLED' || status === 'CANCELING' || status === 'EXCEPTION' || status === 'CONFLICT') {
+        counter++;
+        if (status === 'CANCELLED' || status === 'CANCELING' || status === 'EXCEPTION' || status === 'CONFLICT' || counter > 50) {
             clearInterval(waitForTaskToComplete);
             callback({ error: true, message: response.message, });
         } else if (status === 'COMPLETED') {
             clearInterval(waitForTaskToComplete);
-            if (isDependencyCheck) response = await sendAPIRequest(method, taskAPI + '/results', {}, undefined, { 'Allow-hidden': true, });
+            if (isDependencyCheck) response = await sendAPIRequest(method, taskAPI + '/results', {});
             callback(response);
         } else {
-            response = await sendAPIRequest(method, taskAPI, { fields: fields, }, undefined, { 'Allow-hidden': true, });
+            response = await sendAPIRequest(method, taskAPI, { fields: fields, });
             status = response.status;
         }
     }, 500);
@@ -60,7 +60,14 @@ export async function loadReferenceData(type) {
     const api = `/reference_data/${type}`;
     const method = 'GET';
 
-    return await sendAPIRequest(method, api, undefined, undefined, { 'Allow-hidden': true, });
+    return await sendAPIRequest(method, api);
+}
+
+export async function createReferenceData(type, query) {
+    const api = `/reference_data/${type}`;
+    const method = 'POST';
+
+    return await sendAPIRequest(method, api, query);
 }
 
 export async function loadReferenceDataValues(type, name, headers) {
@@ -71,20 +78,25 @@ export async function loadReferenceDataValues(type, name, headers) {
 }
 
 export async function loadReferenceDataDependents(type, name, callback, skipWaitForCompletion) {
-    const api = `/reference_data/${type}/${name}/dependents`;
+    const api = `/reference_data/${type}/${Util.doubleEncode(name)}/dependents`;
     const method = 'GET', fields = 'status, id, message';
 
-    if (!name) return {};
+    try {
+        if (!name) throw {};
 
-    const response = await sendAPIRequest(method, api, { fields: fields, }, undefined, { 'Allow-hidden': true, });
-    const status = response.status || 'CANCELLED'; // If the first request fails, we consider the status cancelled
+        const response = await sendAPIRequest(method, api, { fields: fields, });
+        if (!response || !response.id) throw {};
 
-    if (type === 'maps') type = 'map';
-    else if (type === 'sets') type = 'set';
+        const status = response.status || 'CANCELLED'; // If the first request fails, we consider the status cancelled
+        if (type === 'maps') type = 'map';
+        else if (type === 'sets') type = 'set';
 
-    const apiDependentTask = `/reference_data/${type}_dependent_tasks/${response.id}`;
-    if (skipWaitForCompletion) return response;
-    else checkTaskStatus(apiDependentTask, status, callback, true);
+        const apiDependentTask = `/reference_data/${type}_dependent_tasks/${response.id}`;
+        if (skipWaitForCompletion) return response;
+        else checkTaskStatus(apiDependentTask, status, callback, true);
+    } catch (e) {
+        callback({ error: e, message: 'Unable to load dependents', });
+    }
 }
 
 export async function addReferenceDataEntry(type, name, values) {
@@ -110,7 +122,11 @@ export async function deleteReferenceData(type, name, callback, purge_only = fal
     const method = 'DELETE';
 
     try {
+        if (!name) throw {};
+
         const response = await sendAPIRequest(method, api, { purge_only: purge_only, });
+        if (!response || !response.id) throw {};
+
         const status = response.status;
 
         if (type === 'maps') type = 'map';
@@ -120,7 +136,7 @@ export async function deleteReferenceData(type, name, callback, purge_only = fal
         if (!callback || skipWaitForCompletion) return response;
         else checkTaskStatus(apiDeleteTask, status, callback);
     } catch (e) {
-        callback({ error: e, message: e.message, });
+        callback({ error: e, message: e.message || 'Unable to delete Reference Data', });
     }
 }
 

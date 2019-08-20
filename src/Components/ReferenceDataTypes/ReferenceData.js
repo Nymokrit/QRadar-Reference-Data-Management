@@ -162,7 +162,7 @@ class ReferenceData extends Component {
                         selectionChanged={this.selectionChanged}
                         selectionClearedCallback={(f) => this.clearSelection = f}
 
-                        expandable={['map_of_sets', 'table'].includes(this.type)}
+                        expandable={['map_of_sets', 'table',].includes(this.type)}
                         extendableColumns={this.columns[this.type + 'Inner']}
                         addInnerItem={this.clickAddInnerItem}
                         deleteInnerItem={this.clickDeleteInnerItem}

@@ -68,7 +68,7 @@ class DataTable extends Component {
             ),
         };
 
-        const hidden = ['map_of_sets', 'table'].includes(this.props.type);
+        const hidden = ['map_of_sets', 'table',].includes(this.props.type);
         const { SearchBar, } = Search;
         const contentTable = ({ paginationProps, paginationTableProps, }) => (
             <React.Fragment>

@@ -3,7 +3,7 @@ import { ListGroupItem, ListGroup, Badge } from 'reactstrap';
 import * as Formatters from '../Util/Formatters';
 
 class MetaData extends Component {
-    lookup = { 'map': 'Map', 'set': 'Set', 'map_of_sets': 'Map of Sets', 'table': 'Table' };
+    lookup = { 'map': 'Map', 'set': 'Set', 'map_of_sets': 'Map of Sets', 'table': 'Table', };
     
     render() {
         return (

@@ -52,6 +52,7 @@ class Sidebar extends Component {
     }
 
     async getRefData() {
+        DataStore.allRefData = [];
         // const overviewData = [];
         for (const key in DataStore.refData) {
             const response = await APIHelper.loadReferenceData(key);
@@ -72,11 +73,12 @@ class Sidebar extends Component {
         response.forEach(element => {
             const newEntry = { label: element.name, size: element.number_of_elements, datatype: key, key: key + '/' + element.name, };
             data[key].nodes[element.name] = newEntry;
+            DataStore.allRefData.push(element);
             // overviewData.push({ creation_time: element.creation_time, ...newEntry, });
         });
 
         this.setState({ refData: data, });
-        // this.props.updateOverviewData(overviewData);
+        this.props.updateOverviewData();
     }
 
     render() {
