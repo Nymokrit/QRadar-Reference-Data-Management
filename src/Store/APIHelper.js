@@ -1,16 +1,22 @@
 import axios from 'axios';
-import { QRadar } from 'qappfw';
+import { QRadar } from 'qjslib';
 import querystring from 'querystring';
 import Config from '../Util/Config';
 import * as Util from '../Util/Util';
 
-const isProd = QRadar.getCurrentUser();
-const csrfHeader = QRadar.getCookie(QRadar.QRADAR_CSRF);
+let isProd = false;
+let csrfHeader = '';
+try {
+    const user = QRadar.getCurrentUser();
+    if(user && !user.error) isProd = true;
+    csrfHeader = QRadar.getCookie(QRadar.QRADAR_CSRF);
+} catch (e) { }
 
 async function sendAPIRequest(method, path, query, data, headers) {
     const httpClient = axios.create();
     const _headers = Object.assign({}, Config.axiosHeaders, (headers ? headers : {}));
-    // httpClient.defaults.timeout = 10;
+    _headers['Version'] = '10';
+    httpClient.defaults.timeout = 600000;
 
     console.time(`${method} ${path}`);
 

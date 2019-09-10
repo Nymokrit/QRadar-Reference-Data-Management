@@ -21,7 +21,7 @@ class ReferenceMapOfSets extends ReferenceData {
 
         const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
         if (response) {
-            const updateData = this.updateData(this.state.allEntries, { key: key, values: values, source: RefDataHelper.defaultEntryComment, }, true, true);
+            const updateData = this.updateData(this.state.allEntries, { key: key, values: values, source: 'reference data api', }, true, true);
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
@@ -55,7 +55,8 @@ class ReferenceMapOfSets extends ReferenceData {
     }
 
     async addInnerItem(key, entry) {
-        const parsedEntry = { value: entry['value'].value, key: key.key, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
+        const username = await RefDataHelper.defaultEntryComment();
+        const parsedEntry = { value: entry['value'].value, key: key.key, source: entry['source'].value || username, };
 
         const indexOfKey = this.state.allEntries.findIndex((value) => (value.key === key.key));
         if (this.state.allEntries[indexOfKey].values.findIndex((value) => (value.value === entry['value'].value)) !== -1) {

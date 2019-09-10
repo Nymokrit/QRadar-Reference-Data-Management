@@ -33,7 +33,8 @@ class ReferenceMap extends ReferenceData {
             this.props.showError('Cannot add an empty value');
             return;
         }
-        const parsedEntry = { key: entry['key'].value, value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
+        const username = await RefDataHelper.defaultEntryComment();
+        const parsedEntry = { key: entry['key'].value, value: entry['value'].value, source: entry['source'].value || username, };
 
         super.addItem(parsedEntry);
     }
@@ -74,10 +75,11 @@ class ReferenceMap extends ReferenceData {
         let newData = [];
 
         const data = {};
+
         for (const pair of pairs) {
             const [key, value,] = pair.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
             data[key] = value;
-            newData.push({ key: key, value: value, id: key, source: RefDataHelper.defaultEntryComment, });
+            newData.push({ key: key, value: value, id: key, source: 'reference data api', });
         }
 
         // We remove duplicate keys but keep the newest key=value pair

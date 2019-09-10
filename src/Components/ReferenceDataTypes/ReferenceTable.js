@@ -73,7 +73,8 @@ class ReferenceTable extends ReferenceData {
         const outer_key = key.key;
         const inner_key = entries.key.value;
         const value = entries.value.value;
-        const source = entries.source.value || RefDataHelper.defaultEntryComment;
+        const username = await RefDataHelper.defaultEntryComment();
+        const source = entries.source.value || username;
 
         const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { outer_key: outer_key, inner_key: inner_key, value: value, source: source, });
 

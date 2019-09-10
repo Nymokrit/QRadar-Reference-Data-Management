@@ -1,9 +1,17 @@
 import * as APIHelper from '../Store/APIHelper';
 import fileSaver from 'file-saver';
-import { QRadar } from 'qappfw';
+import { QRadar } from 'qjslib';
 
-export const defaultEntryComment = QRadar.getCurrentUser() || 'reference data api';
 
+let username;
+export async function defaultEntryComment() {
+    if (username) return username;
+    try {
+        const entry = await QRadar.getCurrentUser();
+        if (entry && !entry.error) username = entry.username;
+    } catch (e) { console.log(e) };
+    return username;
+}
 
 export function updateMetaData(data) {
     const metaData = this.state.metaData;

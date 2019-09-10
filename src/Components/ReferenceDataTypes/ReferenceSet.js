@@ -32,7 +32,8 @@ class ReferenceSet extends ReferenceData {
             this.props.showError('Cannot add an empty value');
             return;
         }
-        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || RefDataHelper.defaultEntryComment, };
+        const username = await RefDataHelper.defaultEntryComment();
+        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || username };
 
         super.addItem(parsedEntry);
     }
@@ -68,7 +69,7 @@ class ReferenceSet extends ReferenceData {
             .map(value => value.trim()) // remove whitespace
             .filter(value => value); // remove empty values
         data = [...new Set(data),]; // remove duplicates
-        const newData = data.map(elem => ({ value: elem, id: elem, source: RefDataHelper.defaultEntryComment, }));
+        const newData = data.map(elem => ({ value: elem, id: elem, source: 'reference data api', }));
         const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
 
         if (response.error) {

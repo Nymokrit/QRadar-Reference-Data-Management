@@ -34,6 +34,8 @@ class ReferenceData extends Component {
             modalInputDefinition: {},
         };
 
+
+
         this.clearInnerSelection = {};
 
         this.addItem = this.addItem.bind(this);

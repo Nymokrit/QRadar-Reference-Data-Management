@@ -14,7 +14,7 @@
 				"en-US"
 			],
 			"min_qradar_version": "7.3.2",
-			"version": "1.0.3",
+			"version": "2.0.0",
 			"authored_by": "IBM Security Services",
 			"authored_by_email": "michael.essigke1@ibm.com",
 			"package_size": "6124079",
