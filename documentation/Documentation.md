@@ -1,4 +1,24 @@
 # Reference Data Management
+- [Reference Data Management](#reference-data-management)
+    - [Create new data](#create-new-data)
+    - [Display data](#display-data)
+      - [Reference Sets](#reference-sets)
+        - [Add Entry](#add-entry)
+        - [Bulk Add](#bulk-add)
+        - [Import CSV](#import-csv)
+        - [Export CSV](#export-csv)
+        - [Delete Entry](#delete-entry)
+        - [Clear Data](#clear-data)
+        - [Delete Set](#delete-set)
+      - [Reference Maps](#reference-maps)
+      - [Reference Map of Sets](#reference-map-of-sets)
+      - [Reference Tables](#reference-tables)
+  - [Additonal information](#additonal-information)
+    - [Dates](#dates)
+    - [Searching](#searching)
+    - [Errors](#errors)
+    - [Reference Map of Sets with sparse keys and dense values](#reference-map-of-sets-with-sparse-keys-and-dense-values)
+
 The app allows the creation, deletion and visualization of all types of Reference Data in QRadar. Most supported operations on the different data types can be performed from within the app, for instance bulk insertion of new data into a Reference Map. The different data types and available operations are described below.
 
 The view consists of two sections.
@@ -11,7 +31,6 @@ By clicking on the `+` next to a reference data type, a new reference data entry
 
 ![Create new Reference Data](referenceDataCreateNew.png)
 
-It should be noted that the time to live needs to be a string like `1 mons 3 days 5 hours 8 minutes 10 seconds`. If it is not specified, the time to live is infinity.
 
 ### Display data
 Clicking on one of the entries will display the contents of the specified entry.
@@ -34,6 +53,7 @@ Similiarliy to the `Bulk Add` functionality, instead of pasting the contents in 
 
 ##### Export CSV
 The data can be exported easily into a file in CSV format.
+> Important: The exported data cannot simply be reimported to QRadar via the `import csv` function as it contains additional fields like `last seen` or `source`. Instead, the `import csv` function simply expects values separated by the specified character.
 
 ##### Delete Entry
 One or multiple entries can be selected by clicking on them in the table. Clicking on `Delete Entry` afterwards, will attempt to delete the selected entries from the reference data.
@@ -72,12 +92,21 @@ It should be noted, that searching will always search in the keys AND the values
 Reference Tables support the same operations as Reference Map of Sets
 
 ## Additonal information
+
+### Dates
+Dates in DATE Ref Data is represented as timestamp (UNIX epoch). The same is true for 'last seen' or 'first seen' which leads to potentially surprising values like '1.54393E+12' when exported to CSV and opened in a program like MS Excel. They need to be converted to a date, which, in MS Excel may be done with a formula like 
+
+> ```=((((A1/1000)/60)/60)/24)+DATE(1970,1,1)```
+
+
 ### Searching
-Most search fields are regex fields, i.e. one can input a regular expression that will be evaluated against the search text. If a search field is a regex field, it will display the value `/re/` as shown below
+Most search fields are regex fields, i.e. one can input a javascript regular expression that will be evaluated against the search text. If a search field is a regex field, it will display the value `/re/` as shown below
 
 ![Regex Search](searchField.png)
 
-If data contains 'subdata' which is not shown in the tables directly (e.g. rule details or reference table inner key/values), this data is usually also searched for the search expression.
+If data contains 'subdata' which is not shown in the tables directly (e.g. reference table inner key/values), this data is usually also searched for the search expression.
+
+> Important: Only keys/values are searched. It is currently not possible to search for things like 'source', 'last seen' or 'first seen'.
 
 ### Errors
 Most errors are handled either silently or by displaying an error message at the top of the currently displayed screen. For instance, the below error occured when the user attempted to delete a reference set with dependents.
