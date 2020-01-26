@@ -151,7 +151,8 @@ class TimeInput extends Component {
     handleChange(event, target) {
         let newState = '';
         if (target === 'label') {
-            newState = event.target.value + ' ' + this.state.type;
+            if(event.target.value)
+                newState = event.target.value + ' ' + this.state.type;
             this.setState({ label: event.target.value, });
         } else if (target === 'type') {
             newState = this.state.label + ' ' + event.target.value;

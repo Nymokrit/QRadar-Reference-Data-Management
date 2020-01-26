@@ -20,6 +20,8 @@ class ReferenceTable extends ReferenceData {
         this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: entryDefinition, });
     }
 
+
+
     // Entry should consist of an JS Object of the form {value: 'someVal'}
     async addItem(entry) {
         this.props.toggleLoading();
@@ -174,6 +176,59 @@ class ReferenceTable extends ReferenceData {
             data = Object.keys(response.data).map(i => ({ key: i, values: Object.values(response.data[i]), id: i, }));
         }
         return data;
+    }
+
+    async importItems(entries) {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const text = reader.result;
+            const data = {
+                bulkAddEntriesSeparator: entries.bulkAddEntriesSeparator,
+                bulkAddKeyValueSeparator: entries.bulkAddKeyValueSeparator,
+                bulkAddData: { value: text, },
+            };
+            this.bulkAddItems(data);
+        };
+        
+        reader.readAsText(entries.file.value);
+    }
+
+    async bulkAddItems(entries) {
+        // const regexEntries = new RegExp(entries.bulkAddEntriesSeparator.value, 'g');
+        // const regexKeyValue = new RegExp(entries.bulkAddKeyValueSeparator.value, 'g');
+        this.props.toggleLoading();
+
+        const tuples = entries.bulkAddData.value
+            .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
+            .split(entries.bulkAddEntriesSeparator.value)
+            .map(value => value.trim())
+            .filter(value => value);
+
+
+        let newData = {};
+
+
+        for (const tuple of tuples) {
+            const [key, innerKey, value] = tuple.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
+            if (!newData.hasOwnProperty(key)) {
+                newData[key] = {}
+            }
+            newData[key][innerKey] = value;
+            // newData.push({ key: key, value: value, id: key, source: 'reference data api', });
+        }
+
+
+        const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, newData);
+
+        if (response.error) {
+            this.props.showError(response.message);
+        } else {
+            // this.tableChanged('new', oldData);
+            this.updateMetaData(response);
+        }
+        this.loadData(this.props.type, true);
+        this.props.toggleLoading();
     }
 
     exportItems() {

@@ -48,6 +48,7 @@ class Sidebar extends Component {
     }
 
     handleChange(event) {
+        Object.keys(DataStore.refData).map((type) => DataStore.refData[type].isOpen = true);
         this.setState({ searchText: event.target.value, });
     }
 

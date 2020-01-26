@@ -112,16 +112,19 @@ class App extends Component {
       mappedEntries[key] = entries[key].value;
     }
 
-    await APIHelper.createReferenceData(this.state.createNewReferenceEntryType, mappedEntries);
+    const response = await APIHelper.createReferenceData(this.state.createNewReferenceEntryType, mappedEntries);
+    if (response.error) {
+      this.showError(response.message);
+    } else {
+      const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
+      DataStore.currentRefDataEntry = { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, };
+      this.setState({
+        createNew: false,
+        atHome: false,
+      });
 
-    const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
-    DataStore.currentRefDataEntry = { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, };
-    this.setState({
-      createNew: false,
-      atHome: false,
-    });
-
-    this.refreshSidebar();
+      this.refreshSidebar();
+    }
   }
 
   async deleteEntry() {

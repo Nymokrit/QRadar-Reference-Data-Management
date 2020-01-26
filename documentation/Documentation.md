@@ -16,8 +16,10 @@
   - [Additonal information](#additonal-information)
     - [Dates](#dates)
     - [Searching](#searching)
-    - [Errors](#errors)
     - [Reference Map of Sets with sparse keys and dense values](#reference-map-of-sets-with-sparse-keys-and-dense-values)
+    - [Errors](#errors)
+
+
 
 The app allows the creation, deletion and visualization of all types of Reference Data in QRadar. Most supported operations on the different data types can be performed from within the app, for instance bulk insertion of new data into a Reference Map. The different data types and available operations are described below.
 
@@ -108,9 +110,17 @@ If data contains 'subdata' which is not shown in the tables directly (e.g. refer
 
 > Important: Only keys/values are searched. It is currently not possible to search for things like 'source', 'last seen' or 'first seen'.
 
+### Reference Map of Sets with sparse keys and dense values
+Attempting to load a Map of Set that contains only a small number of keys but an extraordinarily large number of values for each key (e.g. 5 keys with 100k values each). Loading that data might fail. Adding data, puring data and deleting the reference data entry are still possible. There is currently no workaround available.
+
 ### Errors
 Most errors are handled either silently or by displaying an error message at the top of the currently displayed screen. For instance, the below error occured when the user attempted to delete a reference set with dependents.
 ![Example Error](referenceDataDeleteFailed.png)
 
-### Reference Map of Sets with sparse keys and dense values
-Attempting to load a Map of Set that contains only a small number of keys but an extraordinarily large number of values for each key (e.g. 5 keys with 100k values each). Loading that data might fail. Adding data, puring data and deleting the reference data entry are still possible. There is currently no workaround available.
+
+#### Errors after Updating the App
+Some users reported duplicate tabs after updating the app from Version 2.0.0 to a newer version. This can be fixed by uninstalling both applications via the API and performing a clean reinstall.
+1.) Uninstall the App via the Extension Management (Admin -> Extension Management)
+2.) Find the old App ID for the other version (most easily via `docker ps` on the console or App Host)
+3.) Remove the old App from QRadar (most easily via the API `DELETE /gui_app_framework/applications/{application_id}`)
+4.) Do a fresh installation (most easily via the App Extension GUI)

@@ -15,7 +15,7 @@ try {
 async function sendAPIRequest(method, path, query, data, headers) {
     const httpClient = axios.create();
     const _headers = Object.assign({}, Config.axiosHeaders, (headers ? headers : {}));
-    _headers['Version'] = '10';
+    _headers['Version'] = '8';
     httpClient.defaults.timeout = 600000;
 
     console.time(`${method} ${path}`);

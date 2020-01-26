@@ -29,7 +29,7 @@ export async function loadData_Normal(key) {
     this.tableChanged();
 }
 
-export async function loadData(key) {
+export async function loadData(key, reload) {
     this.loadDependents(); // async load dependents
 
     const numElements = this.props.size;
@@ -51,7 +51,8 @@ export async function loadData(key) {
             return;
         }
 
-        let data = this.state.allEntries;
+        let data = reload ? [] : this.state.allEntries;
+        reload = false;
         // For map of sets and tables, num_of_elements is #outer_key*#inner_keys, hence at some point we load 
         // a range that contains no data. At that point, we skip the rest
         if (response.data) {

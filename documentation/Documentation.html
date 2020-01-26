@@ -1,130 +1,119 @@
-<!DOCTYPE html>
-    <html>
-    <head>
-        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-        <title>Reference Data Management</title>
-        
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
-        
-        <style>
-.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
-</style>
-        <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-        </style>
-        
-        
-    </head>
-    <body>
-        <h1 id="reference-data-management">Reference Data Management</h1>
-<ul>
-<li><a href="#reference-data-management">Reference Data Management</a>
-<ul>
-<li><a href="#create-new-data">Create new data</a></li>
-<li><a href="#display-data">Display data</a>
-<ul>
-<li><a href="#reference-sets">Reference Sets</a>
-<ul>
-<li><a href="#add-entry">Add Entry</a></li>
-<li><a href="#bulk-add">Bulk Add</a></li>
-<li><a href="#import-csv">Import CSV</a></li>
-<li><a href="#export-csv">Export CSV</a></li>
-<li><a href="#delete-entry">Delete Entry</a></li>
-<li><a href="#clear-data">Clear Data</a></li>
-<li><a href="#delete-set">Delete Set</a></li>
-</ul>
-</li>
-<li><a href="#reference-maps">Reference Maps</a></li>
-<li><a href="#reference-map-of-sets">Reference Map of Sets</a></li>
-<li><a href="#reference-tables">Reference Tables</a></li>
-</ul>
-</li>
-<li><a href="#additonal-information">Additonal information</a>
-<ul>
-<li><a href="#dates">Dates</a></li>
-<li><a href="#searching">Searching</a></li>
-<li><a href="#errors">Errors</a></li>
-<li><a href="#reference-map-of-sets-with-sparse-keys-and-dense-values">Reference Map of Sets with sparse keys and dense values</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>The app allows the creation, deletion and visualization of all types of Reference Data in QRadar. Most supported operations on the different data types can be performed from within the app, for instance bulk insertion of new data into a Reference Map. The different data types and available operations are described below.</p>
-<p>The view consists of two sections.
-In the left side of the view, all the defined reference data entries are shown. The entries are ordered alphabetically by type (set, map, map of set, table).</p>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceDataSidebar.png" alt="Reference Data Sidebar"></p>
-<h3 id="create-new-data">Create new data</h3>
-<p>By clicking on the <code>+</code> next to a reference data type, a new reference data entry of the specific type can be created:</p>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceDataCreateNew.png" alt="Create new Reference Data"></p>
-<h3 id="display-data">Display data</h3>
-<p>Clicking on one of the entries will display the contents of the specified entry.</p>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceSet.png" alt="Display Reference Set"></p>
-<p>It should be noted, that for large reference data entries, loading will be done in chunks but the data will only be displayed when all entries have been loaded. That the loading is ongoing can be verified by checking if the <code>number of elements</code>, displayed on the top of the view changes periodically.</p>
-<h4 id="reference-sets">Reference Sets</h4>
-<p>Reference Sets and Maps support the most operations</p>
-<h5 id="add-entry">Add Entry</h5>
-<p>Add a single entry to the reference set</p>
-<h5 id="bulk-add">Bulk Add</h5>
-<p>Add multiple entries at the same time. A separator needs to be specified which can be used to split the entries. Additionally, a new line can be used to separate entries, as new lines will be implicitly used as separator character.</p>
-<h5 id="import-csv">Import CSV</h5>
-<p>Similiarliy to the <code>Bulk Add</code> functionality, instead of pasting the contents in the bulk add text area, a file can be specified which contains the data to be added. As described above, a separator needs to be specified.</p>
-<h5 id="export-csv">Export CSV</h5>
-<p>The data can be exported easily into a file in CSV format.</p>
-<blockquote>
-<p>Important: The exported data cannot simply be reimported to QRadar via the <code>import csv</code> function as it contains additional fields like <code>last seen</code> or <code>source</code>. Instead, the <code>import csv</code> function simply expects values separated by the specified character.</p>
-</blockquote>
-<h5 id="delete-entry">Delete Entry</h5>
-<p>One or multiple entries can be selected by clicking on them in the table. Clicking on <code>Delete Entry</code> afterwards, will attempt to delete the selected entries from the reference data.</p>
-<h5 id="clear-data">Clear Data</h5>
-<p>Clicking this button will purge all data for this reference data entry. This might be helpful to get rid of all content while keeping the reference data entry existant (e.g. if it cannot be deleted due to dependencies).</p>
-<h5 id="delete-set">Delete Set</h5>
-<p>If the reference data entry has no dependencies, it can be deleted by clicking <code>Delete Set</code>. Attempting to delete an reference data entry will ask for confirmation before performing any action.
-Dependencies are displayed below the table with reference data contents.</p>
-<h4 id="reference-maps">Reference Maps</h4>
-<p>Reference Maps support essentially the same operations as reference sets. While bulk adding or importing entries, two separator characters need to be specified, however.</p>
-<ol>
-<li>The Key-Value Separator which specifies how to distinguish a key from a value (e.g. key=value =&gt; separator is <code>=</code>)</li>
-<li>The Entries Separator which specifies how each key/value pair is separated from each other (e.g. key=value,key2=value2 =&gt; separator is <code>,</code>). As in reference sets, new line characters are implicit entry separators</li>
-</ol>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceMapAddEntries.png" alt="Add Reference Map Entry"></p>
-<h4 id="reference-map-of-sets">Reference Map of Sets</h4>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceDataMoS.png" alt="Reference Map of Sets"></p>
-<p>Reference Map of Sets currently only support a subset of operations, i.e.</p>
-<ol>
-<li>Add entry: add/update a key with one or multiple values</li>
-<li>Delete entry: delete one or more existing keys</li>
-<li>Export CSV: Export all table data</li>
-<li>Add/Delete inner value: Add or delete a 'inner' value for an existing key</li>
-</ol>
-<p>When opening a Reference Map of Sets, only the outer keys are displayed. The inner values for a specific outer key can be displayed by clicking the <code>+</code> at the left side of the key.</p>
-<p>It should be noted, that searching will always search in the keys AND the values of a data entry, e.g. searching for <code>smss.exe</code> will display all keys that match this expression as well as all keys that have some value, matching this expression.</p>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceDataSearchMoS.png" alt="Search Map of Sets"></p>
-<h4 id="reference-tables">Reference Tables</h4>
-<p>Reference Tables support the same operations as Reference Map of Sets</p>
-<h2 id="additonal-information">Additonal information</h2>
-<h3 id="dates">Dates</h3>
-<p>Dates in DATE Ref Data is represented as timestamp (UNIX epoch). The same is true for 'last seen' or 'first seen' which leads to potentially surprising values like '1.54393E+12' when exported to CSV and opened in a program like MS Excel. They need to be converted to a date, which, in MS Excel may be done with a formula like</p>
-<blockquote>
-<p><code>=((((A1/1000)/60)/60)/24)+DATE(1970,1,1)</code></p>
-</blockquote>
-<h3 id="searching">Searching</h3>
-<p>Most search fields are regex fields, i.e. one can input a javascript regular expression that will be evaluated against the search text. If a search field is a regex field, it will display the value <code>/re/</code> as shown below</p>
-<p><img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\searchField.png" alt="Regex Search"></p>
-<p>If data contains 'subdata' which is not shown in the tables directly (e.g. reference table inner key/values), this data is usually also searched for the search expression.</p>
-<blockquote>
-<p>Important: Only keys/values are searched. It is currently not possible to search for things like 'source', 'last seen' or 'first seen'.</p>
-</blockquote>
-<h3 id="errors">Errors</h3>
-<p>Most errors are handled either silently or by displaying an error message at the top of the currently displayed screen. For instance, the below error occured when the user attempted to delete a reference set with dependents.
-<img src="file:///c:\Users\Nymokrit\Documents\Knowledge\IBM\QRadar\Reference-Data-Management-\documentation\referenceDataDeleteFailed.png" alt="Example Error"></p>
-<h3 id="reference-map-of-sets-with-sparse-keys-and-dense-values">Reference Map of Sets with sparse keys and dense values</h3>
-<p>Attempting to load a Map of Set that contains only a small number of keys but an extraordinarily large number of values for each key (e.g. 5 keys with 100k values each). Loading that data might fail. Adding data, puring data and deleting the reference data entry are still possible. There is currently no workaround available.</p>
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js">
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+<link rel="stylesheet" href="https://gitcdn.xyz/repo/goessner/mdmath/master/css/texmath.css">
+<link rel="stylesheet" href="https://gitcdn.xyz/repo/goessner/mdmath/master/css/vscode-texmath.css">
 
-    </body>
-    </html>
+</head><body>
+<h1 id="reference-data-management" data-line="0" class="code-line">Reference Data Management</h1>
+<ul>
+<li data-line="1" class="code-line"><a href="#reference-data-management" data-href="#reference-data-management">Reference Data Management</a>
+<ul>
+<li data-line="2" class="code-line"><a href="#create-new-data" data-href="#create-new-data">Create new data</a></li>
+<li data-line="3" class="code-line"><a href="#display-data" data-href="#display-data">Display data</a>
+<ul>
+<li data-line="4" class="code-line"><a href="#reference-sets" data-href="#reference-sets">Reference Sets</a>
+<ul>
+<li data-line="5" class="code-line"><a href="#add-entry" data-href="#add-entry">Add Entry</a></li>
+<li data-line="6" class="code-line"><a href="#bulk-add" data-href="#bulk-add">Bulk Add</a></li>
+<li data-line="7" class="code-line"><a href="#import-csv" data-href="#import-csv">Import CSV</a></li>
+<li data-line="8" class="code-line"><a href="#export-csv" data-href="#export-csv">Export CSV</a></li>
+<li data-line="9" class="code-line"><a href="#delete-entry" data-href="#delete-entry">Delete Entry</a></li>
+<li data-line="10" class="code-line"><a href="#clear-data" data-href="#clear-data">Clear Data</a></li>
+<li data-line="11" class="code-line"><a href="#delete-set" data-href="#delete-set">Delete Set</a></li>
+</ul>
+</li>
+<li data-line="12" class="code-line"><a href="#reference-maps" data-href="#reference-maps">Reference Maps</a></li>
+<li data-line="13" class="code-line"><a href="#reference-map-of-sets" data-href="#reference-map-of-sets">Reference Map of Sets</a></li>
+<li data-line="14" class="code-line"><a href="#reference-tables" data-href="#reference-tables">Reference Tables</a></li>
+</ul>
+</li>
+<li data-line="15" class="code-line"><a href="#additonal-information" data-href="#additonal-information">Additonal information</a>
+<ul>
+<li data-line="16" class="code-line"><a href="#dates" data-href="#dates">Dates</a></li>
+<li data-line="17" class="code-line"><a href="#searching" data-href="#searching">Searching</a></li>
+<li data-line="18" class="code-line"><a href="#errors" data-href="#errors">Errors</a></li>
+<li data-line="19" class="code-line"><a href="#reference-map-of-sets-with-sparse-keys-and-dense-values" data-href="#reference-map-of-sets-with-sparse-keys-and-dense-values">Reference Map of Sets with sparse keys and dense values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p data-line="21" class="code-line">The app allows the creation, deletion and visualization of all types of Reference Data in QRadar. Most supported operations on the different data types can be performed from within the app, for instance bulk insertion of new data into a Reference Map. The different data types and available operations are described below.</p>
+<p data-line="23" class="code-line">The view consists of two sections.
+In the left side of the view, all the defined reference data entries are shown. The entries are ordered alphabetically by type (set, map, map of set, table).</p>
+<p data-line="26" class="code-line"><img src="referenceDataSidebar.png" alt="Reference Data Sidebar" class="loading" id="image-hash-30fa69891bc36e8b78ae00ed5e072802706adf6a5ea498e731767b37bb213209"></p>
+<h3 id="create-new-data" data-line="28" class="code-line">Create new data</h3>
+<p data-line="29" class="code-line">By clicking on the <code>+</code> next to a reference data type, a new reference data entry of the specific type can be created:</p>
+<p data-line="31" class="code-line"><img src="referenceDataCreateNew.png" alt="Create new Reference Data" class="loading" id="image-hash-0d0a9ef4c428044119ce8062d8fe186f1cc816a4897ebcd564a186684b3cff44"></p>
+<h3 id="display-data" data-line="34" class="code-line">Display data</h3>
+<p data-line="35" class="code-line">Clicking on one of the entries will display the contents of the specified entry.</p>
+<p data-line="37" class="code-line"><img src="referenceSet.png" alt="Display Reference Set" class="loading" id="image-hash-315253ed30fbd4a3e0b2c6d53bb243cafe669947d8da5ad7c365ed007ad54248"></p>
+<p data-line="39" class="code-line">It should be noted, that for large reference data entries, loading will be done in chunks but the data will only be displayed when all entries have been loaded. That the loading is ongoing can be verified by checking if the <code>number of elements</code>, displayed on the top of the view changes periodically.</p>
+<h4 id="reference-sets" data-line="41" class="code-line">Reference Sets</h4>
+<p data-line="42" class="code-line">Reference Sets and Maps support the most operations</p>
+<h5 id="add-entry" data-line="44" class="code-line">Add Entry</h5>
+<p data-line="45" class="code-line">Add a single entry to the reference set</p>
+<h5 id="bulk-add" data-line="47" class="code-line">Bulk Add</h5>
+<p data-line="48" class="code-line">Add multiple entries at the same time. A separator needs to be specified which can be used to split the entries. Additionally, a new line can be used to separate entries, as new lines will be implicitly used as separator character.</p>
+<h5 id="import-csv" data-line="50" class="code-line">Import CSV</h5>
+<p data-line="51" class="code-line">Similiarliy to the <code>Bulk Add</code> functionality, instead of pasting the contents in the bulk add text area, a file can be specified which contains the data to be added. As described above, a separator needs to be specified.</p>
+<h5 id="export-csv" data-line="53" class="code-line">Export CSV</h5>
+<p data-line="54" class="code-line">The data can be exported easily into a file in CSV format.</p>
+<blockquote data-line="55" class="code-line">
+<p data-line="55" class="code-line">Important: The exported data cannot simply be reimported to QRadar via the <code>import csv</code> function as it contains additional fields like <code>last seen</code> or <code>source</code>. Instead, the <code>import csv</code> function simply expects values separated by the specified character.</p>
+</blockquote>
+<h5 id="delete-entry" data-line="57" class="code-line">Delete Entry</h5>
+<p data-line="58" class="code-line">One or multiple entries can be selected by clicking on them in the table. Clicking on <code>Delete Entry</code> afterwards, will attempt to delete the selected entries from the reference data.</p>
+<h5 id="clear-data" data-line="60" class="code-line">Clear Data</h5>
+<p data-line="61" class="code-line">Clicking this button will purge all data for this reference data entry. This might be helpful to get rid of all content while keeping the reference data entry existant (e.g. if it cannot be deleted due to dependencies).</p>
+<h5 id="delete-set" data-line="63" class="code-line">Delete Set</h5>
+<p data-line="64" class="code-line">If the reference data entry has no dependencies, it can be deleted by clicking <code>Delete Set</code>. Attempting to delete an reference data entry will ask for confirmation before performing any action.
+Dependencies are displayed below the table with reference data contents.</p>
+<h4 id="reference-maps" data-line="68" class="code-line">Reference Maps</h4>
+<p data-line="69" class="code-line">Reference Maps support essentially the same operations as reference sets. While bulk adding or importing entries, two separator characters need to be specified, however.</p>
+<ol>
+<li data-line="70" class="code-line">The Key-Value Separator which specifies how to distinguish a key from a value (e.g. key=value =&gt; separator is <code>=</code>)</li>
+<li data-line="71" class="code-line">The Entries Separator which specifies how each key/value pair is separated from each other (e.g. key=value,key2=value2 =&gt; separator is <code>,</code>). As in reference sets, new line characters are implicit entry separators</li>
+</ol>
+<p data-line="73" class="code-line"><img src="referenceMapAddEntries.png" alt="Add Reference Map Entry" class="loading" id="image-hash-c160338d80970c77e813f727374ada4d4caa01eed88b954b73e0d16c810fbe62"></p>
+<h4 id="reference-map-of-sets" data-line="75" class="code-line">Reference Map of Sets</h4>
+<p data-line="76" class="code-line"><img src="referenceDataMoS.png" alt="Reference Map of Sets" class="loading" id="image-hash-a40a66918d25005e9615c873783884b6c786a7e8d6ef3bfe61ffde1f3a58aac0"></p>
+<p data-line="78" class="code-line">Reference Map of Sets currently only support a subset of operations, i.e.</p>
+<ol>
+<li data-line="79" class="code-line">Add entry: add/update a key with one or multiple values</li>
+<li data-line="80" class="code-line">Delete entry: delete one or more existing keys</li>
+<li data-line="81" class="code-line">Export CSV: Export all table data</li>
+<li data-line="82" class="code-line">Add/Delete inner value: Add or delete a 'inner' value for an existing key</li>
+</ol>
+<p data-line="84" class="code-line">When opening a Reference Map of Sets, only the outer keys are displayed. The inner values for a specific outer key can be displayed by clicking the <code>+</code> at the left side of the key.</p>
+<p data-line="86" class="code-line">It should be noted, that searching will always search in the keys AND the values of a data entry, e.g. searching for <code>smss.exe</code> will display all keys that match this expression as well as all keys that have some value, matching this expression.</p>
+<p data-line="88" class="code-line"><img src="referenceDataSearchMoS.png" alt="Search Map of Sets" class="loading" id="image-hash-a45372b99479f4aaecdadff1abf2f4814d0b89b66a8a43321b2d083e1bf17618"></p>
+<h4 id="reference-tables" data-line="90" class="code-line">Reference Tables</h4>
+<p data-line="91" class="code-line">Reference Tables support the same operations as Reference Map of Sets</p>
+<h2 id="additonal-information" data-line="93" class="code-line">Additonal information</h2>
+<h3 id="dates" data-line="95" class="code-line">Dates</h3>
+<p data-line="96" class="code-line">Dates in DATE Ref Data is represented as timestamp (UNIX epoch). The same is true for 'last seen' or 'first seen' which leads to potentially surprising values like '1.54393E+12' when exported to CSV and opened in a program like MS Excel. They need to be converted to a date, which, in MS Excel may be done with a formula like</p>
+<blockquote data-line="98" class="code-line">
+<p data-line="98" class="code-line"><code>=((((A1/1000)/60)/60)/24)+DATE(1970,1,1)</code></p>
+</blockquote>
+<h3 id="searching" data-line="101" class="code-line">Searching</h3>
+<p data-line="102" class="code-line">Most search fields are regex fields, i.e. one can input a javascript regular expression that will be evaluated against the search text. If a search field is a regex field, it will display the value <code>/re/</code> as shown below</p>
+<p data-line="104" class="code-line"><img src="searchField.png" alt="Regex Search" class="loading" id="image-hash-ab544a114b00b5d995ff80d36a82a9db2bdbaec2dc62a9fff6e4bea7aaede06f"></p>
+<p data-line="106" class="code-line">If data contains 'subdata' which is not shown in the tables directly (e.g. reference table inner key/values), this data is usually also searched for the search expression.</p>
+<blockquote data-line="108" class="code-line">
+<p data-line="108" class="code-line">Important: Only keys/values are searched. It is currently not possible to search for things like 'source', 'last seen' or 'first seen'.</p>
+</blockquote>
+<h3 id="errors" data-line="110" class="code-line">Errors</h3>
+<p data-line="111" class="code-line">Most errors are handled either silently or by displaying an error message at the top of the currently displayed screen. For instance, the below error occured when the user attempted to delete a reference set with dependents.
+<img src="referenceDataDeleteFailed.png" alt="Example Error" class="loading" id="image-hash-4615032c9750b813f51ace4ae8ea4895c4cb8998c7af78a4c26bc248756325ba"></p>
+<h4 id="errors-after-updating-the-app" data-line="115" class="code-line">Errors after Updating the App</h4>
+<p data-line="116" class="code-line">Some users reported duplicate tabs after updating the app from Version 2.0.0 to 2.0.1. This can be fixed by uninstalling both applications via the API and performing a clean reinstall.
+1.) Find the App IDs (most easily via <code>docker ps</code> on the console or App Host)
+2.) Remove the Apps from QRadar (most easily via the API <code>DELETE /gui_app_framework/applications/{application_id}</code>)
+3.) Do a fresh installation (most easily via the App Extension GUI)</p>
+<h3 id="reference-map-of-sets-with-sparse-keys-and-dense-values" data-line="121" class="code-line">Reference Map of Sets with sparse keys and dense values</h3>
+<p data-line="122" class="code-line">Attempting to load a Map of Set that contains only a small number of keys but an extraordinarily large number of values for each key (e.g. 5 keys with 100k values each). Loading that data might fail. Adding data, puring data and deleting the reference data entry are still possible. There is currently no workaround available.</p>
+
+</body></html>

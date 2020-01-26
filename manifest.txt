@@ -5,7 +5,7 @@
 			"locale": {
 				"en-US": {
 					"extension.name": "Reference Data Management",
-					"extension.long.description": "The Reference Data Management Application aims at supporting the visualization and management of all types of Reference Data in QRadar."
+					"extension.long.description": "The app allows the creation, deletion and visualization of all types of Reference Data in QRadar.\nFrom within the app, new Reference Data Entries (e.g. Sets) can be created or deleted. Additionally, most supported operations on the different data types can be performed from within the app, for instance bulk insertion of new data into a Reference Map or exporting all data from a Reference Table."
 				}
 			},
 			"extension_name": "extension.name",
@@ -13,39 +13,11 @@
 			"supported_language_set": [
 				"en-US"
 			],
-			"min_qradar_version": "7.3.2",
-			"version": "2.0.0",
-			"authored_by": "IBM Security Services",
-			"authored_by_email": "michael.essigke1@ibm.com",
-			"package_size": "6124079",
-            "extension_hub":
-            {
-                "tags":
-                {
-                    "contents":
-                    {
-                    "Custom List": 0,
-                    "Dashboard": 0,
-                    "Reports": 0,
-                    "Saved Search": 0,
-                    "FGroup": 0,
-                    "FGroup Type": 0,
-                    "Custom Rule": 0,
-                    "Custom Properties": 0,
-                    "Log Sources": 0,
-                    "Log Source Type": 0,
-                    "Log Source Category": 0,
-                    "Log Source Extension": 0,
-                    "Custom QidMap Entries": 0,
-                    "Reference Data Collection": 0,
-                    "Historical Correlation profile": 0,
-                    "Custom Functions": 0,
-                    "Custom Actions": 0,
-                    "Application": 1,
-                    "Other": 0
-                    }
-                }
-            }
+			"min_qradar_version": "7.3.0",
+			"version": "2.0.2",
+			"authored_by": "IBM QRadar Forum Support Only",
+			"authored_by_email": "https://developer.ibm.com/answers/topics/qradar.html",
+			"package_size": "6124079"
 		}
 	}
 }
