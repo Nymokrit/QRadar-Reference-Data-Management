@@ -1,4 +1,4 @@
-import * as APIHelper from '../../Store/APIHelper';
+import * as APIHelper from '../../Util/APIHelper';
 import * as RefDataHelper from '../RefDataHelper';
 import ReferenceData from './ReferenceData';
 
@@ -33,7 +33,7 @@ class ReferenceSet extends ReferenceData {
             return;
         }
         const username = await RefDataHelper.defaultEntryComment();
-        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || username };
+        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || username, };
 
         super.addItem(parsedEntry);
     }

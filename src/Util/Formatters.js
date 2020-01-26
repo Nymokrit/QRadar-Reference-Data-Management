@@ -2,22 +2,6 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import dateformat from 'dateformat';
 
-import * as QRadarHelper from './QRadarHelper';
-
-
-export function formatCEPOpen(cell, row) {
-    return (
-        <button
-            className='btn-default btn-popup btn-inner-table'
-            onClick={(e) => QRadarHelper.openCEPLink(cell)}
-        >
-            <FontAwesomeIcon
-                icon='external-link-alt'
-            />
-        </button>
-    );
-}
-
 /**
  * Formatter to display either a checkmark (true) or times (false) for a cell depending on the cell's value
  * if the options contain an attribute 'reverse', the default display option is reversed
@@ -36,7 +20,6 @@ export function formatEdgeTitle(entry, llc) {
     let titleString = '<span class="' + (entry.enabled ? 'enabled' : 'disabled') + '">';
     if (entry.log_source_id) titleString += '[LS ' + entry.log_source_id + ']';
     else if (entry.qid) titleString += '[QID ' + entry.qid + ']';
-    // else if (entry.qid) titleString += '[QID ' + DataStore.qids[entry.qid].name + ']'
     else if (entry.low_level_category_id) titleString += '[CAT ' + llc.name + ']';
     else titleString += '[ALL]';
     titleString += ' ($' + (entry.capture_group || '0') + ') ';

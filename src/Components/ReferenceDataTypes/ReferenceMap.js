@@ -1,5 +1,5 @@
 import * as RefDataHelper from '../RefDataHelper';
-import * as APIHelper from '../../Store/APIHelper';
+import * as APIHelper from '../../Util/APIHelper';
 import ReferenceData from './ReferenceData';
 
 class ReferenceMap extends ReferenceData {

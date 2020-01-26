@@ -1,4 +1,4 @@
-import * as APIHelper from '../../Store/APIHelper';
+import * as APIHelper from '../../Util/APIHelper';
 import * as RefDataHelper from '../RefDataHelper';
 import ReferenceData from './ReferenceData';
 
@@ -190,7 +190,7 @@ class ReferenceTable extends ReferenceData {
             };
             this.bulkAddItems(data);
         };
-        
+
         reader.readAsText(entries.file.value);
     }
 
@@ -206,13 +206,13 @@ class ReferenceTable extends ReferenceData {
             .filter(value => value);
 
 
-        let newData = {};
+        const newData = {};
 
 
         for (const tuple of tuples) {
-            const [key, innerKey, value] = tuple.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
+            const [key, innerKey, value,] = tuple.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
             if (!newData.hasOwnProperty(key)) {
-                newData[key] = {}
+                newData[key] = {};
             }
             newData[key][innerKey] = value;
             // newData.push({ key: key, value: value, id: key, source: 'reference data api', });
@@ -241,22 +241,25 @@ class ReferenceTable extends ReferenceData {
     }
 
     testValue(entry, searchText, isRegexSearch) {
-        let matches = false;
-        if (isRegexSearch) matches = entry.key.match(searchText);
-        else matches = entry.key.toLowerCase().includes(searchText.toLowerCase());
+        try {
+            let matches = false;
+            if (isRegexSearch) matches = entry.key.match(searchText);
+            else matches = entry.key.toLowerCase().includes(searchText.toLowerCase());
 
-        // if we found the string as part of a key, we add the entry
-        if (matches) return true;
-        // if we didn't find the string as key, let's try each value
-        else {
-            for (const value of entry.values) {
-                if (isRegexSearch) matches = value.value.match(searchText);
-                else matches = value.value.toLowerCase().includes(searchText.toLowerCase());
+            // if we found the string as part of a key, we add the entry
+            if (matches) return true;
+            // if we didn't find the string as key, let's try each value
+            else {
+                for (const value of entry.values) {
+                    if (isRegexSearch) matches = value.value.match(searchText);
+                    else matches = value.value.toLowerCase().includes(searchText.toLowerCase());
 
-                if (matches) return true;
+                    if (matches) return true;
+                }
             }
+        } catch (e) {
+            return false;
         }
-
         return false;
     }
 }

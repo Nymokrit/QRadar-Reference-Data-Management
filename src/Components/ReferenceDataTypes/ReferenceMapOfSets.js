@@ -1,4 +1,4 @@
-import * as APIHelper from '../../Store/APIHelper';
+import * as APIHelper from '../../Util/APIHelper';
 import * as RefDataHelper from '../RefDataHelper';
 import ReferenceData from './ReferenceData';
 
@@ -156,6 +156,59 @@ class ReferenceMapOfSets extends ReferenceData {
             data = Object.keys(response.data).map(i => ({ key: i, values: response.data[i], valueLabel: response.value_label, id: i, }));
         }
         return data;
+    }
+
+    async importItems(entries) {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const text = reader.result;
+            const data = {
+                bulkAddEntriesSeparator: entries.bulkAddEntriesSeparator,
+                bulkAddKeyValueSeparator: entries.bulkAddKeyValueSeparator,
+                bulkAddValuesSeparator: entries.bulkAddValuesSeparator,
+                bulkAddData: { value: text, },
+            };
+            this.bulkAddItems(data);
+        };
+
+        reader.readAsText(entries.file.value);
+    }
+
+    
+    async bulkAddItems(entries) {
+        this.props.toggleLoading();
+
+        const tuples = entries.bulkAddData.value
+            .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
+            .split(entries.bulkAddEntriesSeparator.value)
+            .map(value => value.trim())
+            .filter(value => value);
+
+
+        const newData = {};
+
+
+        for (const tuple of tuples) {
+            const [key, values,] = tuple.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
+            if (!newData.hasOwnProperty(key)) {
+                newData[key] = {};
+            }
+            newData[key] = values.split(entries.bulkAddValuesSeparator.value).map(value => value.trim()).filter(x => x);;
+            // newData.push({ key: key, value: value, id: key, source: 'reference data api', });
+        }
+
+
+        const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, newData);
+
+        if (response.error) {
+            this.props.showError(response.message);
+        } else {
+            // this.tableChanged('new', oldData);
+            this.updateMetaData(response);
+        }
+        this.loadData(this.props.type, true);
+        this.props.toggleLoading();
     }
 
     exportItems() {

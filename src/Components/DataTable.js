@@ -68,7 +68,7 @@ class DataTable extends Component {
             ),
         };
 
-        const hidden = ['map_of_sets'].includes(this.props.type);
+        // const hidden = ['map_of_sets'].includes(this.props.type);
         const { SearchBar, } = Search;
         const contentTable = ({ paginationProps, paginationTableProps, }) => (
             <React.Fragment>
@@ -81,8 +81,8 @@ class DataTable extends Component {
                     {toolkitprops => (
                         <React.Fragment>
                             {this.props.addItem && <button className='btn-default btn-ref-data btn-add' onClick={this.props.addItem}>Add Entry</button>}
-                            {!hidden && this.props.bulkAddItem && <button className='btn-default btn-ref-data btn-bulk' onClick={this.props.bulkAddItem}>Bulk Add</button>}
-                            {!hidden && this.props.importItems && <button className='btn-default btn-ref-data btn-import' onClick={this.props.importItems}>Import CSV</button>}
+                            {this.props.bulkAddItem && <button className='btn-default btn-ref-data btn-bulk' onClick={this.props.bulkAddItem}>Bulk Add</button>}
+                            {this.props.importItems && <button className='btn-default btn-ref-data btn-import' onClick={this.props.importItems}>Import CSV</button>}
                             {this.props.exportItems && <button className='btn-default btn-ref-data btn-export' onClick={this.props.exportItems}>Export CSV</button>}
                             {this.props.deleteItem && <button className='btn-default btn-ref-data btn-delete-data' onClick={this.props.deleteItem}>Delete Entry</button>}
                             {!this.props.innerTable && <SearchBar {...toolkitprops.searchProps} />}
@@ -91,7 +91,7 @@ class DataTable extends Component {
                                 keyField='id'
                                 remote={{ search: true, }}
                                 onTableChange={this.props.tableChanged}
-                                expandRow={this.props.expandable && expandRow}
+                                expandRow={this.props.expandable ? expandRow : undefined}
                                 selectRow={{
                                     mode: 'checkbox',
                                     clickToSelect: true,

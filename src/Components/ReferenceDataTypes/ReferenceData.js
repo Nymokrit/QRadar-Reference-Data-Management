@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import * as RefDataHelper from '../RefDataHelper';
 import * as EntryDefinitions from '../../Definitions/ReferenceDataCreateEntryDefinitions';
 import { setTableColumns, mapTableColumns, mapOfSetsTableColumns, mapOfSetsInnerTableColumns, tableTableColumns, tableInnerTableColumns } from '../../Definitions/TableColumnDefinitions';
-import * as APIHelper from '../../Store/APIHelper';
+import * as APIHelper from '../../Util/APIHelper';
 import MetaData from '../MetaData';
 import DataTable from '../DataTable';
 import Dependents from '../Dependents';
@@ -33,8 +33,6 @@ class ReferenceData extends Component {
             innerSearchText: '',
             modalInputDefinition: {},
         };
-
-
 
         this.clearInnerSelection = {};
 

@@ -4,8 +4,14 @@ import * as Formatters from '../Util/Formatters';
 
 class MetaData extends Component {
     lookup = { 'map': 'Map', 'set': 'Set', 'map_of_sets': 'Map of Sets', 'table': 'Table', };
-    
+
     render() {
+        let keyTypes = this.props.data.key_name_types && "";
+        if (keyTypes !== undefined) {
+            for (const key in this.props.data.key_name_types) {
+                keyTypes += this.props.data.key_name_types[key] + ' (' + key + '), ';
+            }
+        }
         return (
             <React.Fragment>
                 <button className='btn-default btn-delete btn-right btn-top' onClick={this.props.deleteEntry}>Delete {this.lookup[this.props.typeLabel] || 'Data'}</button>
@@ -16,7 +22,8 @@ class MetaData extends Component {
                         <ListGroupItem>Number of Elements: <Badge color='primary' pill>{this.props.data.number_of_elements || 0}</Badge></ListGroupItem>
                         <ListGroupItem>Creation Time: {this.props.data.creation_time ? Formatters.dateFormatter(this.props.data.creation_time) : ''}</ListGroupItem>
                         <ListGroupItem>Timeout Type: {this.props.data.timeout_type}</ListGroupItem>
-                        <ListGroupItem>Element Type: {this.props.data.element_type}</ListGroupItem>
+                        {keyTypes && <ListGroupItem>Key Types: {keyTypes}</ListGroupItem>}
+                        <ListGroupItem>Value Type: {this.props.data.element_type}</ListGroupItem>
                         <ListGroupItem>Time To Live: {this.props.data.time_to_live ? Formatters.ttlFormatter(this.props.data.time_to_live) : 'Infinitly'}</ListGroupItem>
                     </ListGroup>
                 </div>

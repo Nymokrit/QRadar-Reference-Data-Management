@@ -1,4 +1,4 @@
-import * as APIHelper from '../Store/APIHelper';
+import * as APIHelper from '../Util/APIHelper';
 import fileSaver from 'file-saver';
 import { QRadar } from 'qjslib';
 
@@ -9,7 +9,7 @@ export async function defaultEntryComment() {
     try {
         const entry = await QRadar.getCurrentUser();
         if (entry && !entry.error) username = entry.username;
-    } catch (e) { console.log(e) };
+    } catch (e) { console.log(e); };
     return username;
 }
 

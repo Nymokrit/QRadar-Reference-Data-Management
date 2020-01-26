@@ -81,6 +81,20 @@ export const map_of_setsAddInnerItem = {
     'source': { value: '', label: 'Comment', },
 };
 
+export const map_of_setsImportItems = {
+    'file': { label: 'File', value: '', type: 'file', },
+    'bulkAddKeyValueSeparator': { label: 'Key-Values Separator', value: '=', help: 'Example Format: Key=Value1,Value2;Key2=Value3, ...', },
+    'bulkAddValuesSeparator': { label: 'Value-Value Separator', value: ',', help: 'Example Format: Key=Value1,Value2;Key2=Value3, ...', },
+    'bulkAddEntriesSeparator': { label: 'Entries Separator', value: ';', help: 'New lines are implicit separators', },
+};
+
+export const map_of_setsBulkAddItems = {
+    'bulkAddData': { label: 'Entries', value: '', type: 'textarea', },
+    'bulkAddKeyValueSeparator': { label: 'Key-Values Separator', value: '=', help: 'Example Format: Key=Value1,Value2;Key2=Value3, ...', },
+    'bulkAddValuesSeparator': { label: 'Value-Value Separator', value: ',', help: 'Example Format: Key=Value1,Value2;Key2=Value3, ...', },
+    'bulkAddEntriesSeparator': { label: 'Entries Separator', value: ';', help: 'New lines are implicit separators', },
+};
+
 export const tableAddItem = {
     'keyAddDataKey': { label: 'Input Key', value: '', },
     'keyAddDataValues': { label: 'Input Values', value: '', type: 'textarea', },
@@ -96,12 +110,12 @@ export const tableAddInnerItem = {
 
 export const tableImportItems = {
     'file': { label: 'File', value: '', type: 'file', },
-    'bulkAddKeyValueSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value; ...' },
+    'bulkAddKeyValueSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value; ...', },
     'bulkAddEntriesSeparator': { label: 'Entries Separator', value: ';', help: 'New lines are implicit separators', },
 };
 
 export const tableBulkAddItems = {
     'bulkAddData': { label: 'Entries', value: '', type: 'textarea', },
-    'bulkAddKeyValueSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value; ...' },
-    'bulkAddEntriesSeparator': { label: 'Entries Separator', value: '=', help: 'New lines are implicit separators', },
+    'bulkAddKeyValueSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value; ...', },
+    'bulkAddEntriesSeparator': { label: 'Entries Separator', value: ';', help: 'New lines are implicit separators', },
 };

@@ -10,78 +10,52 @@ import { Modal, Alert } from 'reactstrap';
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
 
-import BootstrapTable from 'react-bootstrap-table-next';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
-import paginationFactory, { PaginationProvider } from 'react-bootstrap-table2-paginator';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChevronRight, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faChevronDown, faTrash } from '@fortawesome/free-solid-svg-icons';
 library.add(faChevronRight, faChevronDown, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faTrash);
 
 import './App.scss';
 
-import { dataTableColumns } from '../Definitions/TableColumnDefinitions';
 import Sidebar from '../Components/Sidebar';
 import ReferenceSet from '../Components/ReferenceDataTypes/ReferenceSet';
 import ReferenceMap from '../Components/ReferenceDataTypes/ReferenceMap';
 import ReferenceMapOfSets from '../Components/ReferenceDataTypes/ReferenceMapOfSets';
 import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
-import * as APIHelper from '../Store/APIHelper';
-import DataStore from '../Store/DataStore';
-
+import * as APIHelper from '../Util/APIHelper';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    DataStore.init();
 
     this.refDataMapping = { 'maps': ReferenceMap, 'sets': ReferenceSet, 'map_of_sets': ReferenceMapOfSets, 'tables': ReferenceTable, };
+    const refData = {
+      'sets': { key: 'sets', label: 'Reference Sets', nodes: {}, isOpen: false, },
+      'maps': { key: 'maps', label: 'Reference Maps', nodes: {}, isOpen: false, },
+      'map_of_sets': { key: 'map_of_sets', label: 'Reference Map of Sets', nodes: {}, isOpen: false, },
+      'tables': { key: 'tables', label: 'Reference Tables', nodes: {}, isOpen: false, },
+    };
 
-    this.state = { allRefData: [], refreshData: false, atHome: !(DataStore.currentRefDataEntry && DataStore.currentRefDataEntry.selectedEntryName), errorMessages: [], displayError: false, };
+    this.state = { refData, errorMessages: [], displayError: false, };
 
-    this.refreshSidebar = this.refreshSidebar.bind(this);
-    this.updateOverviewData = this.updateOverviewData.bind(this);
     this.menuItemClicked = this.menuItemClicked.bind(this);
     this.createEntry = this.createEntry.bind(this);
     this.entryCreated = this.entryCreated.bind(this);
     this.deleteEntry = this.deleteEntry.bind(this);
     this.toggleLoading = this.toggleLoading.bind(this);
     this.showError = this.showError.bind(this);
-  }
+    this.getRefData = this.getRefData.bind(this);
 
-
-  showDataErrorMessages() {
-    const errorMessages = [];
-
-    errorMessages.push(...DataStore.loadingErrors.map(e => e.message));
-
-    if (errorMessages.length) {
-      this.showError(errorMessages);
-      DataStore.loadingErrors = [];
-    }
-  }
-
-  showError(message) {
-    document.getElementsByClassName('section-lists')[0].scrollTop = 0;
-    const messages = Array.isArray(message) ? message : [message,];
-    this.setState({ displayError: true, errorMessages: messages, });
-  }
-
-  refreshSidebar() { // needs to be refactored
-    this.setState({ refreshData: true, });
-    this.setState({ refreshData: false, });
+    this.getRefData();
   }
 
   menuItemClicked(event) {
     // event contains information about the currently selected api (e.g. event.key == 'sets/testRefSet')
     this.setState({
+      currentRefDataEntry: { selectedEntryAPI: event.key, selectedEntryName: event.label, selectedEntrySize: event.size, selectedEntryType: event.datatype, },
       atHome: false,
       createNew: false,
     });
-    DataStore.currentRefDataEntry = { selectedEntryAPI: event.key, selectedEntryName: event.label, selectedEntrySize: event.size, selectedEntryType: event.datatype, };
-    console.log(DataStore.currentRefDataEntry);
   }
 
   createEntry(e, type) {
@@ -117,13 +91,13 @@ class App extends Component {
       this.showError(response.message);
     } else {
       const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
-      DataStore.currentRefDataEntry = { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, };
       this.setState({
+        currentRefDataEntry: { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, },
         createNew: false,
         atHome: false,
       });
 
-      this.refreshSidebar();
+      this.getRefData();
     }
   }
 
@@ -137,11 +111,11 @@ class App extends Component {
           this.showError(response.message);
         } else {
           this.setState({ atHome: true, });
-          this.refreshSidebar();
+          this.getRefData();
         }
         this.toggleLoading();
       };
-      await APIHelper.deleteReferenceData(DataStore.currentRefDataEntry.selectedEntryType, DataStore.currentRefDataEntry.selectedEntryName, deleteEntryCallback);
+      await APIHelper.deleteReferenceData(this.state.currentRefDataEntry.selectedEntryType, this.state.currentRefDataEntry.selectedEntryName, deleteEntryCallback);
     } else return;
   }
 
@@ -158,23 +132,40 @@ class App extends Component {
     this.setState({ displayError: true, errorMessages: messages, });
   }
 
-  updateOverviewData() {
-    this.setState({ allRefData: DataStore.allRefData, });
+  async getRefData() {
+    // const overviewData = [];
+    const data = this.state.refData;
+    for (const key in data) {
+      const response = await APIHelper.loadReferenceData(key);
+      if (response.error) {
+        this.props.showError('Unable to load ' + data[key].label);
+        continue;
+      }
+      data[key].nodes = {}; // Clear 'old' node data
+      data[key].size = response.length;
+      data[key].datatype = key.replace(/_/g, ' ');
+      response.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
+      response.forEach(element => {
+        const newEntry = { label: element.name, size: element.number_of_elements, datatype: key, key: key + '/' + element.name, };
+        data[key].nodes[element.name] = newEntry;
+      });
+    }
+    this.setState({ refData: data, });
   }
 
   render() {
     // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
-    const ReferenceDataComponent = this.refDataMapping[DataStore.currentRefDataEntry && DataStore.currentRefDataEntry.selectedEntryType];
+    const ReferenceDataComponent = this.refDataMapping[this.state.currentRefDataEntry && this.state.currentRefDataEntry.selectedEntryType];
     return (
       <SplitterLayout
         secondaryInitialSize={84}
         percentage>
         <Sidebar
           menuItemAction={this.menuItemClicked}
-          refreshData={this.state.refreshData}
-          updateOverviewData={this.updateOverviewData}
           showError={this.showError}
-          createEntry={this.createEntry} />
+          createEntry={this.createEntry}
+          refData={this.state.refData}
+        />
         <div id='content' className='ref-data'>
           <Alert
             color='danger'
@@ -199,17 +190,17 @@ class App extends Component {
               save={this.entryCreated}
             />
             :
-            (this.state.atHome ?
+            (!ReferenceDataComponent ?
               <React.Fragment />
               :
               <ReferenceDataComponent
-                key={DataStore.currentRefDataEntry.selectedEntryAPI}
-                api={DataStore.currentRefDataEntry.selectedEntryAPI}
-                name={DataStore.currentRefDataEntry.selectedEntryName}
-                type={DataStore.currentRefDataEntry.selectedEntryType}
-                size={DataStore.currentRefDataEntry.selectedEntrySize}
+                key={this.state.currentRefDataEntry.selectedEntryAPI}
+                api={this.state.currentRefDataEntry.selectedEntryAPI}
+                name={this.state.currentRefDataEntry.selectedEntryName}
+                type={this.state.currentRefDataEntry.selectedEntryType}
+                size={this.state.currentRefDataEntry.selectedEntrySize}
                 deleteEntry={this.deleteEntry}
-                dataUpdated={this.refreshSidebar}
+                dataUpdated={this.getRefData}
                 toggleLoading={this.toggleLoading}
                 showError={this.showError}
               />
@@ -221,7 +212,7 @@ class App extends Component {
     );
   }
 }
-
+/*
 class WelcomePage extends Component {
   icon = { maps: 'map', sets: 'ellipsis-h', map_of_sets: 'list-ul', tables: 'table', };
 
@@ -259,6 +250,6 @@ class WelcomePage extends Component {
     );
   }
 }
-
+*/
 
 export default App;
