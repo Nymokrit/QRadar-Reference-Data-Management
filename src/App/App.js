@@ -6,6 +6,11 @@ console.fail = msg => console.log(`%c${msg}`, failure);
 
 import React, { Component } from 'react';
 import { Modal, Alert } from 'reactstrap';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link
+} from "react-router-dom";
 
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
@@ -155,60 +160,83 @@ class App extends Component {
 
   render() {
     // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
-    const ReferenceDataComponent = this.refDataMapping[this.state.currentRefDataEntry && this.state.currentRefDataEntry.selectedEntryType];
-    return (
-      <SplitterLayout
-        secondaryInitialSize={84}
-        percentage>
-        <Sidebar
-          menuItemAction={this.menuItemClicked}
-          showError={this.showError}
-          createEntry={this.createEntry}
-          refData={this.state.refData}
-        />
-        <div id='content' className='ref-data'>
-          <Alert
-            color='danger'
-            className='error-alert'
-            isOpen={this.state.displayError}
-            toggle={(e) => this.setState({ displayError: false, errorMessages: [], })}
-          >
-            {this.state.errorMessages.map(message => <p key={message} className='error-alert-message'>{message}</p>)}
-          </Alert>
-          <Modal
-            className='loading-modal'
-            isOpen={this.state.loadingModalOpen}
-            toggle={(e) => this.setState(prevState => ({ loadingModalOpen: !prevState.loadingModalOpen, }))}
-            modalTransition={{ timeout: 0, }}
-            backdrop={true}
-          >
-            <div className='loading'></div>
-          </Modal >
-          {this.state.createNew ?
-            <NewEntry
-              type={this.state.createNewReferenceEntryType}
-              save={this.entryCreated}
-            />
-            :
-            (!ReferenceDataComponent ?
-              <React.Fragment />
-              :
-              <ReferenceDataComponent
-                key={this.state.currentRefDataEntry.selectedEntryAPI}
-                api={this.state.currentRefDataEntry.selectedEntryAPI}
-                name={this.state.currentRefDataEntry.selectedEntryName}
-                type={this.state.currentRefDataEntry.selectedEntryType}
-                size={this.state.currentRefDataEntry.selectedEntrySize}
-                deleteEntry={this.deleteEntry}
-                dataUpdated={this.getRefData}
-                toggleLoading={this.toggleLoading}
-                showError={this.showError}
-              />
 
-            )
-          }
-        </div>
-      </SplitterLayout>
+    let type = ''
+    let api = '';
+    let name = '';
+    let size = 0;
+    console.log(window.location.href);
+
+    if (this.state.currentRefDataEntry) {
+      type = this.state.currentRefDataEntry.selectedEntryType;
+      api = this.state.currentRefDataEntry.selectedEntryAPI;
+      name = this.state.currentRefDataEntry.selectedEntryName;
+      size = this.state.currentRefDataEntry.selectedEntrySize;
+    }
+    if (!type && window.location && window.location.href.includes('/data/')) {
+      api = decodeURI(window.location.href.split('/data')[1])
+      console.log(api);
+      let y = api.split('/')
+      type = y[1];
+      name = y[2];
+    }
+
+    const ReferenceDataComponent = this.refDataMapping[type];
+    console.log(ReferenceDataComponent);
+    return (
+      <Router>
+        <SplitterLayout
+          secondaryInitialSize={84}
+          percentage>
+          <Sidebar
+            menuItemAction={this.menuItemClicked}
+            showError={this.showError}
+            createEntry={this.createEntry}
+            refData={this.state.refData}
+          />
+          <div id='content' className='ref-data'>
+            <Alert
+              color='danger'
+              className='error-alert'
+              isOpen={this.state.displayError}
+              toggle={(e) => this.setState({ displayError: false, errorMessages: [], })}
+            >
+              {this.state.errorMessages.map(message => <p key={message} className='error-alert-message'>{message}</p>)}
+            </Alert>
+            <Modal
+              className='loading-modal'
+              isOpen={this.state.loadingModalOpen}
+              toggle={(e) => this.setState(prevState => ({ loadingModalOpen: !prevState.loadingModalOpen, }))}
+              modalTransition={{ timeout: 0, }}
+              backdrop={true}
+            >
+              <div className='loading'></div>
+            </Modal >
+            {this.state.createNew ?
+              <NewEntry
+                type={type}
+                save={this.entryCreated}
+              />
+              :
+              (!ReferenceDataComponent ?
+                <React.Fragment />
+                :
+                <ReferenceDataComponent
+                  key={api}
+                  api={api}
+                  name={name}
+                  type={type}
+                  size={size}
+                  deleteEntry={this.deleteEntry}
+                  dataUpdated={this.getRefData}
+                  toggleLoading={this.toggleLoading}
+                  showError={this.showError}
+                />
+              )
+            }
+          </div>
+        </SplitterLayout>
+      </Router>
     );
   }
 }

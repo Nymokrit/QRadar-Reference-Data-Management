@@ -1,9 +1,6 @@
-import re
-import json
-from flask import request, render_template, Response
+from flask import render_template
 from app import app
-from qpylib import qpylib
-import os
+
 
 @app.route('/')
 @app.route('/index')

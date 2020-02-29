@@ -126,9 +126,9 @@ export function download(name, content, hasInnerKey, hasOuterKey) {
     if (hasInnerKey) exportString += 'key,';
     exportString += 'value,first_seen,last_seen,source\n';
     for (const value of content) {
-        if (hasOuterKey) exportString += value.outer_key + ',';
-        if (hasInnerKey) exportString += value.key + ',';
-        exportString += value.value + ',' + value.first_seen + ',' + value.last_seen + ',' + value.source + '\n';
+        if (hasOuterKey) exportString += '"' + value.outer_key.replace(/"/g, '""') + '",';
+        if (hasInnerKey) exportString += '"' + value.key.replace(/"/g, '""') + '",';
+        exportString += '"' + value.value.replace(/"/g, '""') + '","' + value.first_seen + '","' + value.last_seen + '","' + value.source.replace(/"/g, '""') + '"\n';
     }
 
     const blob = new Blob([exportString,], { type: "text/csv", });

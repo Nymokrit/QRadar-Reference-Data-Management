@@ -6,10 +6,29 @@
         "description": "View and manage Reference Data",
         "id": "ReferenceDataManagement"
     }],
+    "services": [{
+        "name": "reference_data_service",
+        "version": "1.0",
+        "endpoints": [{
+            "name": "data",
+            "path": "data/{type}/{name}",
+            "http_method": "GET",
+            "parameters": [{
+                "location": "PATH",
+                "name": "type",
+                "definition": "String"
+            }, {
+                "location": "PATH",
+                "name": "name",
+                "definition": "String"
+            }]
+        }],
+        "command": "echo 1"
+    }],
     "description": "Application to view and manage Reference Data",
     "resources": {
         "memory": 100
-    }, 
+    },
     "name": "Reference Data Management",
-    "version": "2.0.2"
+    "version": "2.0.4"
 }

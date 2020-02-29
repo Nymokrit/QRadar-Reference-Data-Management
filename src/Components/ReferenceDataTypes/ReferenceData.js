@@ -60,6 +60,7 @@ class ReferenceData extends Component {
         this.innerSelectionChanged = RefDataHelper.innerSelectionChanged.bind(this);
 
         this.loadData(this.props.api);
+
     }
 
     deleteItem() { };
