@@ -1,26 +1,20 @@
-const success = ['background: green', 'color: white', 'display: block', 'text-align: center',].join(';');
-const failure = ['background: red', 'color: white', 'display: block', 'text-align: center',].join(';');
-console.success = msg => console.log(`%c${msg}`, success);
-console.fail = msg => console.log(`%c${msg}`, failure);
-
-
 import React, { Component } from 'react';
-import { Modal, Alert } from 'reactstrap';
+import { Alert } from 'reactstrap';
 import {
   BrowserRouter as Router,
   Route,
   Link
 } from "react-router-dom";
 
+import { Loading, Modal, InlineNotification } from 'carbon-components-react';
+
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faChevronRight, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faChevronDown, faTrash } from '@fortawesome/free-solid-svg-icons';
-library.add(faChevronRight, faChevronDown, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faTrash);
 
 import './App.scss';
-
 import Sidebar from '../Components/Sidebar';
 import ReferenceSet from '../Components/ReferenceDataTypes/ReferenceSet';
 import ReferenceMap from '../Components/ReferenceDataTypes/ReferenceMap';
@@ -28,6 +22,13 @@ import ReferenceMapOfSets from '../Components/ReferenceDataTypes/ReferenceMapOfS
 import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
 import * as APIHelper from '../Util/APIHelper';
+
+library.add(faChevronRight, faChevronDown, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faTrash);
+
+const success = ['background: green', 'color: white', 'display: block', 'text-align: center',].join(';');
+const failure = ['background: red', 'color: white', 'display: block', 'text-align: center',].join(';');
+console.success = msg => console.log(`%c${msg}`, success);
+console.fail = msg => console.log(`%c${msg}`, failure);
 
 class App extends Component {
   constructor(props) {
@@ -54,7 +55,8 @@ class App extends Component {
     this.getRefData();
   }
 
-  menuItemClicked(event) {
+  menuItemClicked(e, event) {
+    e.stopPropagation();
     // event contains information about the currently selected api (e.g. event.key == 'sets/testRefSet')
     this.setState({
       currentRefDataEntry: { selectedEntryAPI: event.key, selectedEntryName: event.label, selectedEntrySize: event.size, selectedEntryType: event.datatype, },
@@ -165,7 +167,6 @@ class App extends Component {
     let api = '';
     let name = '';
     let size = 0;
-    console.log(window.location.href);
 
     if (this.state.currentRefDataEntry) {
       type = this.state.currentRefDataEntry.selectedEntryType;
@@ -182,11 +183,10 @@ class App extends Component {
     }
 
     const ReferenceDataComponent = this.refDataMapping[type];
-    console.log(ReferenceDataComponent);
     return (
       <Router>
         <SplitterLayout
-          secondaryInitialSize={84}
+          secondaryInitialSize={75}
           percentage>
           <Sidebar
             menuItemAction={this.menuItemClicked}
@@ -195,14 +195,15 @@ class App extends Component {
             refData={this.state.refData}
           />
           <div id='content' className='ref-data'>
-            <Alert
-              color='danger'
-              className='error-alert'
-              isOpen={this.state.displayError}
-              toggle={(e) => this.setState({ displayError: false, errorMessages: [], })}
+            {this.state.displayError && <InlineNotification
+              kind='error'
+              className={'error-alert'}
+              key={this.state.errorMessages}
+              onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }) }}
+              title='Error'
             >
-              {this.state.errorMessages.map(message => <p key={message} className='error-alert-message'>{message}</p>)}
-            </Alert>
+              {this.state.errorMessages.map(message => <p key={message} className='error-alert-message'>{message}<br /></p> )}
+            </InlineNotification>}
             <Modal
               className='loading-modal'
               isOpen={this.state.loadingModalOpen}
@@ -210,7 +211,7 @@ class App extends Component {
               modalTransition={{ timeout: 0, }}
               backdrop={true}
             >
-              <div className='loading'></div>
+              <Loading />
             </Modal >
             {this.state.createNew ?
               <NewEntry
@@ -236,7 +237,7 @@ class App extends Component {
             }
           </div>
         </SplitterLayout>
-      </Router>
+      </Router >
     );
   }
 }

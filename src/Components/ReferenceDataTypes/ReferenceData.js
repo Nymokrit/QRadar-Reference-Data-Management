@@ -8,6 +8,7 @@ import MetaData from '../MetaData';
 import DataTable from '../DataTable';
 import Dependents from '../Dependents';
 import InputModal from '../InputModal';
+import { Loading } from 'carbon-components-react';
 
 class ReferenceData extends Component {
     constructor(props, type) {
@@ -139,7 +140,7 @@ class ReferenceData extends Component {
                     modal={this.state.showInputModal}
                     save={this.state.modalSave}
                     entries={JSON.parse(JSON.stringify(this.state.modalInputDefinition))}
-                    toggle={(e) => this.setState(prevState => ({ showInputModal: !prevState.showInputModal, }))}
+                    closeModal={(e) => this.setState(prevState => ({ showInputModal: !prevState.showInputModal, }))}
                 />
                 <MetaData
                     data={this.state.metaData}
@@ -172,15 +173,9 @@ class ReferenceData extends Component {
                         innerSelectionClearedCallback={(key, f) => this.clearInnerSelection[key] = f}
                     />
                     :
-                    <div className='loading'></div>
+                    <Loading className='loading' small withOverlay={false} />
                 }
-                {this.state.dependentsLoaded ?
-                    <Dependents
-                        dependents={this.state.dependents}
-                    />
-                    :
-                    <div className='loading'></div>
-                }
+                <Dependents dependents={this.state.dependents} loaded={this.state.dependentsLoaded} />
             </React.Fragment>
         );
     }

@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 
 import { Badge, CardHeader } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-    Link
-} from "react-router-dom";
+import { Search, Accordion, AccordionItem, Tag } from 'carbon-components-react';
 
 /*
 Register MenuItemListener by adding a callback to props['menuItemAction']
@@ -49,47 +47,46 @@ class Sidebar extends Component {
         return (
             <div className='ref-data-menu' >
                 <div className='ref-data-menu-search-wrapper'>
-                    <input type='text' placeholder='Search' onChange={this.handleChange} value={this.state.searchText} className='ref-data-menu-search' />
+                    <Search type='text' placeholder='Search' onChange={this.handleChange} value={this.state.searchText} className='ref-data-menu-search' />
                 </div>
-                {
-                    Object.keys(this.props.refData).map(refDataType => (
-                        <React.Fragment key={refDataType} >
-                            <CardHeader className='ref-data-menu-title' onClick={() => this.toggleMenu(refDataType)}>
-                                <FontAwesomeIcon icon={'chevron-' + (this.props.refData[refDataType].isOpen ? 'down' : 'right')} />
-                                {this.props.refData[refDataType].label}
-                                <button
-                                    className='btn-default btn-create'
-                                    onClick={(e) => this.props.createEntry(e, refDataType)}
-                                    title='Create new entry'
-                                ><FontAwesomeIcon icon='plus' />
-                                </button>
-                            </CardHeader>
-                            {this.props.refData[refDataType].isOpen &&
-                                Object.keys(this.props.refData[refDataType].nodes).map(refDataEntry => {
-                                    if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
-                                    const entry = this.props.refData[refDataType].nodes[refDataEntry];
-                                    return <React.Fragment key={entry.label}>
-                                        <div className='ref-data-menu-entry' onClick={(e) => this.props.menuItemAction(entry)}>
-                                            <div className='ref-data-menu-entry-icon'>
-                                                <FontAwesomeIcon icon={icon[entry.datatype]} />
+                <Accordion>
+                    {
+                        Object.keys(this.props.refData).map(refDataType => (
+                            <AccordionItem title={this.props.refData[refDataType].label} className='ref-data-menu-title' onClick={() => this.toggleMenu(refDataType)}>
+
+
+                                {this.props.refData[refDataType].isOpen &&
+                                    Object.keys(this.props.refData[refDataType].nodes).map(refDataEntry => {
+                                        if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
+                                        const entry = this.props.refData[refDataType].nodes[refDataEntry];
+                                        return <React.Fragment key={entry.label}>
+                                            <div className='ref-data-menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
+                                                <div className='ref-data-menu-entry-name'>
+                                                    {entry.label}
+                                                    <Tag className='ref-data-menu-entry-badge'>{entry.size || '0'}</Tag>
+                                                </div>
                                             </div>
-                                            <div className='ref-data-menu-entry-name'>
-                                                {entry.label}
-                                            </div>
-                                            <div className='ref-data-menu-entry-badge'>
-                                                <Badge color='default' pill>{entry.size || '0'}</Badge>
-                                            </div>
-                                        </div>
-                                    </React.Fragment>;
-                                })
-                            }
-                        </React.Fragment>
-                    )
-                    )
-                }
+                                        </React.Fragment>;
+                                    })
+                                }
+                            </AccordionItem>
+                        )
+                        )
+                    }
+                </Accordion>
             </div>
         );
     }
 }
 
 export default Sidebar;
+
+/*
+                                <FontAwesomeIcon icon={'chevron-' + (this.props.refData[refDataType].isOpen ? 'down' : 'right')} />
+                                <button
+                                    className='btn-default btn-create'
+                                    onClick={(e) => this.props.createEntry(e, refDataType)}
+                                    title='Create new entry'
+                                ><FontAwesomeIcon icon='plus' />
+                                </button>
+                                */

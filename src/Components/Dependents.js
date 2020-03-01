@@ -1,31 +1,34 @@
 import React from 'react';
 import { ListGroupItem, ListGroup } from 'reactstrap';
+import { StructuredListWrapper, StructuredListHead, StructuredListRow, StructuredListCell, StructuredListBody, StructuredListSkeleton } from 'carbon-components-react';
+
 
 function Dependents(props) {
     let dependentRules;
     if (props.dependents && props.dependents.length > 0)
         dependentRules = props.dependents.map(dependent => (
-            <ListGroupItem
-                className='ref-data-dependents-entry'
-                key={dependent.dependent_name}
-            >
+            <StructuredListBody><StructuredListRow key={dependent.dependent_name}><StructuredListCell className='ref-data-dependents-entry'>
                 ({dependent.dependent_type}) {dependent.dependent_name}
-            </ListGroupItem>
+            </StructuredListCell></StructuredListRow></StructuredListBody>
         ));
     else
         dependentRules =
-            <ListGroupItem
-                className='ref-data-dependents-entry'
-                key='No Items'
-            >
+            <StructuredListBody><StructuredListRow key='No Items'><StructuredListCell className='ref-data-dependents-entry'>
                 This ReferenceData appears to not have any data depending on it
-            </ListGroupItem>;
+            </StructuredListCell></StructuredListRow></StructuredListBody>;
 
     return (
-        <ListGroup className='ref-data-dependents'>
-            <ListGroupItem className='ref-data-dependents-title'>Dependents:</ListGroupItem>
-            {dependentRules}
-        </ListGroup>
+        props.loaded ?
+            <StructuredListWrapper className='ref-data-dependents'>
+                <StructuredListHead>
+                    <StructuredListRow head className='ref-data-dependents-title'>
+                        <StructuredListCell head>Dependents:</StructuredListCell>
+                    </StructuredListRow>
+                </StructuredListHead >
+                {dependentRules}
+            </StructuredListWrapper >
+            :
+            <StructuredListSkeleton rowCount={1}/>
     );
 }
 

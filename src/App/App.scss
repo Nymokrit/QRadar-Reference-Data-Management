@@ -177,22 +177,9 @@ nav {
     }
 
     &-delete {
-        position: absolute;
-        background: $qradar-button-delete;
-        border-color: $qradar-button-delete;
+        position: absolute !important;
         width: 150px;
-        color: white;
-
-        &:hover {
-            background: $qradar-button-delete-hover;
-            border-color: $qradar-button-delete-hover;
-        }
-
-        &:focus,
-        &:active {
-            box-shadow: 0 0 0 0.1rem $qradar-button-delete;
-            outline: none;
-        }
+        padding-right: 5px !important;
     }
 
     &-nav {
@@ -334,51 +321,13 @@ nav {
 
     &-ref-data {
         min-width: 150px;
-        color: white;
         margin-right: 10px;
         margin-bottom: 10px;
 
-        &.btn-add {
-            background-color: $add;
 
-            &:hover {
-                background-color: $add-hover;
-            }
-        }
 
         &-input {
-            color: white;
             min-width: 100px;
-
-            &.btn-save {
-                background-color: $add;
-
-                &:hover {
-                    background-color: $add-hover;
-                }
-            }
-
-            &.btn-close {
-                background-color: $close;
-
-                &:hover {
-                    background-color: $close-hover;
-                }
-            }
-        }
-
-        &.btn-delete-data {
-            background-color: $delete;
-
-            &:hover {
-                background-color: $delete-hover;
-            }
-
-            &:focus,
-            &:active {
-                box-shadow: 0 0 0 0.1rem $delete;
-                outline: none;
-            }
         }
 
         &.btn-delete-subitem {
@@ -395,30 +344,6 @@ nav {
             &:active {
                 box-shadow: 0 0 0 0.1rem $delete;
                 outline: none;
-            }
-        }
-
-        &.btn-bulk {
-            background-color: $bulk;
-
-            &:hover {
-                background-color: $bulk-hover;
-            }
-        }
-
-        &.btn-export {
-            background-color: $export;
-
-            &:hover {
-                background-color: $export-hover;
-            }
-        }
-
-        &.btn-import {
-            background-color: $import;
-
-            &:hover {
-                background-color: $import-hover;
             }
         }
     }
@@ -534,17 +459,13 @@ nav {
 }
 
 .rule-wizard-frame {
-    background: url('../../public/loading-indicator.gif') no-repeat;
+    background: url('../icons/loading-indicator.gif') no-repeat;
     background-position: center;
     width: 800px;
     height: 750px;
 }
 
-.loading {
-    background: url('../../public/loading-indicator.gif') no-repeat;
-    background-position: center;
-    height: 100px;
-}
+.loading {}
 
 .rule-wizard-modal {
     max-width: 800px !important;
@@ -737,19 +658,25 @@ nav {
     }
 
     input:checked+label::before {
-        background: url('../../public/check-mark.png') no-repeat;
+        background: url('../icons/check-mark.png') no-repeat;
         background-position: center;
         background-color: $qradar-buttons;
     }
 }
 
+.hide {
+    display: none !important;
+}
 
 .ref-data {
     &-meta-data {
-        margin-bottom: 10px;
+        width: 50% !important;
 
-        &-title {
-            font-weight: bold;
+        &-title {}
+
+        &-entry {
+            padding-top: 0.4rem !important;
+            padding-bottom: 0.4rem !important;
         }
     }
 
@@ -767,7 +694,8 @@ nav {
         }
 
         & &-entry {
-            border-radius: 0px;
+            padding-top: 0.4rem !important;
+            padding-bottom: 0.4rem !important;
         }
     }
 
@@ -788,7 +716,7 @@ nav {
     .react-bootstrap-table {
 
         input:checked[type="checkbox"]+label::before {
-            background: url('../../public/check-mark.png') no-repeat;
+            background: url('../icons/check-mark.png') no-repeat;
             background-position: center;
             background-color: $qradar-buttons;
         }
@@ -810,7 +738,8 @@ nav {
 }
 
 .ref-data-input-modal-entry {
-    margin-top: 10px;
+    // margin-top: 10px;
+    margin-bottom: 10px !important;
 }
 
 .search {
@@ -830,50 +759,13 @@ nav {
     padding-bottom: 20px;
 
     &-search-wrapper {
-        margin-top: 27px;
-        position: relative;
-
-        &::after {
-            content: "/re/";
-            position: absolute;
-            top: 7px;
-            right: 12px;
-            color: gray;
-        }
+        margin-top: 20px;
     }
 
-    &-search {
-        border: 1px solid #ced4da;
-        width: 100%;
-        height: calc(1.5em + 0.375rem + 2px);
-        padding: 0.375rem 0.75rem;
-        font-size: 1rem;
-        font-weight: 400;
-        line-height: 1.5;
-        color: #495057;
-        background-clip: padding-box;
-        border-radius: 0px !important;
-
-        &:active,
-        &:focus {
-            border-radius: 0px !important;
-            border: 1px solid $qradar-buttons;
-            box-shadow: 0 0 0 0.1rem $qradar-buttons-50 !important;
-        }
-    }
+    &-search {}
 
     &-title {
-        margin-top: 20px;
-        margin-bottom: 5px;
-        font-weight: bold;
-        font-size: 1rem;
-        border-bottom: 1px solid #4178be50;
-        padding: 0px;
-        padding-left: 5px;
-        width: 100%;
-        background-color: white;
-        position: relative;
-        cursor: pointer;
+
 
         >svg {
             margin-right: 5px;
@@ -881,47 +773,11 @@ nav {
     }
 
     &-entry {
-        word-break: break-all;
-        // border-bottom: 1px solid $qradar-buttons-50;
-        padding: 0.25rem 0rem;
-        line-height: 1.2rem;
-        display: grid;
-        grid-template-columns: 20px 1fr;
-        align-items: center;
-
-        &-icon {
-            grid-column: 1;
-            grid-row: 1;
-            margin-right: 10px;
-            padding-left: 5px;
-        }
-
-        &-name {
-            grid-column: 2;
-            grid-row: 1;
-            padding-left: 5px;
-        }
-
         &-badge {
-            grid-column: 3;
-            grid-row: 1;
-            // margin-left: 10px;
-        }
-
-        &:active {
-            background-color: $qradar-buttons;
-            border-color: $qradar-buttons;
-            z-index: 1;
-            // border: none;
-        }
-
-        &:hover {
-            background-color: rgba(0, 0, 0, 0.075);
-            border-color: rgba(0, 0, 0, 0.075);
-            box-shadow: none;
-            z-index: 1;
-            // border: none;
-            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            height: 1.1rem !important;
+            min-width: 1.5rem !important;
         }
     }
 }

@@ -37,28 +37,28 @@ class AbstractQpylib(object):
                 params=None, json_inst=None, auth=None):
         self.log("REST get issued to " + URL + " " + str(params), "debug")
         return requests.get(URL, params=params,
-                            headers=headers, verify=False, auth=auth,
+                            headers=headers, verify=bool(0), auth=auth,
                             data=data, json=json_inst)
 
     def RESTput(self, URL, headers, data=None,
                 params=None, json_inst=None, auth=None):
         self.log("REST put issued to " + URL + " " + str(params), "debug")
         return requests.put(URL, params=params,
-                            headers=headers, verify=False, auth=auth,
+                            headers=headers, verify=bool(0), auth=auth,
                             data=data, json=json_inst)
 
     def RESTpost(self, URL, headers, data=None,
                  params=None, json_inst=None, auth=None):
         self.log("REST post issued to " + URL + " " + str(params), "debug")
         return requests.post(URL, params=params,
-                            headers=headers, verify=False, auth=auth,
+                            headers=headers, verify=bool(0), auth=auth,
                             data=data, json=json_inst)
 
     def RESTdelete(self, URL, headers, data=None,
                    params=None, json_inst=None, auth=None):
         self.log("REST delete issued to " + URL + " " + str(params), "debug")
         return requests.delete(URL, params=params,
-                            headers=headers, verify=False, auth=auth,
+                            headers=headers, verify=bool(0), auth=auth,
                             data=data, json=json_inst)
 
     def RESTunsupported(self, URL, headers, data=None,
