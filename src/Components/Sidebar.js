@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 
-import { Badge, CardHeader } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Search, Accordion, AccordionItem, Tag } from 'carbon-components-react';
+import { Search, Accordion, AccordionItem, Tag, Button } from 'carbon-components-react';
 
 /*
 Register MenuItemListener by adding a callback to props['menuItemAction']
@@ -53,9 +51,16 @@ class Sidebar extends Component {
                     {
                         Object.keys(this.props.refData).map(refDataType => (
                             <AccordionItem title={this.props.refData[refDataType].label} className='ref-data-menu-title' onClick={() => this.toggleMenu(refDataType)}>
-
-
-                                {this.props.refData[refDataType].isOpen &&
+                                <Button
+                                    kind='primary'
+                                    size='small'
+                                    className='btn-default btn-create'
+                                    onClick={(e) => this.props.createEntry(e, refDataType)}
+                                    key={'btn-' + refDataType}
+                                >
+                                    Create New
+                                </Button>
+                                {
                                     Object.keys(this.props.refData[refDataType].nodes).map(refDataEntry => {
                                         if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
                                         const entry = this.props.refData[refDataType].nodes[refDataEntry];

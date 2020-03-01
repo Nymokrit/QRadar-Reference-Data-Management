@@ -67,6 +67,7 @@ class App extends Component {
 
   createEntry(e, type) {
     e.stopPropagation();
+    console.log(type);
     this.setState({ createNew: true, createNewReferenceEntryType: type, });
   }
 
@@ -215,7 +216,7 @@ class App extends Component {
             </Modal >
             {this.state.createNew ?
               <NewEntry
-                type={type}
+                type={this.state.createNewReferenceEntryType}
                 save={this.entryCreated}
               />
               :
