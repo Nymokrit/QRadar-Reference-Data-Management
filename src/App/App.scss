@@ -160,20 +160,7 @@ nav {
     }
 
     &-create {
-        color: black;
-        background-color: inherit;
-        min-height: unset;
-        min-width: unset;
-        padding-right: 2px;
-        position: absolute;
-        right: 0px;
-        height: 0px;
-        top: -1px;
-
-        &:focus,
-        &:active {
-            outline: none;
-        }
+        margin-bottom: 15px;
     }
 
     &-delete {
@@ -330,24 +317,11 @@ nav {
             min-width: 100px;
         }
 
-        &.btn-delete-subitem {
-            min-width: unset;
-            width: 30px;
-            font-size: 1rem;
-            background-color: $delete;
-
-            &:hover {
-                background-color: $delete-hover;
-            }
-
-            &:focus,
-            &:active {
-                box-shadow: 0 0 0 0.1rem $delete;
-                outline: none;
-            }
-        }
     }
 
+    &-delete-subitem {
+        height: unset !important;
+    }
 
 
     i {
@@ -410,6 +384,11 @@ nav {
 
 .inner-keys-inputs {
     margin-bottom: 10px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
 
     button {
         border-radius: 0;
@@ -465,7 +444,22 @@ nav {
     height: 750px;
 }
 
-.loading {}
+.loading {
+    &-modal {
+        .bx--modal-close {
+            display: none !important; // Hide Closing Button on Loading Modal
+        }
+
+        &-loader {
+            width: 100px !important;
+            height: unset !important;
+            margin-top: 40px !important;
+            margin-bottom: 10px !important;
+
+        }
+    }
+}
+
 
 .rule-wizard-modal {
     max-width: 800px !important;
@@ -765,17 +759,30 @@ nav {
     &-search {}
 
     &-title {
+        padding-right: unset;
 
+        >div {
+            padding-right: unset;
+        }
 
         >svg {
             margin-right: 5px;
         }
     }
 
+    &-list {
+        width: 100%;
+
+        ::before {
+            all: unset !important;
+        }
+    }
+
     &-entry {
+        width: 100%;
+        max-width: unset !important;
+
         &-badge {
-            position: absolute;
-            right: 20px;
             height: 1.1rem !important;
             min-width: 1.5rem !important;
         }

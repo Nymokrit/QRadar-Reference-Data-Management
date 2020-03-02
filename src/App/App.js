@@ -72,11 +72,12 @@ class App extends Component {
   }
 
   async entryCreated(entries) {
+    this.toggleLoading(true, true);
     const mappedEntries = {};
     // RefSet, RefMap and RefMoS can be created identically, refTable requires some more preprocessing
     if (entries.inner_labels) {
       mappedEntries.outer_key_label = entries.key_label.value;
-      const key_name_types = [];
+      const key_name_types = []; // for the api we ned to rename some things
       Object.keys(entries.inner_labels.values).forEach((key) => {
         key_name_types.push(
           {
@@ -85,12 +86,10 @@ class App extends Component {
           });
       });
       mappedEntries.key_name_types = JSON.stringify(key_name_types);
-
-      delete entries.key_label;
-      delete entries.inner_lables;
     }
 
     for (const key in entries) {
+      if (key === 'key_label' || key === 'inner_labels') continue;// We ignore the 'old' names
       mappedEntries[key] = entries[key].value;
     }
 
@@ -107,28 +106,30 @@ class App extends Component {
 
       this.getRefData();
     }
+    this.toggleLoading(true, false);
   }
 
   async deleteEntry() {
     const save = window.confirm('Do you really want to delete this entry');
     if (save) {
-      this.toggleLoading();
+      this.toggleLoading(true, true);
 
       const deleteEntryCallback = (response) => {
         if (response.error) {
           this.showError(response.message);
         } else {
-          this.setState({ atHome: true, });
+          this.setState({ atHome: true, currentRefDataEntry: undefined });
           this.getRefData();
         }
-        this.toggleLoading();
+        this.toggleLoading(true, false);
       };
       await APIHelper.deleteReferenceData(this.state.currentRefDataEntry.selectedEntryType, this.state.currentRefDataEntry.selectedEntryName, deleteEntryCallback);
     } else return;
   }
 
-  toggleLoading() {
-    this.setState(prevState => ({ loadingModalOpen: !prevState.loadingModalOpen, }));
+  toggleLoading(explicit = false, state = false) {
+    console.log(explicit, state);
+    this.setState(prevState => ({ loadingModalOpen: explicit ? state : !prevState.loadingModalOpen, }));
   }
 
   showError(message) {
@@ -198,21 +199,21 @@ class App extends Component {
           <div id='content' className='ref-data'>
             {this.state.displayError && <InlineNotification
               kind='error'
-              className={'error-alert'}
+              className='error-alert'
               key={this.state.errorMessages}
               onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }) }}
               title='Error'
             >
-              {this.state.errorMessages.map(message => <p key={message} className='error-alert-message'>{message}<br /></p> )}
+              {this.state.errorMessages.map(message => <span key={message} className='error-alert-message'>{message}<br /></span>)}
             </InlineNotification>}
             <Modal
               className='loading-modal'
-              isOpen={this.state.loadingModalOpen}
-              toggle={(e) => this.setState(prevState => ({ loadingModalOpen: !prevState.loadingModalOpen, }))}
-              modalTransition={{ timeout: 0, }}
-              backdrop={true}
+              open={this.state.loadingModalOpen}
+              onRequestClose={(e) => this.setState(prevState => ({ loadingModalOpen: !prevState.loadingModalOpen, }))}
+              passiveModal
+              size='xs'
             >
-              <Loading />
+              <Loading className='loading-modal-loader' />
             </Modal >
             {this.state.createNew ?
               <NewEntry

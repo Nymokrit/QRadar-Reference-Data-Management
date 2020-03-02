@@ -1,34 +1,54 @@
 import React from 'react';
-import { ListGroupItem, ListGroup } from 'reactstrap';
-import { StructuredListWrapper, StructuredListHead, StructuredListRow, StructuredListCell, StructuredListBody, StructuredListSkeleton } from 'carbon-components-react';
-
+import { DataTableSkeleton, DataTable } from 'carbon-components-react';
+const {
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableBody,
+    TableCell,
+    TableHeader,
+} = DataTable;
 
 function Dependents(props) {
-    let dependentRules;
+    let dependents;
     if (props.dependents && props.dependents.length > 0)
-        dependentRules = props.dependents.map(dependent => (
-            <StructuredListBody><StructuredListRow key={dependent.dependent_name}><StructuredListCell className='ref-data-dependents-entry'>
-                ({dependent.dependent_type}) {dependent.dependent_name}
-            </StructuredListCell></StructuredListRow></StructuredListBody>
-        ));
+        dependents = props.dependents.map(dependent => ({ id: String(Math.random()), dependent: '(' + dependent.dependent_type + ')' + dependent.dependent_name }));
     else
-        dependentRules =
-            <StructuredListBody><StructuredListRow key='No Items'><StructuredListCell className='ref-data-dependents-entry'>
-                This ReferenceData appears to not have any data depending on it
-            </StructuredListCell></StructuredListRow></StructuredListBody>;
+        dependents = [{ id: '0', dependent: 'This ReferenceData appears to not have any data depending on it' }];
 
     return (
         props.loaded ?
-            <StructuredListWrapper className='ref-data-dependents'>
-                <StructuredListHead>
-                    <StructuredListRow head className='ref-data-dependents-title'>
-                        <StructuredListCell head>Dependents:</StructuredListCell>
-                    </StructuredListRow>
-                </StructuredListHead >
-                {dependentRules}
-            </StructuredListWrapper >
+            <DataTable
+                className='ref-data-dependents'
+                headers={[{ header: 'Dependents', key: 'dependent' }]}
+                rows={dependents}
+                useZebraStyles={true}
+                render={({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+                    <Table {...getTableProps()}>
+                        <TableHead>
+                            <TableRow>
+                                {headers.map(header => (
+                                    <TableHeader {...getHeaderProps({ header })}>
+                                        {header.header}
+                                    </TableHeader>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.map(row => (
+                                <TableRow key={row.id} {...getRowProps({ row })}>
+                                    {row.cells.map(cell => (
+                                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
+            />
             :
-            <StructuredListSkeleton rowCount={1}/>
+            <DataTableSkeleton headers={['Dependents']} columnCount={1} rowCount={1} />
     );
 }
 

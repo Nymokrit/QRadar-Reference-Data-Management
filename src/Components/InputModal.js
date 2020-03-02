@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ListGroup, Label, Input, UncontrolledTooltip } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { Modal, TextInput, TextArea, FileUploaderDropContainer, StructuredListWrapper, StructuredListBody, StructuredListRow } from 'carbon-components-react';
+import { FormLabel, Tooltip, Modal, TextInput, TextArea, FileUploaderDropContainer, StructuredListWrapper, StructuredListBody, StructuredListRow } from 'carbon-components-react';
 
 class InputModal extends Component {
     constructor(props) {
@@ -67,14 +67,13 @@ class InputModal extends Component {
                 {Object.keys(this.state.entries).map((key) => (
                     < StructuredListWrapper className='ref-data-input-modal-entry' key={key} >
                         <StructuredListBody>
-                            <StructuredListRow>{this.state.entries[key].label}
-                                {this.state.entries[key].help &&
-                                    <React.Fragment>
-                                        &nbsp;<FontAwesomeIcon icon='question-circle' id={'input-data-label-' + key} />
-                                        <UncontrolledTooltip placement='right' target={'input-data-label-' + key}>
-                                            {this.state.entries[key].help}
-                                        </UncontrolledTooltip>
-                                    </React.Fragment>
+                            <StructuredListRow>
+                                {this.state.entries[key].help ?
+                                    <Tooltip direction='right' triggerText={this.state.entries[key].label}>
+                                        {this.state.entries[key].help}
+                                    </Tooltip>
+                                    :
+                                    <FormLabel>{this.state.entries[key].label}</FormLabel>
                                 }
                             </StructuredListRow>
                             <StructuredListRow>

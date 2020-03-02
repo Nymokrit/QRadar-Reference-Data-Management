@@ -6,7 +6,7 @@ import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import paginationFactory, { PaginationProvider } from 'react-bootstrap-table2-paginator';
 import { Button } from 'carbon-components-react';
 
-class DataTable extends Component {
+class DataTableX extends Component {
     constructor(props) {
         super(props);
 
@@ -53,7 +53,7 @@ class DataTable extends Component {
             expandColumnRenderer: ({ expanded, }) => (<FontAwesomeIcon icon={expanded ? 'minus' : 'plus'} />),
             renderer: row => (
                 <div className='inner-table'>
-                    <DataTable
+                    <DataTableX
                         innerTable={true}
                         parent={row}
                         data={row.values}
@@ -72,6 +72,11 @@ class DataTable extends Component {
         const { SearchBar, } = Search;
         const contentTable = ({ paginationProps, paginationTableProps, }) => (
             <React.Fragment>
+                <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.addItem}>Add Entry</Button>
+                <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.bulkAddItem}>Bulk Add</Button>
+                <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.importItems}>Import CSV</Button>
+                <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.exportItems}>Export CSV</Button>
+                <Button kind='danger' size='small' className='btn-default btn-ref-data' onClick={this.props.deleteItem}>Delete Entry</Button>
                 <ToolkitProvider
                     keyField='id'
                     data={this.props.data}
@@ -80,11 +85,6 @@ class DataTable extends Component {
                 >
                     {toolkitprops => (
                         <React.Fragment>
-                            {this.props.addItem && <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.addItem}>Add Entry</Button>}
-                            {this.props.bulkAddItem && <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.bulkAddItem}>Bulk Add</Button>}
-                            {this.props.importItems && <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.importItems}>Import CSV</Button>}
-                            {this.props.exportItems && <Button kind='tertiary' size='small' className='btn-default btn-ref-data' onClick={this.props.exportItems}>Export CSV</Button>}
-                            {this.props.deleteItem && <Button kind='danger' size='small' className='btn-default btn-ref-data' onClick={this.props.deleteItem}>Delete Entry</Button>}
                             {!this.props.innerTable && <SearchBar {...toolkitprops.searchProps} />}
                             <BootstrapTable
                                 hover
@@ -132,4 +132,4 @@ class DataTable extends Component {
     }
 }
 
-export default DataTable;
+export default DataTableX;

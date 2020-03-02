@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Search, Accordion, AccordionItem, Tag, Button } from 'carbon-components-react';
+import { Search, Accordion, AccordionItem, Tag, Button, UnorderedList, ListItem } from 'carbon-components-react';
 
 /*
 Register MenuItemListener by adding a callback to props['menuItemAction']
@@ -50,7 +50,7 @@ class Sidebar extends Component {
                 <Accordion>
                     {
                         Object.keys(this.props.refData).map(refDataType => (
-                            <AccordionItem title={this.props.refData[refDataType].label} className='ref-data-menu-title' onClick={() => this.toggleMenu(refDataType)}>
+                            <AccordionItem open={this.props.refData[refDataType].isOpen} title={this.props.refData[refDataType].label} className='ref-data-menu-title' onClick={() => this.toggleMenu(refDataType)}>
                                 <Button
                                     kind='primary'
                                     size='small'
@@ -60,20 +60,20 @@ class Sidebar extends Component {
                                 >
                                     Create New
                                 </Button>
-                                {
-                                    Object.keys(this.props.refData[refDataType].nodes).map(refDataEntry => {
-                                        if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
-                                        const entry = this.props.refData[refDataType].nodes[refDataEntry];
-                                        return <React.Fragment key={entry.label}>
-                                            <div className='ref-data-menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
-                                                <div className='ref-data-menu-entry-name'>
+                                <UnorderedList className='ref-data-menu-list'>
+                                    {
+                                        Object.keys(this.props.refData[refDataType].nodes).map(refDataEntry => {
+                                            if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
+                                            const entry = this.props.refData[refDataType].nodes[refDataEntry];
+                                            return (
+                                                <Button kind='ghost' size='small' key={entry.label} className='ref-data-menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
                                                     {entry.label}
                                                     <Tag className='ref-data-menu-entry-badge'>{entry.size || '0'}</Tag>
-                                                </div>
-                                            </div>
-                                        </React.Fragment>;
-                                    })
-                                }
+                                                </Button>
+                                            );
+                                        })
+                                    }
+                                </UnorderedList>
                             </AccordionItem>
                         )
                         )

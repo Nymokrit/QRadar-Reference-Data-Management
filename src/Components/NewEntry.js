@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { Label, Input, Tooltip, InputGroup, InputGroupAddon, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { Label, Input, InputGroup, InputGroupAddon, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import * as EntryDefinitions from '../Definitions/ReferenceDataCreateEntryDefinitions';
+
+import { Button, TextInput, Form, FormGroup, Dropdown, FormLabel, Tooltip } from 'carbon-components-react';
+import { Delete16 } from '@carbon/icons-react';
+
 
 class NewEntry extends Component {
     constructor(props) {
@@ -16,10 +20,12 @@ class NewEntry extends Component {
         this.typeLookup = { tables: 'Table', map_of_sets: 'Map of Sets', sets: 'Set', maps: 'Map', };
 
         this.handleChange = this.handleChange.bind(this);
+        console.log(EntryDefinitions[this.props.type]);
     }
 
     componentDidUpdate() {
         if (this.state.type !== this.props.type) {
+            console.log(EntryDefinitions[this.props.type]);
             this.setState({
                 type: this.props.type,
                 entries: JSON.parse(JSON.stringify(EntryDefinitions[this.props.type])),
@@ -33,36 +39,53 @@ class NewEntry extends Component {
         this.setState({ entries: entries, });
     }
 
+    handleDropdownChange(event, target) {
+        const entries = this.state.entries;
+        entries[target].value = event.selectedItem
+        this.setState({ entries: entries, });
+    }
+
     render() {
+        console.log(this.state.entries);
         return (
-            <div className='ref-data-create-entry'>
-                <b>Add new Reference {this.typeLookup[this.state.type]} to Database</b>
-                <div>
-                    {Object.keys(this.state.entries).map((key) => {
-                        let inputField = <Input type={this.state.entries[key].type || 'text'} id={key} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />;
-                        if (this.state.entries[key].type === 'select') {
-                            inputField = (<Input type='select' value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)}>
-                                {this.state.entries[key].options.map(entry => (<option key={entry}>{entry}</option>))}
-                            </Input>);
-                        } else if (this.state.entries[key].type === 'list') {
-                            inputField = (<ListInput options={this.state.entries[key].options} label={this.state.entries[key].label} values={this.state.entries[key].values} />);
-                        } else if (this.state.entries[key].type === 'date') {
-                            inputField = (<TimeInput options={this.state.entries[key].options} label={this.state.entries[key].label} setValue={e => this.state.entries[key].value = e} />);
-                        }
-                        return (
-                            <div key={key} className='ref-data-create-entry-element'>
-                                <Label for='inputData'>{this.state.entries[key].label}</Label>
-                                &nbsp;<i id={'tooltip' + key} className='fas fa-question-circle'></i>
-                                <Tooltip isOpen={this.state['tooltip' + key]} target={'tooltip' + key} toggle={(e) => this.setState({ [e.target.id]: !this.state[e.target.id], })}>
-                                    {this.state.entries[key].help || 'Help will arrive soon'}
-                                </Tooltip>
-                                {inputField}
-                            </div>
+            <Form className='ref-data-create-entry'>
+                <FormGroup legendText={'Add new Reference' + this.typeLookup[this.state.type] + ' to Database'} />
+                {Object.keys(this.state.entries).map((key) => {
+                    let inputField = <TextInput id={key} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />;
+                    if (this.state.entries[key].type === 'select') {
+                        inputField = (
+                            <Dropdown
+                                selectedItem={this.state.entries[key].value}
+                                onChange={(e) => this.handleDropdownChange(e, key)}
+                                items={this.state.entries[key].options}
+                            />
                         );
-                    })}
-                    <button className='btn-default btn-ref-data btn-add' onClick={(e) => this.props.save(this.state.entries)}>Create</button>
-                </div>
-            </div>);
+                    } else if (this.state.entries[key].type === 'list') {
+                        inputField = (<ListInput options={this.state.entries[key].options} label={this.state.entries[key].label} values={this.state.entries[key].values} />);
+                    } else if (this.state.entries[key].type === 'date') {
+                        inputField = (<TimeInput options={this.state.entries[key].options} label={this.state.entries[key].label} setValue={e => this.state.entries[key].value = e} />);
+                    }
+                    return (
+                        <FormGroup key={key} className='ref-data-create-entry-element'>
+                            {this.state.entries[key].help ?
+                                <Tooltip direction='right' triggerText={this.state.entries[key].label}>
+                                    {this.state.entries[key].help}
+                                </Tooltip>
+                                :
+                                <FormLabel>{this.state.entries[key].label}</FormLabel>
+                            }
+                            {inputField}
+                        </FormGroup>
+                    );
+                })}
+                <Button
+                    className='btn-default btn-ref-data btn-add'
+                    kind="primary"
+                    tabIndex={0}
+                    size="small"
+                    onClick={(e) => this.props.save(this.state.entries)}
+                >Create</Button>
+            </Form>);
     }
 }
 
@@ -84,6 +107,14 @@ class ListInput extends Component {
         this.setState({ entries: entries, });
 
         this.props.values[key][target] = event.target.value;
+    }
+
+    handleDropdownChange(event, key, target) {
+        const entries = this.state.entries;
+        entries[key][target] = event.selectedItem;
+        this.setState({ entries: entries, });
+
+        this.props.values[key][target] = event.selectedItem;
     }
 
     addInnerKey(e) {
@@ -115,26 +146,15 @@ class ListInput extends Component {
             <div className='inner-keys'>
                 {
                     Object.keys(this.state.entries).map(entry => (
-                        <InputGroup className='inner-keys-inputs' key={entry}>
-                            <InputGroupButtonDropdown addonType='prepend' isOpen={this.state.entries[entry].elemTypeDropdownState} toggle={(e) => this.toggleDropDown(entry)}>
-                                <DropdownToggle className='btn-default btn-add-inner-keys' caret>
-                                    {this.state.entries[entry].type}
-                                </DropdownToggle>
-                                <DropdownMenu onClick={(e) => this.handleChange(e, entry, 'type')}>
-                                    {this.props.options.map(entry => (<DropdownItem value={entry} key={'bu' + entry}>{entry}</DropdownItem>))}
-                                </DropdownMenu>
-                            </InputGroupButtonDropdown>
-                            <Input key={entry} value={this.state.entries[entry].label} onChange={(e) => this.handleChange(e, entry, 'label')} />
-                            <InputGroupAddon addonType='append'>
-                                <button className='btn-default btn-ref-data btn-delete-subitem' onClick={(e) => this.removeInnerKey(entry)}>
-                                    <FontAwesomeIcon icon='trash' />
-                                </button>
-                            </InputGroupAddon>
-                        </InputGroup>
+                        <div className='inner-keys-inputs' key={entry}>
+                            <Dropdown items={this.props.options} selectedItem={this.state.entries[entry].type} onChange={(e) => this.handleDropdownChange(e, entry, 'type')} />
+                            <TextInput key={entry} value={this.state.entries[entry].label} onChange={(e) => this.handleChange(e, entry, 'label')} />
+                            <Button kind='danger' size='small' hasIconOnly renderIcon={Delete16} iconDescription='Delete' tooltipPosition='bottom' className='btn-default btn-delete-subitem' onClick={(e) => this.removeInnerKey(entry)}></Button>
+                        </div>
                     )
                     )
                 }
-                <button className='btn-default btn-ref-data btn-bulk' onClick={(e) => this.addInnerKey(e)}>Add Inner Key</button>
+                <Button kind='tertiary' size='small' className='btn-default btn-ref-data btn-bulk' onClick={(e) => this.addInnerKey(e)}>Add Inner Key</Button>
             </div>
         );
     }
@@ -148,22 +168,17 @@ class TimeInput extends Component {
         this.state = { label: '', type: 'days', };
     }
 
-    handleChange(event, target) {
+    handleChange(event) {
         let newState = '';
-        if (target === 'label') {
-            if(event.target.value)
-                newState = event.target.value + ' ' + this.state.type;
-            this.setState({ label: event.target.value, });
-        } else if (target === 'type') {
-            newState = this.state.label + ' ' + event.target.value;
-            this.setState({ type: event.target.value, });
-        }
-
+        if (event.target.value) newState = event.target.value + ' ' + this.state.type;
+        this.setState({ label: event.target.value, });
         this.props.setValue(newState);
     }
 
-    toggleDropDown() {
-        this.setState(prevState => ({ elemTypeDropdownState: !prevState.elemTypeDropdownState, }));
+    handleDropdownChange(event) {
+        let newState = this.state.label + ' ' + event.selectedItem;
+        this.setState({ type: event.selectedItem, });
+        this.props.setValue(newState);
     }
 
     render() {
@@ -171,15 +186,12 @@ class TimeInput extends Component {
             <div className='inner-keys'>
                 {
                     <InputGroup className='inner-keys-inputs'>
-                        <Input value={this.state.label} onChange={(e) => this.handleChange(e, 'label')} />
-                        <InputGroupButtonDropdown addonType='append' isOpen={this.state.elemTypeDropdownState} toggle={(e) => this.toggleDropDown()}>
-                            <DropdownToggle className='btn-default btn-add-inner-keys' caret>
-                                {this.state.type}
-                            </DropdownToggle>
-                            <DropdownMenu onClick={(e) => this.handleChange(e, 'type')}>
-                                {this.props.options.map(entry => (<DropdownItem value={entry} key={'bu' + entry}>{entry}</DropdownItem>))}
-                            </DropdownMenu>
-                        </InputGroupButtonDropdown>
+                        <TextInput value={this.state.label} onChange={(e) => this.handleChange(e)} />
+                        <Dropdown
+                            selectedItem={this.state.type}
+                            onChange={(e) => this.handleDropdownChange(e)}
+                            items={this.props.options}
+                        />
                     </InputGroup>
                 }
             </div>
