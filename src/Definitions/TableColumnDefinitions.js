@@ -1,56 +1,50 @@
 import * as Formatters from '../Util/Formatters';
 
 export const dataTableColumns = [
-    { dataField: 'type', text: 'Type', sort: true, },
-    { dataField: 'name', text: 'Name', sort: true, },
-    { dataField: 'number_of_elements', text: 'Number of Elements', sort: true, },
-    { dataField: 'creation_time', text: 'Created at', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'element_type', text: 'Type', sort: true, },
-    { dataField: 'timeout_type', text: 'Timeout', sort: true, },
+    { key: 'type', header: 'Type', sort: true, },
+    { key: 'name', header: 'Name', sort: true, },
+    { key: 'number_of_elements', header: 'Number of Elements', sort: true, },
+    { key: 'creation_time', header: 'Created at', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'element_type', header: 'Type', sort: true, },
+    { key: 'timeout_type', header: 'Timeout', sort: true, },
 ];
 
 export const setTableColumns = [
-    { dataField: 'value', text: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'first_seen', text: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'last_seen', text: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'source', text: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'id', text: 'ID', sort: true, hidden: true, },
+    { key: 'value', header: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
+    { key: 'first_seen', header: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'last_seen', header: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'source', header: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
 ];
 
 export const mapTableColumns = [
-    { dataField: 'key', text: 'Key', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'value', text: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'first_seen', text: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'last_seen', text: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'source', text: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'id', text: 'ID', sort: true, hidden: true, },
+    { key: 'key', header: 'Key', sort: true, style: { wordBreak: 'break-all', }, },
+    { key: 'value', header: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
+    { key: 'first_seen', header: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'last_seen', header: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'source', header: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
 ];
 
 export const mapOfSetsTableColumns = [
-    { dataField: 'key', text: 'Key', sort: true, style: { width: '10000px', wordBreak: 'break-all', }, },
-    { dataField: 'id', text: 'ID', sort: true, hidden: true, },
+    { key: 'key', header: 'Key', sort: true, style: { width: '10000px', wordBreak: 'break-all', }, },
 ];
 
 export const mapOfSetsInnerTableColumns = [
-    { dataField: 'key', text: 'Key', sort: true, hidden: true, },
-    { dataField: 'value', text: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'first_seen', text: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'last_seen', text: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'source', text: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'id', text: 'ID', sort: true, hidden: true, },
+    { key: 'key', header: 'Key', sort: true, hidden: true, },
+    { key: 'value', header: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
+    { key: 'first_seen', header: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'last_seen', header: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'source', header: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
 ];
 
 export const tableTableColumns = [
-    { dataField: 'key', text: 'Key', sort: true, style: { width: '10000px', wordBreak: 'break-all', }, },
-    { dataField: 'id', text: 'ID', sort: true, hidden: true, },
+    { key: 'key', header: 'Key', sort: true, style: { width: '10000px', wordBreak: 'break-all', }, },
 ];
 
 export const tableInnerTableColumns = [
-    { dataField: 'parentKey', text: 'Key', sort: true, hidden: true, },
-    { dataField: 'key', text: 'Inner Key', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'value', text: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'first_seen', text: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'last_seen', text: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
-    { dataField: 'source', text: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
-    { dataField: 'id', text: 'ID', sort: true, hidden: true, },
+    { key: 'parentKey', header: 'Key', sort: true, hidden: true, },
+    { key: 'key', header: 'Inner Key', sort: true, style: { wordBreak: 'break-all', }, },
+    { key: 'value', header: 'Value', sort: true, style: { wordBreak: 'break-all', }, },
+    { key: 'first_seen', header: 'First Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'last_seen', header: 'Last Seen', sort: true, formatter: Formatters.dateFormatter, },
+    { key: 'source', header: 'Source', sort: true, style: { wordBreak: 'break-all', }, },
 ];

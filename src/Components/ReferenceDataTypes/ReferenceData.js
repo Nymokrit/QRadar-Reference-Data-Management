@@ -6,6 +6,7 @@ import { setTableColumns, mapTableColumns, mapOfSetsTableColumns, mapOfSetsInner
 import * as APIHelper from '../../Util/APIHelper';
 import MetaData from '../MetaData';
 import DataTableX from '../DataTable';
+import DataTableCarbon from '../DataTableCarbon';
 import Dependents from '../Dependents';
 import InputModal from '../InputModal';
 import { Loading } from 'carbon-components-react';
@@ -149,7 +150,7 @@ class ReferenceData extends Component {
                     purgeData={this.purgeData}
                 />
                 {this.state.loaded ?
-                    <DataTableX
+                    <DataTableCarbon
                         tableChanged={this.tableChanged}
                         data={this.state.tableData}
                         columns={this.columns[this.type]}
