@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { Label, Input, InputGroup, InputGroupAddon, InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import * as EntryDefinitions from '../Definitions/ReferenceDataCreateEntryDefinitions';
 
@@ -18,14 +16,10 @@ class NewEntry extends Component {
         };
 
         this.typeLookup = { tables: 'Table', map_of_sets: 'Map of Sets', sets: 'Set', maps: 'Map', };
-
-        this.handleChange = this.handleChange.bind(this);
-        console.log(EntryDefinitions[this.props.type]);
     }
 
     componentDidUpdate() {
         if (this.state.type !== this.props.type) {
-            console.log(EntryDefinitions[this.props.type]);
             this.setState({
                 type: this.props.type,
                 entries: JSON.parse(JSON.stringify(EntryDefinitions[this.props.type])),
@@ -41,36 +35,34 @@ class NewEntry extends Component {
 
     handleDropdownChange(event, target) {
         const entries = this.state.entries;
-        entries[target].value = event.selectedItem
+        entries[target].value = event.selectedItem;
         this.setState({ entries: entries, });
     }
 
     render() {
-        console.log(this.state.entries);
         return (
-            <Form className='ref-data-create-entry'>
-                <FormGroup legendText={'Add new Reference' + this.typeLookup[this.state.type] + ' to Database'} />
+            <Form>
+                <FormGroup legendText={'Add new Reference ' + this.typeLookup[this.state.type] + ' to Database'} />
                 {Object.keys(this.state.entries).map((key) => {
-                    let inputField = <TextInput id={key} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />;
-                    if (this.state.entries[key].type === 'select') {
-                        inputField = (
-                            <Dropdown
-                                selectedItem={this.state.entries[key].value}
-                                onChange={(e) => this.handleDropdownChange(e, key)}
-                                items={this.state.entries[key].options}
-                            />
-                        );
-                    } else if (this.state.entries[key].type === 'list') {
-                        inputField = (<ListInput options={this.state.entries[key].options} label={this.state.entries[key].label} values={this.state.entries[key].values} />);
-                    } else if (this.state.entries[key].type === 'date') {
-                        inputField = (<TimeInput options={this.state.entries[key].options} label={this.state.entries[key].label} setValue={e => this.state.entries[key].value = e} />);
+                    let inputField;
+                    switch (this.state.entries[key].type) {
+                        case 'select':
+                            inputField = <Dropdown selectedItem={this.state.entries[key].value} onChange={(e) => this.handleDropdownChange(e, key)} items={this.state.entries[key].options} />;
+                            break;
+                        case 'list':
+                            inputField = <ListInput options={this.state.entries[key].options} label={this.state.entries[key].label} values={this.state.entries[key].values} />;
+                            break;
+                        case 'date':
+                            inputField = <TimeInput options={this.state.entries[key].options} label={this.state.entries[key].label} setValue={e => this.state.entries[key].value = e} />;
+                            break;
+                        default:
+                            inputField = <TextInput id={key} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />;
                     }
+
                     return (
-                        <FormGroup key={key} className='ref-data-create-entry-element'>
+                        <FormGroup key={key}>
                             {this.state.entries[key].help ?
-                                <Tooltip direction='right' triggerText={this.state.entries[key].label}>
-                                    {this.state.entries[key].help}
-                                </Tooltip>
+                                <Tooltip direction='right' triggerText={this.state.entries[key].label}>{this.state.entries[key].help}</Tooltip>
                                 :
                                 <FormLabel>{this.state.entries[key].label}</FormLabel>
                             }
@@ -78,13 +70,7 @@ class NewEntry extends Component {
                         </FormGroup>
                     );
                 })}
-                <Button
-                    className='btn-default btn-ref-data btn-add'
-                    kind="primary"
-                    tabIndex={0}
-                    size="small"
-                    onClick={(e) => this.props.save(this.state.entries)}
-                >Create</Button>
+                <Button kind='primary' size='small' onClick={() => this.props.save(this.state.entries)} >Create</Button>
             </Form>);
     }
 }
@@ -92,8 +78,6 @@ class NewEntry extends Component {
 class ListInput extends Component {
     constructor(props) {
         super(props);
-
-        this.addInnerKey = this.addInnerKey.bind(this);
 
         const inputLabels = {};
         Object.keys(this.props.values).forEach((label) => { inputLabels[label] = this.props.values[label]; });
@@ -135,26 +119,20 @@ class ListInput extends Component {
         delete this.props.values[key];
     }
 
-    toggleDropDown(entry) {
-        const entries = this.state.entries;
-        entries[entry].elemTypeDropdownState = !entries[entry].elemTypeDropdownState;
-        this.setState({ entries: entries, });
-    }
-
     render() {
         return (
             <div className='inner-keys'>
                 {
                     Object.keys(this.state.entries).map(entry => (
-                        <div className='inner-keys-inputs' key={entry}>
+                        <div className='input-group' key={entry}>
                             <Dropdown items={this.props.options} selectedItem={this.state.entries[entry].type} onChange={(e) => this.handleDropdownChange(e, entry, 'type')} />
                             <TextInput key={entry} value={this.state.entries[entry].label} onChange={(e) => this.handleChange(e, entry, 'label')} />
-                            <Button kind='danger' size='small' hasIconOnly renderIcon={Delete16} iconDescription='Delete' tooltipPosition='bottom' className='btn-default btn-delete-subitem' onClick={(e) => this.removeInnerKey(entry)}></Button>
+                            <Button kind='danger' size='small' hasIconOnly renderIcon={Delete16} iconDescription='Delete' tooltipPosition='bottom' className='delete-inner-key' onClick={(e) => this.removeInnerKey(entry)}></Button>
                         </div>
                     )
                     )
                 }
-                <Button kind='tertiary' size='small' className='btn-default btn-ref-data btn-bulk' onClick={(e) => this.addInnerKey(e)}>Add Inner Key</Button>
+                <Button kind='tertiary' size='small' onClick={(e) => this.addInnerKey(e)}>Add Inner Key</Button>
             </div>
         );
     }
@@ -176,7 +154,7 @@ class TimeInput extends Component {
     }
 
     handleDropdownChange(event) {
-        let newState = this.state.label + ' ' + event.selectedItem;
+        const newState = this.state.label + ' ' + event.selectedItem;
         this.setState({ type: event.selectedItem, });
         this.props.setValue(newState);
     }
@@ -184,16 +162,10 @@ class TimeInput extends Component {
     render() {
         return (
             <div className='inner-keys'>
-                {
-                    <InputGroup className='inner-keys-inputs'>
-                        <TextInput value={this.state.label} onChange={(e) => this.handleChange(e)} />
-                        <Dropdown
-                            selectedItem={this.state.type}
-                            onChange={(e) => this.handleDropdownChange(e)}
-                            items={this.props.options}
-                        />
-                    </InputGroup>
-                }
+                <div className='input-group'>
+                    <TextInput value={this.state.label} onChange={(e) => this.handleChange(e)} />
+                    <Dropdown selectedItem={this.state.type} onChange={(e) => this.handleDropdownChange(e)} items={this.props.options} />
+                </div>
             </div>
         );
     }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-
-import { Search, Accordion, AccordionItem, Tag, Button, UnorderedList, ListItem } from 'carbon-components-react';
+import { Search, Accordion, AccordionItem, Tag, Button, UnorderedList } from 'carbon-components-react';
 
 /*
 Register MenuItemListener by adding a callback to props['menuItemAction']
@@ -12,7 +11,6 @@ class Sidebar extends Component {
         this.state = {
             searchText: '',
         };
-        // console.log(this.props.refData)
 
         this.toggleMenu = this.toggleMenu.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -41,41 +39,31 @@ class Sidebar extends Component {
     }
 
     render() {
-        const icon = { maps: 'map', sets: 'ellipsis-h', map_of_sets: 'list-ul', tables: 'table', };
         return (
-            <div className='ref-data-menu' >
-                <div className='ref-data-menu-search-wrapper'>
-                    <Search type='text' placeholder='Search' onChange={this.handleChange} value={this.state.searchText} className='ref-data-menu-search' />
-                </div>
+            <div className='menu' >
+                <Search type='text' labelText='Search' placeHolderText='Search' light onChange={this.handleChange} value={this.state.searchText} />
                 <Accordion>
                     {
-                        Object.keys(this.props.refData).map(refDataType => (
-                            <AccordionItem open={this.props.refData[refDataType].isOpen} title={this.props.refData[refDataType].label} className='ref-data-menu-title' onClick={() => this.toggleMenu(refDataType)}>
-                                <Button
-                                    kind='primary'
-                                    size='small'
-                                    className='btn-default btn-create'
-                                    onClick={(e) => this.props.createEntry(e, refDataType)}
-                                    key={'btn-' + refDataType}
-                                >
+                        Object.keys(this.props.refData).map(refDataType =>
+                            <AccordionItem key={refDataType} open={this.props.refData[refDataType].isOpen} title={this.props.refData[refDataType].label} className='menu-title' onClick={() => this.toggleMenu(refDataType)}>
+                                <Button kind='primary' size='small' onClick={(e) => this.props.createEntry(e, refDataType)} key={'btn-' + refDataType}>
                                     Create New
                                 </Button>
-                                <UnorderedList className='ref-data-menu-list'>
+                                <UnorderedList className='menu-list'>
                                     {
                                         Object.keys(this.props.refData[refDataType].nodes).map(refDataEntry => {
                                             if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
                                             const entry = this.props.refData[refDataType].nodes[refDataEntry];
                                             return (
-                                                <Button kind='ghost' size='small' key={entry.label} className='ref-data-menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
+                                                <Button kind='ghost' size='small' key={entry.label} className='menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
                                                     {entry.label}
-                                                    <Tag className='ref-data-menu-entry-badge'>{entry.size || '0'}</Tag>
+                                                    <Tag className='menu-entry-badge'>{entry.size || '0'}</Tag>
                                                 </Button>
                                             );
                                         })
                                     }
                                 </UnorderedList>
                             </AccordionItem>
-                        )
                         )
                     }
                 </Accordion>
@@ -85,13 +73,3 @@ class Sidebar extends Component {
 }
 
 export default Sidebar;
-
-/*
-                                <FontAwesomeIcon icon={'chevron-' + (this.props.refData[refDataType].isOpen ? 'down' : 'right')} />
-                                <button
-                                    className='btn-default btn-create'
-                                    onClick={(e) => this.props.createEntry(e, refDataType)}
-                                    title='Create new entry'
-                                ><FontAwesomeIcon icon='plus' />
-                                </button>
-                                */

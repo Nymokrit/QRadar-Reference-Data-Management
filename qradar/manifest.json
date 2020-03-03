@@ -11,7 +11,7 @@
         "version": "1.0",
         "endpoints": [{
             "name": "data",
-            "path": "data/{type}/{name}",
+            "path": "#/data/{type}/{name}",
             "http_method": "GET",
             "parameters": [{
                 "location": "PATH",

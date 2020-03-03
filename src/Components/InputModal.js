@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import { ListGroup, Label, Input, UncontrolledTooltip } from 'reactstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import { FormLabel, Tooltip, Modal, TextInput, TextArea, FileUploaderDropContainer, StructuredListWrapper, StructuredListBody, StructuredListRow } from 'carbon-components-react';
 
 class InputModal extends Component {
@@ -39,12 +36,12 @@ class InputModal extends Component {
         this.setState({ entries: entries, filename: filename, });
     }
 
-    save(e) {
+    save() {
         this.props.save(this.state.entries);
-        this.closeModal(e);
+        this.closeModal();
     }
 
-    closeModal(e) {
+    closeModal() {
         this.setState({
             entries: JSON.parse(JSON.stringify(this.props.entries)),
             filename: '',
@@ -53,7 +50,22 @@ class InputModal extends Component {
         this.props.closeModal();
     }
 
+    label(key) {
+        if (this.state.entries[key].help)
+            return (
+                <Tooltip direction='right' triggerText={this.state.entries[key].label}>
+                    {this.state.entries[key].help}
+                </Tooltip>
+            )
+        else
+            return (
+                <FormLabel>{this.state.entries[key].label}</FormLabel>
+            )
+    }
+
     render() {
+        const defaultFileUploadText = 'Drag and drop file here or click to upload';
+
         return (
             <Modal
                 size='sm'
@@ -64,49 +76,22 @@ class InputModal extends Component {
                 primaryButtonText={this.props.saveLabel || 'Save'}
                 secondaryButtonText='Close'
             >
-                {Object.keys(this.state.entries).map((key) => (
-                    < StructuredListWrapper className='ref-data-input-modal-entry' key={key} >
-                        <StructuredListBody>
-                            <StructuredListRow>
-                                {this.state.entries[key].help ?
-                                    <Tooltip direction='right' triggerText={this.state.entries[key].label}>
-                                        {this.state.entries[key].help}
-                                    </Tooltip>
-                                    :
-                                    <FormLabel>{this.state.entries[key].label}</FormLabel>
-                                }
-                            </StructuredListRow>
-                            <StructuredListRow>
+                <StructuredListWrapper className='input-modal'>
+                    <StructuredListBody>
+                        {Object.keys(this.state.entries).map((key) =>
+                            <StructuredListRow className='input-modal-entry'>
                                 {
-                                    this.state.entries[key].type === 'file'
-                                    &&
-                                    <FileUploaderDropContainer
-                                        labelText={this.state.filename || "Drag and drop file here or click to upload"}
-                                        onChange={(e) => this.handleChange(e, key)}
-                                    />
-                                }{
-                                    this.state.entries[key].type === 'text'
-                                    &&
-                                    <TextInput id={key} onChange={(e) => this.handleChange(e, key)} value={this.state.entries[key].value} />
-                                }{this.state.entries[key].type === 'textarea' &&
-                                    <TextArea
-                                        id={key}
-                                        value={this.state.entries[key].value}
-                                        onChange={(e) => this.handleChange(e, key)}
-                                    />
-                                }{this.state.entries[key].type === 'select' &&
-                                    <Input
-                                        type={this.state.entries[key].type}
-                                        id={key}
-                                        value={this.state.entries[key].value}
-                                        onChange={(e) => this.handleChange(e, key)}
-                                    />
+                                    {
+                                        file: <FileUploaderDropContainer id={key} labelText={this.state.filename || defaultFileUploadText} onChange={(e) => this.handleChange(e, key)} />,
+                                        text: <TextInput id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
+                                        textarea: <TextArea id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
+                                    }[this.state.entries[key].type]
                                 }
                             </StructuredListRow>
-                        </StructuredListBody>
-                    </StructuredListWrapper>
-                ))
-                }
+                        )
+                        }
+                    </StructuredListBody>
+                </StructuredListWrapper>
 
             </Modal>
         );

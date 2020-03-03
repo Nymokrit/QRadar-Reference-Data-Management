@@ -5,11 +5,10 @@ import * as EntryDefinitions from '../../Definitions/ReferenceDataCreateEntryDef
 import { setTableColumns, mapTableColumns, mapOfSetsTableColumns, mapOfSetsInnerTableColumns, tableTableColumns, tableInnerTableColumns } from '../../Definitions/TableColumnDefinitions';
 import * as APIHelper from '../../Util/APIHelper';
 import MetaData from '../MetaData';
-import DataTableX from '../DataTable';
 import DataTableCarbon from '../DataTableCarbon';
 import Dependents from '../Dependents';
 import InputModal from '../InputModal';
-import { Loading } from 'carbon-components-react';
+import { DataTableSkeleton } from 'carbon-components-react';
 
 class ReferenceData extends Component {
     constructor(props, type) {
@@ -89,7 +88,8 @@ class ReferenceData extends Component {
         this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: EntryDefinitions[this.type + 'AddItem'], });
     }
 
-    clickDeleteItem() {
+    clickDeleteItem(selectedRow) {
+        console.log(selectedRow);
         this.deleteItem(this.state.selected);
         this.setState({ selected: [], });
         this.clearSelection();
@@ -127,14 +127,19 @@ class ReferenceData extends Component {
             isRegexSearch = true;
         } catch (e) { }
 
+        let i = 0;
         for (const entry of allEntries) {
             const matches = this.testValue(entry, searchText, isRegexSearch);
-            if (matches) tableData.push(entry);
+            if (matches) {
+                entry['index'] = i++;
+                tableData.push(entry);
+            }
         }
         this.setState({ tableData: tableData, searchText: searchText, allEntries: allEntries, });
     }
 
     render() {
+        console.log(this.props);
         return (
             <React.Fragment>
                 <InputModal
@@ -174,8 +179,9 @@ class ReferenceData extends Component {
                         innerSelectionClearedCallback={(key, f) => this.clearInnerSelection[key] = f}
                     />
                     :
-                    <Loading className='loading' small withOverlay={false} />
+                    <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1)} columnCount={this.columns[this.type].length} />
                 }
+                <div className='separator'></div>
                 <Dependents dependents={this.state.dependents} loaded={this.state.dependentsLoaded} />
             </React.Fragment>
         );

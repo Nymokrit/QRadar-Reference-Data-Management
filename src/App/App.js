@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
-import { Alert } from 'reactstrap';
 import {
-  BrowserRouter as Router,
-  Route,
-  Link
+  BrowserRouter as Router
 } from "react-router-dom";
 
-import { Loading, Modal, InlineNotification } from 'carbon-components-react';
+import { Loading, InlineNotification } from 'carbon-components-react';
 
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faChevronRight, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faChevronDown, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import './App.scss';
 import Sidebar from '../Components/Sidebar';
@@ -23,7 +18,6 @@ import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
 import * as APIHelper from '../Util/APIHelper';
 
-library.add(faChevronRight, faChevronDown, faCheck, faTimes, faPlus, faMinus, faTable, faEllipsisH, faListUl, faMap, faQuestionCircle, faCog, faTrash);
 
 const success = ['background: green', 'color: white', 'display: block', 'text-align: center',].join(';');
 const failure = ['background: red', 'color: white', 'display: block', 'text-align: center',].join(';');
@@ -42,7 +36,7 @@ class App extends Component {
       'tables': { key: 'tables', label: 'Reference Tables', nodes: {}, isOpen: false, },
     };
 
-    this.state = { refData, errorMessages: [], displayError: false, };
+    this.state = { refData, errorMessages: [], displayError: false, loadingModalOpen: false, };
 
     this.menuItemClicked = this.menuItemClicked.bind(this);
     this.createEntry = this.createEntry.bind(this);
@@ -118,7 +112,7 @@ class App extends Component {
         if (response.error) {
           this.showError(response.message);
         } else {
-          this.setState({ atHome: true, currentRefDataEntry: undefined });
+          this.setState({ atHome: true, currentRefDataEntry: undefined, });
           this.getRefData();
         }
         this.toggleLoading(true, false);
@@ -165,10 +159,10 @@ class App extends Component {
   render() {
     // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
 
-    let type = ''
+    let type = '';
     let api = '';
     let name = '';
-    let size = 0;
+    let size = 10e6; // TODO need to adjust that when acessing the direct link
 
     if (this.state.currentRefDataEntry) {
       type = this.state.currentRefDataEntry.selectedEntryType;
@@ -177,9 +171,8 @@ class App extends Component {
       size = this.state.currentRefDataEntry.selectedEntrySize;
     }
     if (!type && window.location && window.location.href.includes('/data/')) {
-      api = decodeURI(window.location.href.split('/data')[1])
-      console.log(api);
-      let y = api.split('/')
+      api = decodeURI(window.location.href.split('/data')[1]);
+      const y = api.split('/');
       type = y[1];
       name = y[2];
     }
@@ -188,7 +181,7 @@ class App extends Component {
     return (
       <Router>
         <SplitterLayout
-          secondaryInitialSize={75}
+          secondaryInitialSize={84}
           percentage>
           <Sidebar
             menuItemAction={this.menuItemClicked}
@@ -196,25 +189,16 @@ class App extends Component {
             createEntry={this.createEntry}
             refData={this.state.refData}
           />
-          <div id='content' className='ref-data'>
+          <div id='content'>
             {this.state.displayError && <InlineNotification
               kind='error'
               className='error-alert'
-              key={this.state.errorMessages}
-              onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }) }}
+              onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }); }}
               title='Error'
             >
               {this.state.errorMessages.map(message => <span key={message} className='error-alert-message'>{message}<br /></span>)}
             </InlineNotification>}
-            <Modal
-              className='loading-modal'
-              open={this.state.loadingModalOpen}
-              onRequestClose={(e) => this.setState(prevState => ({ loadingModalOpen: !prevState.loadingModalOpen, }))}
-              passiveModal
-              size='xs'
-            >
-              <Loading className='loading-modal-loader' />
-            </Modal >
+            <Loading active={this.state.loadingModalOpen} withOverlay />
             {this.state.createNew ?
               <NewEntry
                 type={this.state.createNewReferenceEntryType}
@@ -243,44 +227,5 @@ class App extends Component {
     );
   }
 }
-/*
-class WelcomePage extends Component {
-  icon = { maps: 'map', sets: 'ellipsis-h', map_of_sets: 'list-ul', tables: 'table', };
-
-  render() {
-    const { SearchBar, } = Search;
-    const contentTable = ({ paginationProps, paginationTableProps, }) => (
-      <ToolkitProvider
-        keyField='id'
-        data={this.props.data}
-        columns={dataTableColumns}
-        search
-      >
-        {toolkitprops => (
-          <React.Fragment>
-            <button className='btn-default btn-ref-data btn-export' onClick={this.props.exportItems}>Export CSV</button>
-            <SearchBar {...toolkitprops.searchProps} />
-            <BootstrapTable
-              hover
-              keyField='name'
-              remote={{ search: true, }}
-              {...toolkitprops.baseProps}
-              {...paginationTableProps}
-            />
-          </React.Fragment>
-        )}
-      </ToolkitProvider>
-    );
-
-    return (
-      <React.Fragment>
-        <PaginationProvider pagination={paginationFactory()}>
-          {contentTable}
-        </PaginationProvider>
-      </React.Fragment>
-    );
-  }
-}
-*/
 
 export default App;

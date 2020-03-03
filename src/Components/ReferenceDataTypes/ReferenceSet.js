@@ -40,6 +40,8 @@ class ReferenceSet extends ReferenceData {
 
     // Entries should be an array containing the values to be deleted
     async deleteItem(entries) {
+        console.log(entries);
+        return;
         if (!entries || !entries.length) return;
         this.props.toggleLoading();
         let response;
