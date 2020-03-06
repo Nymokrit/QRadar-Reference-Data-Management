@@ -57,7 +57,7 @@ class Sidebar extends Component {
                                             return (
                                                 <Button kind='ghost' size='small' key={entry.label} className='menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
                                                     {entry.label}
-                                                    <Tag className='menu-entry-badge'>{entry.size || '0'}</Tag>
+                                                    <Tag type='cool-gray' className='menu-entry-badge'>{entry.size || '0'}</Tag>
                                                 </Button>
                                             );
                                         })

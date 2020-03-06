@@ -42,11 +42,12 @@ class ReferenceMap extends ReferenceData {
     // Entries should be an array containing the values to be deleted
     async deleteItem(entries) {
         if (!entries || !entries.length) return;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
-        for (const key of entries) {
+        for (const entry of entries) {
+            const key = entry.id;
             const keyIndex = updateData.findIndex((value) => (value.key === key));
             response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, key, { value: updateData[keyIndex].value, });
             updateData = this.updateData(updateData, { key: key, }, false);
@@ -58,13 +59,13 @@ class ReferenceMap extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     async bulkAddItems(entries) {
         // const regexEntries = new RegExp(entries.bulkAddEntriesSeparator.value, 'g');
         // const regexKeyValue = new RegExp(entries.bulkAddKeyValueSeparator.value, 'g');
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
 
         const pairs = entries.bulkAddData.value
             .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
@@ -112,7 +113,7 @@ class ReferenceMap extends ReferenceData {
             this.tableChanged('new', oldData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     updateData(currentState, value, isAdd) {

@@ -24,7 +24,7 @@ class ReferenceTable extends ReferenceData {
 
     // Entry should consist of an JS Object of the form {value: 'someVal'}
     async addItem(entry) {
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
         const outer_key = entry.outer_key.value;
@@ -42,12 +42,12 @@ class ReferenceTable extends ReferenceData {
         }
 
         this.updateMetaData(response);
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
     // Entries should be an array containing the values to be deleted
     async deleteItem(entries) {
         if (!entries || !entries.length) return;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
@@ -67,11 +67,11 @@ class ReferenceTable extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     async addInnerItem(key, entries, asSub) {
-        if (!asSub) this.props.toggleLoading();
+        if (!asSub) this.props.displayLoadingModal(true);
         const outer_key = key.key;
         const inner_key = entries.key.value;
         const value = entries.value.value;
@@ -90,12 +90,12 @@ class ReferenceTable extends ReferenceData {
         }
 
         if (asSub) return response;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     async deleteInnerItem(outer_key, entries) {
         if (!entries || !entries.length) return;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
@@ -113,7 +113,7 @@ class ReferenceTable extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     /**
@@ -197,7 +197,7 @@ class ReferenceTable extends ReferenceData {
     async bulkAddItems(entries) {
         // const regexEntries = new RegExp(entries.bulkAddEntriesSeparator.value, 'g');
         // const regexKeyValue = new RegExp(entries.bulkAddKeyValueSeparator.value, 'g');
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
 
         const tuples = entries.bulkAddData.value
             .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
@@ -228,7 +228,7 @@ class ReferenceTable extends ReferenceData {
             this.updateMetaData(response);
         }
         this.loadData(this.props.type, true);
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     exportItems() {

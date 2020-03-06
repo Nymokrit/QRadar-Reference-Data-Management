@@ -42,7 +42,7 @@ class App extends Component {
     this.createEntry = this.createEntry.bind(this);
     this.entryCreated = this.entryCreated.bind(this);
     this.deleteEntry = this.deleteEntry.bind(this);
-    this.toggleLoading = this.toggleLoading.bind(this);
+    this.displayLoadingModal = this.displayLoadingModal.bind(this);
     this.showError = this.showError.bind(this);
     this.getRefData = this.getRefData.bind(this);
 
@@ -61,12 +61,11 @@ class App extends Component {
 
   createEntry(e, type) {
     e.stopPropagation();
-    console.log(type);
     this.setState({ createNew: true, createNewReferenceEntryType: type, });
   }
 
   async entryCreated(entries) {
-    this.toggleLoading(true, true);
+    this.displayLoadingModal(true);
     const mappedEntries = {};
     // RefSet, RefMap and RefMoS can be created identically, refTable requires some more preprocessing
     if (entries.inner_labels) {
@@ -100,13 +99,13 @@ class App extends Component {
 
       this.getRefData();
     }
-    this.toggleLoading(true, false);
+    this.displayLoadingModal(false);
   }
 
   async deleteEntry() {
     const save = window.confirm('Do you really want to delete this entry');
     if (save) {
-      this.toggleLoading(true, true);
+      this.displayLoadingModal(true);
 
       const deleteEntryCallback = (response) => {
         if (response.error) {
@@ -115,20 +114,18 @@ class App extends Component {
           this.setState({ atHome: true, currentRefDataEntry: undefined, });
           this.getRefData();
         }
-        this.toggleLoading(true, false);
+        this.displayLoadingModal(false);
       };
       await APIHelper.deleteReferenceData(this.state.currentRefDataEntry.selectedEntryType, this.state.currentRefDataEntry.selectedEntryName, deleteEntryCallback);
     } else return;
   }
 
-  toggleLoading(explicit = false, state = false) {
-    console.log(explicit, state);
-    this.setState(prevState => ({ loadingModalOpen: explicit ? state : !prevState.loadingModalOpen, }));
+  displayLoadingModal(state) {
+    this.setState({ loadingModalOpen: state, });
   }
 
   showError(message) {
     const messages = this.state.errorMessages;
-    document.getElementsByClassName('ref-data')[0].scrollTop = 0;
     if (!message) message = 'An unspecified error occured';
     message = Array.isArray(message) ? message : [message,];
     messages.push(...message);
@@ -162,19 +159,18 @@ class App extends Component {
     let type = '';
     let api = '';
     let name = '';
-    let size = 10e6; // TODO need to adjust that when acessing the direct link
+    let size; // undefined when directly accessing a ref data link like "#/data/sets/early_warning"
 
-    if (this.state.currentRefDataEntry) {
+    if (this.state.currentRefDataEntry) { // We 
       type = this.state.currentRefDataEntry.selectedEntryType;
       api = this.state.currentRefDataEntry.selectedEntryAPI;
       name = this.state.currentRefDataEntry.selectedEntryName;
       size = this.state.currentRefDataEntry.selectedEntrySize;
     }
-    if (!type && window.location && window.location.href.includes('/data/')) {
-      api = decodeURI(window.location.href.split('/data')[1]);
-      const y = api.split('/');
-      type = y[1];
-      name = y[2];
+    if (!type && window.location.hash.includes('#/data/')) {
+      let _; // throw away
+      api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{type}/{name}
+      [_, type, name] = api.split('/');
     }
 
     const ReferenceDataComponent = this.refDataMapping[type];
@@ -216,7 +212,7 @@ class App extends Component {
                   size={size}
                   deleteEntry={this.deleteEntry}
                   dataUpdated={this.getRefData}
-                  toggleLoading={this.toggleLoading}
+                  displayLoadingModal={this.displayLoadingModal}
                   showError={this.showError}
                 />
               )

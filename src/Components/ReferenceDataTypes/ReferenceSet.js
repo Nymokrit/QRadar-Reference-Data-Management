@@ -41,15 +41,14 @@ class ReferenceSet extends ReferenceData {
     // Entries should be an array containing the values to be deleted
     async deleteItem(entries) {
         console.log(entries);
-        return;
         if (!entries || !entries.length) return;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
         for (const value of entries) {
-            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, value);
-            updateData = this.updateData(updateData, { value: value, }, false);
+            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, value.id);
+            updateData = this.updateData(updateData, { value: value.id, }, false);
         }
 
         if (response.error) {
@@ -58,12 +57,12 @@ class ReferenceSet extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     async bulkAddItems(entries) {
         // const regexEntries = new RegExp(entries.bulkAddSeparator.value, 'g');
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
 
         let data = entries.bulkAddData.value
             .replace(/\r?\n/g, entries.bulkAddSeparator.value) // Remove new lines 
@@ -89,7 +88,7 @@ class ReferenceSet extends ReferenceData {
             this.tableChanged('new', oldData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     updateData(currentState, value, isAdd) {

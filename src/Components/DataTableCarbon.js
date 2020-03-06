@@ -24,16 +24,12 @@ class DataTableCarbon extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { selected: [], currentPageSize: 10, firstRowIndex: 0, currentPage: 1, updatePagination: Math.random() };
+        this.state = {
+            selected: [], currentPageSize: 10, firstRowIndex: 0, currentPage: 1, updatePagination: Math.random(), sortDirection: 'ASC'
+        };
 
-        this.clearSelection = this.clearSelection.bind(this);
-
-        if (this.props.innerTable) this.props.selectionClearedCallback(this.props.parent.key, this.clearSelection);
-        else this.props.selectionClearedCallback(this.clearSelection);
-    }
-
-    clearSelection() {
-        this.setState({ selected: [], });
+        /* if (this.props.innerTable) this.props.selectionClearedCallback(this.props.parent.key, this.clearSelection);
+        else this.props.selectionClearedCallback(this.clearSelection); */
     }
 
     handleOnSelect = (row, isSelect) => {
@@ -64,7 +60,32 @@ class DataTableCarbon extends Component {
         this.setState({ firstRowIndex: 0, currentPage: 1, updatePagination: Math.random() });
     }
 
+    // Because the default sorting of the table doesn't work with pagination, we need to hook into the sorting and overwrite it
+    // We store current sorting information as state information (direction + header) and sort the props.data inplace
+    sortTable = (key) => {
+        let newDirection = 'ASC';
+        if (key === this.state.sortHeader) // The last sorting was for the same key, so we need to switch to the next sorting direction
+            newDirection = this.state.sortDirection === 'ASC' ? 'DESC' : 'ASC'
+
+        const comp = { 'ASC': [-1, 1], 'DESC': [1, -1] }; // Change sorting direction based on newDirection key
+        this.props.data.sort((a, b) => (a[key] < b[key] ? comp[newDirection][0] : comp[newDirection][1]));
+
+        this.setState({
+            sortDirection: newDirection,
+            sortHeader: key,
+        });
+    }
+
+
+
     render() {
+        // Due to pagination, we only display a certain subset of the original dataset
+        const data = this.props.data.slice(
+            this.state.firstRowIndex,
+            this.state.firstRowIndex + this.state.currentPageSize
+        );
+
+
         const expandRow = (row) => {
             console.log(row);
             return (<div className='inner-table'>
@@ -76,58 +97,45 @@ class DataTableCarbon extends Component {
                     addItem={(e) => this.props.addInnerItem(row)}
                     deleteItem={(e) => this.props.deleteInnerItem(row)}
                     searchText={this.props.innerSearchText}
-                    selectionChanged={this.props.innerSelectionChanged}
-                    selectionClearedCallback={this.props.innerSelectionClearedCallback}
                 />
             </div>);
         };
 
-        console.log(this.props.data);
         return (
             <DataTable
                 useZebraStyles={true}
                 isSortable
-                rows={this.props.data.slice(
-                    this.state.firstRowIndex,
-                    this.state.firstRowIndex + this.state.currentPageSize
-                )}
+                rows={data}
                 headers={this.props.columns}
                 render={({
                     rows,
                     headers,
                     getHeaderProps,
                     getRowProps,
+                    getTableProps,
                     getSelectionProps,
                     getBatchActionProps,
-                    selectedRows,
+                    selectedRows
                 }) => (
                         <TableContainer>
                             <TableToolbar>
                                 <TableBatchActions {...getBatchActionProps()}>
-                                    <TableBatchAction primaryFocus renderIcon={Delete24} onClick={(e) => this.props.deleteItem(selectedRows)}>
-                                        Delete
-                                </TableBatchAction>
+                                    <TableBatchAction renderIcon={Delete24} onClick={(e) => this.props.deleteItem(selectedRows)}>Delete</TableBatchAction>
                                 </TableBatchActions>
                                 <TableToolbarContent>
-                                    {!this.props.innerTable && <TableToolbarSearch onChange={this.onInputChange} />}
-                                    <Button onClick={this.props.addItem} size='small' kind='primary'>
-                                        Add Entry
-                                    </Button>
-                                    <Button onClick={this.props.bulkAddItem} size='small' kind='primary'>
-                                        Bulk Add
-                                    </Button>
-                                    <Button onClick={this.props.importItems} size='small' kind='primary'>
-                                        Import CSV
-                                    </Button>
+                                    {!this.props.innerTable && <TableToolbarSearch onChange={this.onInputChange} />}{ /* We only display a search bar for the outer table since we don't expect many inner values anyways */}
+                                    <Button onClick={this.props.addItem} size='small' kind='primary'>Add Entry</Button>
+                                    <Button onClick={this.props.bulkAddItem} size='small' kind='primary'>Bulk Add</Button>
+                                    <Button onClick={this.props.importItems} size='small' kind='primary'>Import CSV</Button>
                                 </TableToolbarContent>
                             </TableToolbar>
-                            <Table>
+                            <Table {...getTableProps()}>
                                 <TableHead>
                                     <TableRow>
                                         {this.props.expandable && <TableExpandHeader />}
                                         <TableSelectAll {...getSelectionProps()} />
                                         {headers.map(header => (
-                                            <TableHeader {...getHeaderProps({ header, })}>
+                                            <TableHeader {...getHeaderProps({ header, })} sortDirection={this.state.sortDirection} isSortHeader={this.state.sortHeader == header.key} onClick={() => this.sortTable(header.key)}>
                                                 {header.header}
                                             </TableHeader>
                                         ))}
@@ -135,7 +143,7 @@ class DataTableCarbon extends Component {
                                 </TableHead>
                                 <TableBody>
                                     {this.props.expandable && rows.map(row => (
-                                        < React.Fragment key={row.id} >
+                                        <React.Fragment key={row.id} >
                                             <TableExpandRow {...getRowProps({ row, })}>
                                                 <TableSelectRow {...getSelectionProps({ row })} />
                                                 {row.cells.map(cell => (
@@ -152,7 +160,7 @@ class DataTableCarbon extends Component {
                                         </React.Fragment>
                                     ))}
                                     {!this.props.expandable && rows.map(row => (
-                                        <TableRow key={row.id}>
+                                        <TableRow key={row.id}  {...getRowProps({ row, })}>
                                             <TableSelectRow {...getSelectionProps({ row, })} />
                                             {row.cells.map(cell => (
                                                 <TableCell key={cell.id}>{cell.value}</TableCell>
@@ -165,21 +173,9 @@ class DataTableCarbon extends Component {
                                 key={this.state.currentPage * this.props.data.length * this.state.updatePagination}
                                 page={this.state.currentPage}
                                 pageSize={this.state.currentPageSize}
-                                pageSizes={[
-                                    10,
-                                    20,
-                                    30,
-                                    40,
-                                    50,
-                                ]}
+                                pageSizes={[10, 30, 50, 100,]}
                                 totalItems={this.props.data.length}
-                                onChange={({ page, pageSize, }) => {
-                                    console.log(page);
-                                    if (pageSize !== this.state.currentPageSize) {
-                                        this.setState({ currentPageSize: pageSize, });
-                                    }
-                                    this.setState({ firstRowIndex: pageSize * (page - 1), });
-                                }}
+                                onChange={({ page, pageSize, }) => this.setState({ firstRowIndex: pageSize * (page - 1), currentPageSize: pageSize })}
                             />
                         </ TableContainer>
                     )}

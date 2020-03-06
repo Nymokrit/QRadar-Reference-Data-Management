@@ -32,9 +32,9 @@ export async function loadData_Normal(key) {
 export async function loadData(key, reload) {
     this.loadDependents(); // async load dependents
 
-    const numElements = this.props.size;
     let response;
     let stepSize = 5000;
+    let numElements = this.props.size;
     // If we have more than 250k Elements, we increase the step size, to have a maximum of 50 requests until the data has been loaded
     if (numElements / 50 > stepSize) stepSize = Math.ceil(numElements / 50);
 
@@ -51,6 +51,10 @@ export async function loadData(key, reload) {
             return;
         }
 
+        // this.props.size is unknown if the RefData is accessed by URL directly
+        // so we only set numElements to a value if we know the definite value for sure
+        if (!this.props.size && response.number_of_elements) numElements = response.number_of_elements;
+
         let data = reload ? [] : this.state.allEntries;
         reload = false;
         // For map of sets and tables, num_of_elements is #outer_key*#inner_keys, hence at some point we load 
@@ -61,10 +65,10 @@ export async function loadData(key, reload) {
             else data = newData;
 
             await this.setState({ allEntries: data, });
-            delete response.data;
+            delete response.data; // We will use the remaining object for displaying meta data
             this.tableChanged();
 
-            if (numElements > to) {
+            if (numElements && numElements > to) {
                 response.number_of_elements = to + 1;
                 this.setState({ metaData: response, });
 
@@ -97,21 +101,16 @@ export async function loadDependents() {
 }
 
 export async function purgeData() {
-    this.props.toggleLoading();
+    this.props.displayLoadingModal(true);
 
     const purgeDataCallback = (response) => {
         this.tableChanged('new', []);
         this.updateMetaData(response);
-        this.setState({ selected: [], innerSelected: {}, });
-        this.clearSelection();
-        this.props.toggleLoading();
+        this.setState({ innerSelected: {}, });
+        this.props.displayLoadingModal(false);
     };
 
     await APIHelper.purgeReferenceData(this.props.type, this.props.name, purgeDataCallback);
-}
-
-export function selectionChanged(selection) {
-    this.setState({ selected: selection, });
 }
 
 export function innerSelectionChanged(key, selection) {

@@ -30,7 +30,7 @@ class ReferenceMapOfSets extends ReferenceData {
     // Entries should be an array containing the values to be deleted
     async deleteItem(entries) {
         if (!entries || !entries.length) return;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.tableData;
 
@@ -51,7 +51,7 @@ class ReferenceMapOfSets extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     async addInnerItem(key, entry) {
@@ -65,7 +65,7 @@ class ReferenceMapOfSets extends ReferenceData {
             return;
         }
 
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, parsedEntry);
         const updateData = this.updateData(this.state.allEntries, parsedEntry, true);
 
@@ -75,12 +75,12 @@ class ReferenceMapOfSets extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     async deleteInnerItem(key, entries) {
         if (!entries || !entries.length) return;
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
@@ -95,7 +95,7 @@ class ReferenceMapOfSets extends ReferenceData {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
 
@@ -177,7 +177,7 @@ class ReferenceMapOfSets extends ReferenceData {
 
     
     async bulkAddItems(entries) {
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
 
         const tuples = entries.bulkAddData.value
             .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
@@ -208,7 +208,7 @@ class ReferenceMapOfSets extends ReferenceData {
             this.updateMetaData(response);
         }
         this.loadData(this.props.type, true);
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     exportItems() {

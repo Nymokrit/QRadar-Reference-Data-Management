@@ -24,7 +24,6 @@ class ReferenceData extends Component {
         };
 
         this.state = {
-            selected: [],
             innerSelected: {},
             metaData: {},
             allEntries: [],
@@ -57,7 +56,6 @@ class ReferenceData extends Component {
         this.loadData = RefDataHelper.loadData.bind(this);
         this.loadDependents = RefDataHelper.loadDependents.bind(this);
         this.purgeData = RefDataHelper.purgeData.bind(this);
-        this.selectionChanged = RefDataHelper.selectionChanged.bind(this);
         this.innerSelectionChanged = RefDataHelper.innerSelectionChanged.bind(this);
 
         this.loadData(this.props.api);
@@ -70,7 +68,7 @@ class ReferenceData extends Component {
     exportItems() { };
 
     async addItem(parsedEntry) {
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(true);
 
         const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, parsedEntry);
         const updateData = this.updateData(this.state.allEntries, parsedEntry, true);
@@ -81,7 +79,7 @@ class ReferenceData extends Component {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
         }
-        this.props.toggleLoading();
+        this.props.displayLoadingModal(false);
     }
 
     clickAddItem() {
@@ -89,10 +87,7 @@ class ReferenceData extends Component {
     }
 
     clickDeleteItem(selectedRow) {
-        console.log(selectedRow);
-        this.deleteItem(this.state.selected);
-        this.setState({ selected: [], });
-        this.clearSelection();
+        this.deleteItem(selectedRow);
     }
     clickBulkAddItem() {
         this.setState({ showInputModal: true, modalSave: this.bulkAddItems, modalInputDefinition: EntryDefinitions[this.type + 'BulkAddItems'], });
@@ -139,7 +134,6 @@ class ReferenceData extends Component {
     }
 
     render() {
-        console.log(this.props);
         return (
             <React.Fragment>
                 <InputModal
@@ -167,9 +161,6 @@ class ReferenceData extends Component {
                         deleteItem={this.clickDeleteItem}
                         searchText={this.state.searchText}
 
-                        selectionChanged={this.selectionChanged}
-                        selectionClearedCallback={(f) => this.clearSelection = f}
-
                         expandable={['map_of_sets', 'table',].includes(this.type)}
                         extendableColumns={this.columns[this.type + 'Inner']}
                         addInnerItem={this.clickAddInnerItem}
@@ -179,7 +170,7 @@ class ReferenceData extends Component {
                         innerSelectionClearedCallback={(key, f) => this.clearInnerSelection[key] = f}
                     />
                     :
-                    <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1)} columnCount={this.columns[this.type].length} />
+                    <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1 || 1)} columnCount={this.columns[this.type].length} />
                 }
                 <div className='separator'></div>
                 <Dependents dependents={this.state.dependents} loaded={this.state.dependentsLoaded} />

@@ -34,8 +34,8 @@ class MetaData extends Component {
                             </StructuredListRow>
                             </StructuredListHead>
                             <StructuredListBody>
-                                {entries.map(entry =>
-                                    <StructuredListRow><StructuredListCell className='meta-data-entry'>
+                                {entries.map((entry, index) =>
+                                    <StructuredListRow key={index}><StructuredListCell className='meta-data-entry'>
                                         {entry}
                                     </StructuredListCell></StructuredListRow>
                                 )}
