@@ -1,5 +1,6 @@
 import React from 'react';
 import { DataTableSkeleton, DataTable } from 'carbon-components-react';
+import i18n from '../I18n/i18n';
 const {
     Table,
     TableHead,
@@ -19,7 +20,7 @@ function Dependents(props) {
     return (
         props.loaded ?
             <DataTable
-                headers={[{ header: 'Dependents', key: 'dependent', },]}
+                headers={[{ header: i18n.t('Dependents'), key: 'dependent', },]}
                 rows={dependents}
                 useZebraStyles={true}
                 render={({ rows, headers, getTableProps, getHeaderProps, getRowProps, }) => (
@@ -46,7 +47,7 @@ function Dependents(props) {
                 )}
             />
             :
-            <DataTableSkeleton headers={['Dependents',]} columnCount={1} rowCount={1} />
+            <DataTableSkeleton headers={[i18n.t('Dependents'),]} columnCount={1} rowCount={1} />
     );
 }
 

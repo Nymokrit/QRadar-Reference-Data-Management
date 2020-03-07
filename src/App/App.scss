@@ -46,7 +46,7 @@ button {
 
     &.delete {
         position: absolute;
-        width: 150px;
+        min-width: 150px;
         padding-right: 5px;
     }
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Search, Accordion, AccordionItem, Tag, Button, UnorderedList, SkeletonText } from 'carbon-components-react';
-
+import i18n from '../I18n/i18n';
 class Sidebar extends Component {
 
     constructor(props) {
@@ -38,13 +38,13 @@ class Sidebar extends Component {
     render() {
         return (
             <div className='menu' >
-                <Search type='text' labelText='Search' placeHolderText='Search' light onChange={this.searchInputChanged} value={this.state.searchText} />
+                <Search type='text' labelText={i18n.t('Search')} placeHolderText={i18n.t('Search')} light onChange={this.searchInputChanged} value={this.state.searchText} />
                 <Accordion>
                     {
                         Object.keys(this.props.refData).map(type =>
                             <AccordionItem key={type} open={this.props.refData[type].isOpen} title={this.props.refData[type].label} className='menu-title' onClick={() => this.toggleMenu(type)}>
                                 <Button kind='primary' size='small' className='btn-create-new' onClick={(e) => this.props.createEntry(e, type)} key={'btn-' + type}>
-                                    Create New
+                                    {i18n.t('Create New')}
                                 </Button>
                                 <UnorderedList className='menu-list'>
                                     {

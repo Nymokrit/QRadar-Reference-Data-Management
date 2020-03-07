@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { Delete24 } from '@carbon/icons-react';
 import { Button, DataTable, TableExpandHeader, TableExpandRow, TableExpandedRow, Pagination } from 'carbon-components-react';
-
+import i18n from '../I18n/i18n';
 
 import dateformat from 'dateformat';
 
@@ -99,16 +99,16 @@ class DataTableCarbon extends Component {
                         <TableContainer>
                             <TableToolbar>
                                 <TableBatchActions {...getBatchActionProps()}>
-                                    <TableBatchAction renderIcon={Delete24} onClick={(e) => this.props.deleteItem(selectedRows)}>Delete</TableBatchAction>
+                                    <TableBatchAction renderIcon={Delete24} onClick={(e) => this.props.deleteItem(selectedRows)}>{i18n.t('Delete')}</TableBatchAction>
                                 </TableBatchActions>
                                 <TableToolbarContent>
                                     {!this.props.innerTable && <TableToolbarSearch onChange={this.onInputChange} />}{ /* We only display a search bar for the outer table since we don't expect many inner values anyways */}
-                                    <Button onClick={this.props.addItem} size='small' kind='primary' className='btn-table'>Add Entry</Button>
+                                    <Button onClick={this.props.addItem} size='small' kind='primary' className='btn-table'>{i18n.t('Add Entry')}</Button>
                                     {!this.props.innerTable &&
                                         <React.Fragment>
-                                            <Button onClick={this.props.bulkAddItem} size='small' kind='primary' className='btn-table'>Bulk Add</Button>
-                                            <Button onClick={this.props.importItems} size='small' kind='primary' className='btn-table'>Import CSV</Button>
-                                            <Button onClick={this.props.exportItems} size='small' kind='primary' className='btn-table'>Export CSV</Button>
+                                            <Button onClick={this.props.bulkAddItem} size='small' kind='primary' className='btn-table'>{i18n.t('Bulk Add')}</Button>
+                                            <Button onClick={this.props.importItems} size='small' kind='primary' className='btn-table'>{i18n.t('Import CSV')}</Button>
+                                            <Button onClick={this.props.exportItems} size='small' kind='primary' className='btn-table'>{i18n.t('Export CSV')}</Button>
                                         </React.Fragment>
                                     }
                                 </TableToolbarContent>
@@ -164,6 +164,13 @@ class DataTableCarbon extends Component {
                                 pageSize={this.state.currentPageSize}
                                 pageSizes={[10, 30, 50, 100,]}
                                 totalItems={this.props.data.length}
+                                itemsPerPageText={i18n.t('Items per page')}
+                                pageRangeText={(current, total) => (
+                                    i18n.t("of") + ' ' + total + ' ' + i18n.t("pages")
+                                )}
+                                itemRangeText={(min, max, total) => (
+                                    min + "\u2013" + max + ' ' + i18n.t("of") + ' ' + total + ' ' + i18n.t("items")
+                                )}
                                 onChange={({ page, pageSize, }) => this.setState({ firstRowIndex: pageSize * (page - 1), currentPageSize: pageSize })}
                             />
                         </ TableContainer>

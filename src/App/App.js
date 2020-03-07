@@ -13,6 +13,8 @@ import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
 import * as APIHelper from '../Util/APIHelper';
 
+// import { Translation as t } from 'react-i18next';
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -194,7 +196,7 @@ class App extends Component {
             />
             :
             (!ReferenceDataComponent ?
-              <React.Fragment />
+              <React.Fragment></React.Fragment>
               :
               <ReferenceDataComponent
                 key={api}
