@@ -75,7 +75,6 @@ class DataTableCarbon extends Component {
                         addItem={(e) => this.props.addInnerItem(row)}
                         deleteItem={(selectedRows) => this.props.deleteInnerItem(row.key, selectedRows)}
                         searchText={this.props.innerSearchText}
-
                     />
                 </div>
             );

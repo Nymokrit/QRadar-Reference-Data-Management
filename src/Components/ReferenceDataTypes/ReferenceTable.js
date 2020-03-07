@@ -15,7 +15,7 @@ class ReferenceTable extends ReferenceData {
             }
         }
 
-        const entryDefinition = { 'outer_key': { label: this.state.metaData.key_label || 'Key', value: '', type: 'text', }, ...inners, source: { label: 'Comment', value: '', type: 'text', }, };
+        const entryDefinition = { 'outer_key': { label: this.state.metaData.key_label || 'Key', value: '', type: 'text', }, ...inners, source: { label: 'Comment', value: '', type: 'text', help: 'Optional: A comment to add to the new data entry' }, };
 
         this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: entryDefinition, });
     }

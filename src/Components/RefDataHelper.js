@@ -20,15 +20,6 @@ export function updateMetaData(data) {
     this.props.dataUpdated();
 }
 
-export async function loadData_Normal(key) {
-    const response = await APIHelper.loadReferenceDataValues(this.props.type, this.props.name);
-
-    this.setState({ allEntries: this.parseResponseData(response), });
-    delete response.data;
-    this.setState({ metaData: response, loaded: true, });
-    this.tableChanged();
-}
-
 export async function loadData(key, reload) {
     this.loadDependents(); // async load dependents
 
@@ -106,18 +97,12 @@ export async function purgeData() {
     const purgeDataCallback = (response) => {
         this.tableChanged('new', []);
         this.updateMetaData(response);
-        this.setState({ innerSelected: {}, });
         this.props.displayLoadingModal(false);
     };
 
     await APIHelper.purgeReferenceData(this.props.type, this.props.name, purgeDataCallback);
 }
 
-export function innerSelectionChanged(key, selection) {
-    const selected = this.state.innerSelected;
-    selected[key] = selection;
-    this.setState({ innerSelected: selected, });
-}
 
 export function download(name, content, hasInnerKey, hasOuterKey) {
     let exportString = '';

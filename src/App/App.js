@@ -4,7 +4,6 @@ import { Loading, InlineNotification } from 'carbon-components-react';
 import SplitterLayout from 'react-splitter-layout';
 import 'react-splitter-layout/lib/index.css';
 
-
 import './App.scss';
 import Sidebar from '../Components/Sidebar';
 import ReferenceSet from '../Components/ReferenceDataTypes/ReferenceSet';
@@ -13,12 +12,6 @@ import ReferenceMapOfSets from '../Components/ReferenceDataTypes/ReferenceMapOfS
 import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
 import * as APIHelper from '../Util/APIHelper';
-
-
-const success = ['background: green', 'color: white', 'display: block', 'text-align: center',].join(';');
-const failure = ['background: red', 'color: white', 'display: block', 'text-align: center',].join(';');
-console.success = msg => console.log(`%c${msg}`, success);
-console.fail = msg => console.log(`%c${msg}`, failure);
 
 class App extends Component {
   constructor(props) {
@@ -136,7 +129,7 @@ class App extends Component {
     for (const key in data) {
       const response = await APIHelper.loadReferenceData(key);
       if (response.error) {
-        this.props.showError('Unable to load ' + data[key].label);
+        this.showError('Unable to load ' + data[key].label);
         continue;
       }
       data[key].nodes = {}; // Clear 'old' node data

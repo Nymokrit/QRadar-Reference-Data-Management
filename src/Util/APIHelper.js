@@ -32,7 +32,7 @@ async function sendAPIRequest(method, path, query, data, headers) {
             headers: _headers,
         });
     } catch (error) {
-        console.fail(`Failed loading data from ${path}`);
+        console.log(`Failed loading data from ${path}`);
         console.timeEnd(`${r}: ${method} ${path}`);
         if (!error.response || !error.response.data) return { error: error, message: 'Failed performing the requested network operation', };
         else return { error: error, message: error.response.data.message, };

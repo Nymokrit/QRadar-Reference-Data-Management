@@ -5,6 +5,10 @@
 .menu {
     padding: 20px 10px 20px 10px;
 
+    .btn-create-new {
+        margin-bottom: 1rem;
+    }
+
     &-title {
         >div {
             padding-right: unset;
@@ -78,6 +82,11 @@ button {
     }
 }
 
+.bx--data-table {
+    td {
+        word-break: break-all !important;
+    }
+}
 
 .inner-keys {
     .input-group {
@@ -126,13 +135,15 @@ button {
     display: none !important;
 }
 
+$color-inner-table: #e5e5e5;
+
 .bx--expandable-row:not(.bx--parent-row) td {
-    background-color: #e5e5e5 !important;
+    background-color: $color-inner-table !important;
 }
 
 .inner-table {
     .bx--toolbar-content {
-        background-color: #e5e5e5 !important;
+        background-color: $color-inner-table !important;
     }
 
     th.bx--table-column-checkbox {
@@ -141,29 +152,29 @@ button {
     }
 
     table * {
-        background-color: #e5e5e5 !important;
+        background-color: $color-inner-table !important;
 
         &:hover:not(th) {
-            background-color: #e5e5e5 !important;
+            background-color: $color-inner-table !important;
         }
 
         th {
-            border-color: lightgray !important;
+            border-color: darken($color-inner-table, 8) !important;
 
             ~:hover {
-                border-color: lightgray !important;
+                border-color: darken($color-inner-table, 8) !important;
             }
         }
     }
 
     td.bx--table-column-checkbox {
         ~td {
-            padding-left: 1rem !important;
+            padding-left: 1.25rem !important;
         }
     }
 
     .bx--pagination {
-        background-color: #e5e5e5 !important;
+        background-color: $color-inner-table !important;
     }
 
 

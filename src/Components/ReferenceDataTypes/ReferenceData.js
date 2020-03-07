@@ -24,17 +24,13 @@ class ReferenceData extends Component {
         };
 
         this.state = {
-            innerSelected: {},
             metaData: {},
             allEntries: [],
             tableData: [],
             loaded: false,
             searchText: '',
-            innerSearchText: '',
             modalInputDefinition: {},
         };
-
-        this.clearInnerSelection = {};
 
         this.addItem = this.addItem.bind(this);
         this.deleteItem = this.deleteItem.bind(this);
@@ -56,7 +52,6 @@ class ReferenceData extends Component {
         this.loadData = RefDataHelper.loadData.bind(this);
         this.loadDependents = RefDataHelper.loadDependents.bind(this);
         this.purgeData = RefDataHelper.purgeData.bind(this);
-        this.innerSelectionChanged = RefDataHelper.innerSelectionChanged.bind(this);
 
         this.loadData(this.props.api);
 
@@ -162,8 +157,6 @@ class ReferenceData extends Component {
                         addInnerItem={this.clickAddInnerItem}
                         deleteInnerItem={this.clickDeleteInnerItem}
                         innerSearchText={this.state.innerSearchText}
-                        innerSelectionChanged={this.innerSelectionChanged}
-                        innerSelectionClearedCallback={(key, f) => this.clearInnerSelection[key] = f}
                     />
                     :
                     <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1 || 1)} columnCount={this.headers[this.type].length} />
