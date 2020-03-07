@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import {
-  BrowserRouter as Router
-} from "react-router-dom";
-
 import { Loading, InlineNotification } from 'carbon-components-react';
 
 import SplitterLayout from 'react-splitter-layout';
@@ -51,9 +47,9 @@ class App extends Component {
 
   menuItemClicked(e, event) {
     e.stopPropagation();
+    this.updateHash(event.key);
     // event contains information about the currently selected api (e.g. event.key == 'sets/testRefSet')
     this.setState({
-      currentRefDataEntry: { selectedEntryAPI: event.key, selectedEntryName: event.label, selectedEntrySize: event.size, selectedEntryType: event.datatype, },
       atHome: false,
       createNew: false,
     });
@@ -91,8 +87,8 @@ class App extends Component {
       this.showError(response.message);
     } else {
       const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
+      this.updateHash(api);
       this.setState({
-        currentRefDataEntry: { selectedEntryAPI: api, selectedEntryName: mappedEntries.name, selectedEntrySize: 0, selectedEntryType: this.state.createNewReferenceEntryType, },
         createNew: false,
         atHome: false,
       });
@@ -111,12 +107,14 @@ class App extends Component {
         if (response.error) {
           this.showError(response.message);
         } else {
-          this.setState({ atHome: true, currentRefDataEntry: undefined, });
+          this.updateHash('');
+          this.setState({ atHome: true, });
           this.getRefData();
         }
         this.displayLoadingModal(false);
       };
-      await APIHelper.deleteReferenceData(this.state.currentRefDataEntry.selectedEntryType, this.state.currentRefDataEntry.selectedEntryName, deleteEntryCallback);
+      const [api, type, name] = this.parseHash();
+      await APIHelper.deleteReferenceData(type, name, deleteEntryCallback);
     } else return;
   }
 
@@ -153,6 +151,16 @@ class App extends Component {
     this.setState({ refData: data, });
   }
 
+  parseHash = () => {
+    const api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{type}/{name}
+    const [_, type, name] = api.split('/');
+    return [api, type, name];
+  }
+
+  updateHash = (api) => {
+    window.location.hash = '/data/' + api;
+  }
+
   render() {
     // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
 
@@ -161,65 +169,55 @@ class App extends Component {
     let name = '';
     let size; // undefined when directly accessing a ref data link like "#/data/sets/early_warning"
 
-    if (this.state.currentRefDataEntry) { // We 
-      type = this.state.currentRefDataEntry.selectedEntryType;
-      api = this.state.currentRefDataEntry.selectedEntryAPI;
-      name = this.state.currentRefDataEntry.selectedEntryName;
-      size = this.state.currentRefDataEntry.selectedEntrySize;
-    }
-    if (!type && window.location.hash.includes('#/data/')) {
-      let _; // throw away
-      api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{type}/{name}
-      [_, type, name] = api.split('/');
+    if (window.location.hash.includes('#/data/')) {
+      [api, type, name] = this.parseHash()
     }
 
     const ReferenceDataComponent = this.refDataMapping[type];
     return (
-      <Router>
-        <SplitterLayout
-          secondaryInitialSize={84}
-          percentage>
-          <Sidebar
-            menuItemAction={this.menuItemClicked}
-            showError={this.showError}
-            createEntry={this.createEntry}
-            refData={this.state.refData}
-          />
-          <div id='content'>
-            {this.state.displayError && <InlineNotification
-              kind='error'
-              className='error-alert'
-              onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }); }}
-              title='Error'
-            >
-              {this.state.errorMessages.map(message => <span key={message} className='error-alert-message'>{message}<br /></span>)}
-            </InlineNotification>}
-            <Loading active={this.state.loadingModalOpen} withOverlay />
-            {this.state.createNew ?
-              <NewEntry
-                type={this.state.createNewReferenceEntryType}
-                save={this.entryCreated}
-              />
+      <SplitterLayout
+        secondaryInitialSize={84}
+        percentage>
+        <Sidebar
+          menuItemAction={this.menuItemClicked}
+          showError={this.showError}
+          createEntry={this.createEntry}
+          refData={this.state.refData}
+        />
+        <div id='content'>
+          {this.state.displayError && <InlineNotification
+            kind='error'
+            className='error-alert'
+            onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }); }}
+            title='Error'
+          >
+            {this.state.errorMessages.map(message => <span key={message} className='error-alert-message'>{message}<br /></span>)}
+          </InlineNotification>}
+          <Loading active={this.state.loadingModalOpen} withOverlay />
+          {this.state.createNew ?
+            <NewEntry
+              type={this.state.createNewReferenceEntryType}
+              save={this.entryCreated}
+            />
+            :
+            (!ReferenceDataComponent ?
+              <React.Fragment />
               :
-              (!ReferenceDataComponent ?
-                <React.Fragment />
-                :
-                <ReferenceDataComponent
-                  key={api}
-                  api={api}
-                  name={name}
-                  type={type}
-                  size={size}
-                  deleteEntry={this.deleteEntry}
-                  dataUpdated={this.getRefData}
-                  displayLoadingModal={this.displayLoadingModal}
-                  showError={this.showError}
-                />
-              )
-            }
-          </div>
-        </SplitterLayout>
-      </Router >
+              <ReferenceDataComponent
+                key={api}
+                api={api}
+                name={name}
+                type={type}
+                size={size}
+                deleteEntry={this.deleteEntry}
+                dataUpdated={this.getRefData}
+                displayLoadingModal={this.displayLoadingModal}
+                showError={this.showError}
+              />
+            )
+          }
+        </div>
+      </SplitterLayout>
     );
   }
 }

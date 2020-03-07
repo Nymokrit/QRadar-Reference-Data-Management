@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Search, Accordion, AccordionItem, Tag, Button, UnorderedList } from 'carbon-components-react';
-
 /*
 Register MenuItemListener by adding a callback to props['menuItemAction']
 */
@@ -55,7 +54,7 @@ class Sidebar extends Component {
                                             if (!this.matchSearch(refDataEntry)) return <React.Fragment></React.Fragment>;
                                             const entry = this.props.refData[refDataType].nodes[refDataEntry];
                                             return (
-                                                <Button kind='ghost' size='small' key={entry.label} className='menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)}>
+                                                <Button kind='ghost' size='small' key={entry.label} className='menu-entry' onClick={(e) => this.props.menuItemAction(e, entry)} >
                                                     {entry.label}
                                                     <Tag type='cool-gray' className='menu-entry-badge'>{entry.size || '0'}</Tag>
                                                 </Button>

@@ -84,9 +84,10 @@ class ReferenceMapOfSets extends ReferenceData {
         let response;
         let updateData = this.state.allEntries;
 
-        for (const value of entries) {
-            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, key.key, { value: value, });
-            updateData = this.updateData(updateData, { key: key.key, value: value, }, false);
+        for (const entry of entries) {
+            const value = entry.id;
+            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, key, { value: value, });
+            updateData = this.updateData(updateData, { key: key, value: value, }, false);
         }
 
         if (response.error) {
@@ -175,7 +176,7 @@ class ReferenceMapOfSets extends ReferenceData {
         reader.readAsText(entries.file.value);
     }
 
-    
+
     async bulkAddItems(entries) {
         this.props.displayLoadingModal(true);
 

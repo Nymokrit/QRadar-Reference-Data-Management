@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import * as RefDataHelper from '../RefDataHelper';
 import * as EntryDefinitions from '../../Definitions/ReferenceDataCreateEntryDefinitions';
-import { setTableColumns, mapTableColumns, mapOfSetsTableColumns, mapOfSetsInnerTableColumns, tableTableColumns, tableInnerTableColumns } from '../../Definitions/TableColumnDefinitions';
+import { setTableHeaders, mapTableHeaders, mapOfSetsTableHeaders, mapOfSetsInnerTableHeaders, tableTableHeaders, tableInnerTableHeaders } from '../../Definitions/TableHeaderDefinitions';
 import * as APIHelper from '../../Util/APIHelper';
 import MetaData from '../MetaData';
 import DataTableCarbon from '../DataTableCarbon';
@@ -14,13 +14,13 @@ class ReferenceData extends Component {
     constructor(props, type) {
         super(props);
         this.type = type;
-        this.columns = {
-            'set': setTableColumns,
-            'map': mapTableColumns,
-            'map_of_sets': mapOfSetsTableColumns,
-            'map_of_setsInner': mapOfSetsInnerTableColumns,
-            'table': tableTableColumns,
-            'tableInner': tableInnerTableColumns,
+        this.headers = {
+            'set': setTableHeaders,
+            'map': mapTableHeaders,
+            'map_of_sets': mapOfSetsTableHeaders,
+            'map_of_setsInner': mapOfSetsInnerTableHeaders,
+            'table': tableTableHeaders,
+            'tableInner': tableInnerTableHeaders,
         };
 
         this.state = {
@@ -101,12 +101,8 @@ class ReferenceData extends Component {
         this.setState({ showInputModal: true, modalSave: (e) => this.addInnerItem(key, e), modalInputDefinition: EntryDefinitions[this.type + 'AddInnerItem'], });
     }
 
-    clickDeleteInnerItem(key) {
-        this.deleteInnerItem(key, this.state.innerSelected[key.key]);
-        const selection = this.state.innerSelected;
-        selection[key.key] = [];
-        this.setState({ innerSelected: selection, });
-        this.clearInnerSelection[key.key]();
+    clickDeleteInnerItem(outer_key, selectedRows) {
+        this.deleteInnerItem(outer_key, selectedRows);
     }
 
     tableChanged(type, options) {
@@ -152,7 +148,7 @@ class ReferenceData extends Component {
                     <DataTableCarbon
                         tableChanged={this.tableChanged}
                         data={this.state.tableData}
-                        columns={this.columns[this.type]}
+                        headers={this.headers[this.type]}
                         type={this.type}
                         addItem={this.clickAddItem}
                         bulkAddItem={this.clickBulkAddItem}
@@ -162,7 +158,7 @@ class ReferenceData extends Component {
                         searchText={this.state.searchText}
 
                         expandable={['map_of_sets', 'table',].includes(this.type)}
-                        extendableColumns={this.columns[this.type + 'Inner']}
+                        extendableHeaders={this.headers[this.type + 'Inner']}
                         addInnerItem={this.clickAddInnerItem}
                         deleteInnerItem={this.clickDeleteInnerItem}
                         innerSearchText={this.state.innerSearchText}
@@ -170,7 +166,7 @@ class ReferenceData extends Component {
                         innerSelectionClearedCallback={(key, f) => this.clearInnerSelection[key] = f}
                     />
                     :
-                    <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1 || 1)} columnCount={this.columns[this.type].length} />
+                    <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1 || 1)} columnCount={this.headers[this.type].length} />
                 }
                 <div className='separator'></div>
                 <Dependents dependents={this.state.dependents} loaded={this.state.dependentsLoaded} />

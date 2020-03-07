@@ -99,12 +99,13 @@ class ReferenceTable extends ReferenceData {
         let response;
         let updateData = this.state.allEntries;
 
-        for (const inner_key of entries) {
-            const indexOfOuterKey = updateData.findIndex((value) => (value.key === outer_key.key));
+        for (const entry of entries) {
+            const inner_key = entry.id;
+            const indexOfOuterKey = updateData.findIndex((value) => (value.key === outer_key));
             const indexOfInnerKey = updateData[indexOfOuterKey].values.findIndex((value) => value.key === inner_key);
-            response = await APIHelper.deleteReferenceDataInnerEntry(this.props.type, this.props.name, outer_key.key, inner_key, { value: updateData[indexOfOuterKey].values[indexOfInnerKey].value, });
+            response = await APIHelper.deleteReferenceDataInnerEntry(this.props.type, this.props.name, outer_key, inner_key, { value: updateData[indexOfOuterKey].values[indexOfInnerKey].value, });
 
-            updateData = this.updateData(updateData, { outer_key: outer_key.key, inner_key: inner_key, }, false, false);
+            updateData = this.updateData(updateData, { outer_key: outer_key, inner_key: inner_key, }, false, false);
         }
 
         if (response.error) {

@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 import { Delete24 } from '@carbon/icons-react';
 import { Button, DataTable, TableExpandHeader, TableExpandRow, TableExpandedRow, Pagination } from 'carbon-components-react';
 
+
+import dateformat from 'dateformat';
+
 const {
     TableContainer,
     Table,
@@ -20,39 +23,17 @@ const {
     TableToolbarSearch,
 } = DataTable;
 
+const dateFormatter = (input) => dateformat(input, 'dd/mmm/yyyy, hh:MM:ss TT')
+
 class DataTableCarbon extends Component {
+    formatters = { 'first_seen': dateFormatter, 'last_seen': dateFormatter }
+
     constructor(props) {
         super(props);
 
         this.state = {
-            selected: [], currentPageSize: 10, firstRowIndex: 0, currentPage: 1, updatePagination: Math.random(), sortDirection: 'ASC'
+            currentPageSize: 10, firstRowIndex: 0, currentPage: 1, updatePagination: Math.random(), sortDirection: 'ASC'
         };
-
-        /* if (this.props.innerTable) this.props.selectionClearedCallback(this.props.parent.key, this.clearSelection);
-        else this.props.selectionClearedCallback(this.clearSelection); */
-    }
-
-    handleOnSelect = (row, isSelect) => {
-        let selected;
-        if (isSelect) selected = [...this.state.selected, row.id,];
-        else selected = this.state.selected.filter(x => x !== row.id);
-
-        this.setState({ selected, });
-        if (this.props.innerTable) this.props.selectionChanged(row.outer_key || row.key, selected);
-        else this.props.selectionChanged(selected);
-
-    }
-
-    handleOnSelectAll = (isSelect, rows) => {
-        const ids = rows.map(r => r.id);
-
-        let selected;
-        if (isSelect) selected = ids;
-        else selected = [];
-
-        this.setState({ selected, });
-        if (this.props.innerTable) this.props.selectionChanged(rows[0].outer_key || rows[0].key, selected);
-        else this.props.selectionChanged(selected);
     }
 
     onInputChange = (event) => {
@@ -76,8 +57,6 @@ class DataTableCarbon extends Component {
         });
     }
 
-
-
     render() {
         // Due to pagination, we only display a certain subset of the original dataset
         const data = this.props.data.slice(
@@ -87,18 +66,19 @@ class DataTableCarbon extends Component {
 
 
         const expandRow = (row) => {
-            console.log(row);
-            return (<div className='inner-table'>
-                <DataTableCarbon
-                    innerTable={true}
-                    parent={row}
-                    data={row.values}
-                    columns={this.props.extendableColumns}
-                    addItem={(e) => this.props.addInnerItem(row)}
-                    deleteItem={(e) => this.props.deleteInnerItem(row)}
-                    searchText={this.props.innerSearchText}
-                />
-            </div>);
+            return (
+                <div className='inner-table'>
+                    <DataTableCarbon
+                        innerTable={true}
+                        data={row.values}
+                        headers={this.props.extendableHeaders}
+                        addItem={(e) => this.props.addInnerItem(row)}
+                        deleteItem={(selectedRows) => this.props.deleteInnerItem(row.key, selectedRows)}
+                        searchText={this.props.innerSearchText}
+
+                    />
+                </div>
+            );
         };
 
         return (
@@ -106,16 +86,16 @@ class DataTableCarbon extends Component {
                 useZebraStyles={true}
                 isSortable
                 rows={data}
-                headers={this.props.columns}
+                headers={this.props.headers}
                 render={({
                     rows,
+                    getRowProps,
                     headers,
                     getHeaderProps,
-                    getRowProps,
-                    getTableProps,
+                    selectedRows,
                     getSelectionProps,
-                    getBatchActionProps,
-                    selectedRows
+                    getTableProps,
+                    getBatchActionProps
                 }) => (
                         <TableContainer>
                             <TableToolbar>
@@ -124,9 +104,14 @@ class DataTableCarbon extends Component {
                                 </TableBatchActions>
                                 <TableToolbarContent>
                                     {!this.props.innerTable && <TableToolbarSearch onChange={this.onInputChange} />}{ /* We only display a search bar for the outer table since we don't expect many inner values anyways */}
-                                    <Button onClick={this.props.addItem} size='small' kind='primary'>Add Entry</Button>
-                                    <Button onClick={this.props.bulkAddItem} size='small' kind='primary'>Bulk Add</Button>
-                                    <Button onClick={this.props.importItems} size='small' kind='primary'>Import CSV</Button>
+                                    <Button onClick={this.props.addItem} size='small' kind='primary' className='btn-table'>Add Entry</Button>
+                                    {!this.props.innerTable &&
+                                        <React.Fragment>
+                                            <Button onClick={this.props.bulkAddItem} size='small' kind='primary' className='btn-table'>Bulk Add</Button>
+                                            <Button onClick={this.props.importItems} size='small' kind='primary' className='btn-table'>Import CSV</Button>
+                                            <Button onClick={this.props.exportItems} size='small' kind='primary' className='btn-table'>Export CSV</Button>
+                                        </React.Fragment>
+                                    }
                                 </TableToolbarContent>
                             </TableToolbar>
                             <Table {...getTableProps()}>
@@ -135,7 +120,7 @@ class DataTableCarbon extends Component {
                                         {this.props.expandable && <TableExpandHeader />}
                                         <TableSelectAll {...getSelectionProps()} />
                                         {headers.map(header => (
-                                            <TableHeader {...getHeaderProps({ header, })} sortDirection={this.state.sortDirection} isSortHeader={this.state.sortHeader == header.key} onClick={() => this.sortTable(header.key)}>
+                                            <TableHeader {...getHeaderProps({ header, })} sortDirection={this.state.sortDirection} isSortHeader={this.state.sortHeader === header.key} onClick={() => this.sortTable(header.key)}>
                                                 {header.header}
                                             </TableHeader>
                                         ))}
@@ -162,9 +147,14 @@ class DataTableCarbon extends Component {
                                     {!this.props.expandable && rows.map(row => (
                                         <TableRow key={row.id}  {...getRowProps({ row, })}>
                                             <TableSelectRow {...getSelectionProps({ row, })} />
-                                            {row.cells.map(cell => (
-                                                <TableCell key={cell.id}>{cell.value}</TableCell>
-                                            ))}
+                                            {row.cells.map(cell => {
+                                                const [_, key] = cell.id.split(':');
+                                                let value = cell.value;
+                                                if (key in this.formatters)
+                                                    value = this.formatters[key](value);
+
+                                                return <TableCell key={cell.id}>{value}</TableCell>
+                                            })}
                                         </TableRow>
                                     ))}
                                 </TableBody>
