@@ -1,4 +1,4 @@
-import * as RefDataHelper from '../RefDataHelper';
+
 import * as APIHelper from '../../Util/APIHelper';
 import ReferenceData from './ReferenceData';
 
@@ -7,40 +7,32 @@ class ReferenceMap extends ReferenceData {
         super(props, 'map');
     }
 
-    async importItems(entries) {
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            const text = reader.result;
-            const data = {
-                bulkAddEntriesSeparator: entries.bulkAddEntriesSeparator,
-                bulkAddKeyValueSeparator: entries.bulkAddKeyValueSeparator,
-                bulkAddData: { value: text, },
-            };
-            this.bulkAddItems(data);
-        };
-
-        reader.readAsText(entries.file.value);
-    }
-
-    exportItems() {
-        RefDataHelper.download(this.props.name, this.state.allEntries, true);
-    }
-
     // Entry should consist of an JS Object of the form {key: 'someKey', value: 'someVal'}
-    async addItem(entry) {
+    addItem = async (entry) => {
         if (!entry['value'].value || !entry['key'].value) {
             this.props.showError('Cannot add an empty value');
             return;
         }
-        const username = await RefDataHelper.defaultEntryComment();
-        const parsedEntry = { key: entry['key'].value, value: entry['value'].value, source: entry['source'].value || username, };
 
-        super.addItem(parsedEntry);
+        this.props.displayLoadingModal(true);
+        const username = await this.defaultEntryComment();
+        const [key, value, source] = [entry['key'].value, entry['value'].value, entry['source'].value || username];
+
+        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { key, value, source });
+
+        if (response.error) {
+            this.props.showError(response.message);
+        } else {
+            let updateData = this.state.allEntries;
+            updateData.push({ key, value, source, id: key, first_seen: Date.now(), last_seen: Date.now(), });
+            this.tableChanged('new', updateData);
+            this.updateMetaData(response);
+        }
+        this.props.displayLoadingModal(false);
     }
 
     // Entries should be an array containing the values to be deleted
-    async deleteItem(entries) {
+    deleteItem = async (entries) => {
         if (!entries || !entries.length) return;
         this.props.displayLoadingModal(true);
         let response;
@@ -50,7 +42,8 @@ class ReferenceMap extends ReferenceData {
             const key = entry.id;
             const keyIndex = updateData.findIndex((value) => (value.key === key));
             response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, key, { value: updateData[keyIndex].value, });
-            updateData = this.updateData(updateData, { key: key, }, false);
+            if (response.error) this.props.showError(response.message);
+            else updateData.splice(keyIndex, 1);
         }
 
         if (response.error) {
@@ -62,78 +55,90 @@ class ReferenceMap extends ReferenceData {
         this.props.displayLoadingModal(false);
     }
 
-    async bulkAddItems(entries) {
-        // const regexEntries = new RegExp(entries.bulkAddEntriesSeparator.value, 'g');
-        // const regexKeyValue = new RegExp(entries.bulkAddKeyValueSeparator.value, 'g');
-        this.props.displayLoadingModal(true);
+    importItems = async (entries) => {
+        const reader = new FileReader();
 
+        reader.onloadend = () => {
+            const text = reader.result;
+            const pairs = text
+                .split(/\r?\n/g) // each line is interpreted as one key=value pair
+                .map(value => value.trim())
+                .filter(value => value);
+
+            const data = {};
+            for (const pair of pairs) {
+                const [key, value,] = pair.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+                data[key] = value;
+            }
+
+            this.bulkAdd(data);
+        };
+
+        reader.readAsText(entries.file.value);
+    }
+    /**
+     * Split all items and remove empty ones + leading/trailing whitespace. The perform bulk add
+     * This is extracted into a second method bulkAdd to reuse the function for the import
+     */
+    bulkAddItems = async (entries) => {
         const pairs = entries.bulkAddData.value
-            .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
-            .split(entries.bulkAddEntriesSeparator.value)
+            .split(/\r?\n/g) // each line is interpreted as one key=value pair
             .map(value => value.trim())
             .filter(value => value);
 
-        let newData = [];
-
         const data = {};
-
         for (const pair of pairs) {
-            const [key, value,] = pair.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
+            const [key, value,] = pair.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
             data[key] = value;
-            newData.push({ key: key, value: value, id: key, source: 'reference data api', });
         }
 
-        // We remove duplicate keys but keep the newest key=value pair
-        // This is be the expected behaviour when duplicate keys are passed to the API so we imitate the same
-        newData = newData
-            .reverse()
-            .filter((entry, index, self) =>
-                index === self.findIndex((e) => (
-                    e.key === entry.key
-                ))
-            )
-            .reverse();
+        this.bulkAdd(data);
+    }
+
+    /**
+     * Data is expected to be a regular json object. The data is first uploaded to QRadar and upon success the table is updated locally.
+     * This might potentially lead to inconsistencies as we mirror the 'expected' state which does not necessarily match the 'real' state. 
+     * A potential workaround would be to directly reload the full map, however, this might be resource intensive so we accept potential temporary inconsistencies
+     * as they can be resolved by clicking the reload button if necessary.
+     * {"key1":"Data1",
+     *  "key2":"Data2",
+     *  "key3":"Data3",}
+     */
+    bulkAdd = async (data) => {
+        this.props.displayLoadingModal(true);
 
         const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
 
         if (response.error) {
             this.props.showError(response.message);
         } else {
-            let oldData = this.state.allEntries;
-            oldData.push(...newData);
-            // remove new duplicate keys and keep the newest ones
-            oldData = oldData.reverse()
-                .filter((entry, index, self) =>
-                    index === self.findIndex((e) => (
-                        e.key === entry.key
-                    ))
-                )
-                .reverse();
+            let tableData = this.state.allEntries;
 
-            this.tableChanged('new', oldData);
+            for (const key in data) {
+                tableData.push({ key, value: data[key], id: key, source: 'reference data api', first_seen: Date.now(), last_seen: Date.now(), });
+            }
+            // remove new duplicate keys and keep the newest ones
+            tableData = this.removeDuplicates(tableData)
+
+            this.tableChanged('new', tableData);
             this.updateMetaData(response);
         }
         this.props.displayLoadingModal(false);
     }
 
-    updateData(currentState, value, isAdd) {
-        let updateData = currentState;
-        if (isAdd) updateData.push({ key: value.key, value: value.value, id: value.key, source: value.source, });
-        else updateData = updateData.filter(e => e.key !== value.key);
+    exportItems = () => this.download(this.props.name, this.state.allEntries, true);
 
-        updateData = updateData
-            .reverse()
+    removeDuplicates = (data) => {
+        return data.reverse()
             .filter((entry, index, self) =>
                 index === self.findIndex((e) => (
                     e.key === entry.key
                 ))
             )
             .reverse();
-
-        return updateData;
     }
 
-    parseResponseData(response) {
+    parseResponseData = (response) => {
         const data = [];
         if (response.number_of_elements > 0) {
             for (const key in response.data) {
@@ -145,7 +150,7 @@ class ReferenceMap extends ReferenceData {
         }
     }
 
-    testValue(entry, searchText, isRegexSearch) {
+    testValue = (entry, searchText, isRegexSearch) => {
         if (!entry.value || !entry.key) return false;
 
         let matches = false;

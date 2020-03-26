@@ -5,46 +5,30 @@ class Sidebar extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            searchText: '',
-        };
-
-        this.toggleMenu = this.toggleMenu.bind(this);
-        this.searchInputChanged = this.searchInputChanged.bind(this);
-        this.matchesCurrentSearch = this.matchesCurrentSearch.bind(this);
+        this.state = { searchText: '', };
     }
 
-    toggleMenu(type) {
-        //const entries = this.props.refData;
-        this.props.refData[type].isOpen = !this.props.refData[type].isOpen;
-        this.setState({ entries: this.props.refData, });
-    }
-
-    matchesCurrentSearch(entry) {
-        const searchText = this.state.searchText;
+    toggleMenu = (type) => this.setState(prevState => ({ entries: this.props.refData, [type]: !prevState[type] }));
+    searchInputChanged = (event) => this.setState({ searchText: event.target.value, 'sets': true, 'maps': true, 'map_of_sets': true, 'tables': true });
+    matchesCurrentSearch = (entry) => {
+        // try to interpret current search string as Regex, if that fails, simply perform string matching
         try {
-            const regex = new RegExp(searchText, 'i');
-            return entry.match(regex);
+            return entry.match(new RegExp(this.state.searchText, 'i'));
         } catch (e) {
-            return entry.toLowerCase().includes(searchText.toLowerCase());
+            return entry.toLowerCase().includes(this.state.searchText.toLowerCase());
         }
-    }
-
-    searchInputChanged(event) {
-        Object.keys(this.props.refData).map((type) => this.props.refData[type].isOpen = true);
-        this.setState({ searchText: event.target.value, });
     }
 
     render() {
         return (
             <div className='menu' >
-                <Search type='text' labelText={i18n.t('Search')} placeHolderText={i18n.t('Search')} light onChange={this.searchInputChanged} value={this.state.searchText} />
+                <Search type='text' labelText={i18n.t('data.sidebar.search')} placeHolderText={i18n.t('data.sidebar.search')} light onChange={this.searchInputChanged} value={this.state.searchText} />
                 <Accordion>
                     {
                         Object.keys(this.props.refData).map(type =>
-                            <AccordionItem key={type} open={this.props.refData[type].isOpen} title={this.props.refData[type].label} className='menu-title' onClick={() => this.toggleMenu(type)}>
+                            <AccordionItem key={type} open={this.state[type]} title={this.props.refData[type].label} className='menu-title' onClick={() => this.toggleMenu(type)}>
                                 <Button kind='primary' size='small' className='btn-create-new' onClick={(e) => this.props.createEntry(e, type)} key={'btn-' + type}>
-                                    {i18n.t('Create New')}
+                                    {i18n.t('data.sidebar.create')}
                                 </Button>
                                 <UnorderedList className='menu-list'>
                                     {

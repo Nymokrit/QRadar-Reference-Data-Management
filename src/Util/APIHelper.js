@@ -5,6 +5,7 @@ import Config from '../Util/Config';
 
 const doubleEncode = (input) => input ? encodeURIComponent(encodeURIComponent(input)) : undefined;
 
+
 let isProd = false;
 let csrfHeader = '';
 try {

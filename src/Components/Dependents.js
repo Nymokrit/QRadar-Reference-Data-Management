@@ -1,5 +1,5 @@
 import React from 'react';
-import { DataTableSkeleton, DataTable } from 'carbon-components-react';
+import { DataTableSkeleton, DataTable, Link } from 'carbon-components-react';
 import i18n from '../I18n/i18n';
 const {
     Table,
@@ -13,14 +13,14 @@ const {
 function Dependents(props) {
     let dependents;
     if (props.dependents && props.dependents.length > 0)
-        dependents = props.dependents.map(dependent => ({ id: String(Math.random()), dependent: '(' + dependent.dependent_type + ') ' + dependent.dependent_name, }));
+        dependents = props.dependents.map((dependent, i) => ({ id: i, dependent: '(' + dependent.dependent_type + ') ' + dependent.dependent_name }));
     else
-        dependents = [{ id: '0', dependent: 'This ReferenceData appears to not have any data depending on it', },];
+        dependents = [{ id: '0', dependent: i18n.t('data.dependents.none'), },];
 
     return (
         props.loaded ?
             <DataTable
-                headers={[{ header: i18n.t('Dependents'), key: 'dependent', },]}
+                headers={[{ header: i18n.t('data.dependents.title'), key: 'dependent', },]}
                 rows={dependents}
                 useZebraStyles={true}
                 render={({ rows, headers, getTableProps, getHeaderProps, getRowProps, }) => (
@@ -38,7 +38,15 @@ function Dependents(props) {
                             {rows.map(row => (
                                 <TableRow key={row.id} {...getRowProps({ row, })}>
                                     {row.cells.map(cell => (
-                                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                                        <TableCell key={cell.id}>
+                                            {
+                                                props.dependents && props.dependents.length && ['CRE_RULE', 'BUILDING_BLOCK', 'ADE_RULE'].includes(props.dependents[row.id].dependent_type)
+                                                    ?
+                                                    <Link href='#' onClick={e => { e.preventDefault(); props.editRule(props.dependents[row.id].dependent_id) }}>{cell.value}</Link>
+                                                    :
+                                                    <Link>{cell.value}</Link>
+                                            }
+                                        </TableCell>
                                     ))}
                                 </TableRow>
                             ))}
@@ -47,8 +55,9 @@ function Dependents(props) {
                 )}
             />
             :
-            <DataTableSkeleton headers={[i18n.t('Dependents'),]} columnCount={1} rowCount={1} />
+            <DataTableSkeleton headers={[i18n.t('data.dependents.title'),]} columnCount={1} rowCount={1} />
     );
 }
 
 export default Dependents;
+

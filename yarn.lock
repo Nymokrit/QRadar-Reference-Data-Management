@@ -979,12 +979,24 @@
   resolved "https://registry.yarnpkg.com/@carbon/icon-helpers/-/icon-helpers-10.5.2.tgz#7975fc091206f4a423e812dada89519df52c2041"
   integrity sha512-L3pK5YbXj2B/lXHb0NyHbGzOLpMBOP0uL9J4wARCr/NNvuyqJEkgj9JSSX7OAORkOk9NncOdpgCyKzjIBheU6w==
 
+"@carbon/icon-helpers@^10.6.0":
+  version "10.6.0"
+  resolved "https://registry.yarnpkg.com/@carbon/icon-helpers/-/icon-helpers-10.6.0.tgz#72a5bbd1edbee3728e47fa6d17c2aca67dbb101c"
+  integrity sha512-4Nh6l+B8SRNyw1RpgNT4Z83Aa5UwRFmKJ2mx5m7mE5TqxPkfIZjyyLHyv5gl3gPtaVwq78ZGz80wG0NRQzRM7g==
+
 "@carbon/icons-react@^10.8.2":
   version "10.8.2"
   resolved "https://registry.yarnpkg.com/@carbon/icons-react/-/icons-react-10.8.2.tgz#f109b80457a4dcb23dd4d168662966ca229a3614"
   integrity sha512-7XPbFk3DrVzfgjNmKXBT/qpTJ7bG4htGsp+CTt3X/kXrxPVd/VYUpeSErG1ozLNp/dSwzuPb8w0dQh1j9+HuDw==
   dependencies:
     "@carbon/icon-helpers" "^10.5.2"
+
+"@carbon/icons-react@^10.9.2":
+  version "10.9.2"
+  resolved "https://registry.yarnpkg.com/@carbon/icons-react/-/icons-react-10.9.2.tgz#8f4e81e78c8750a1dd3ccb4bb9c8cfa7642bccb7"
+  integrity sha512-Dm3ouT2ZEC3sY1ndOxUsHYUJhkwT7OLFqCwGr6zx2VhH27WQu4S63WBvm6N9g5UJkxKAbEH5v2kD7OUH9wV+4A==
+  dependencies:
+    "@carbon/icon-helpers" "^10.6.0"
 
 "@cnakazawa/watch@^1.0.3":
   version "1.0.4"
@@ -2677,20 +2689,21 @@ capture-exit@^2.0.0:
   dependencies:
     rsvp "^4.8.4"
 
-carbon-components-react@^7.9.3:
-  version "7.9.3"
-  resolved "https://registry.yarnpkg.com/carbon-components-react/-/carbon-components-react-7.9.3.tgz#664dda1c47077944e30a9de5bcdbd4c219954248"
-  integrity sha512-D6514Cgl3Iz5n9XH0Vp+3cYsSRaE4n9eXy6S9JpZPR1StDDrnGb/KIwH9vmz4gevpNFjLRo7To0E1R5hB3U3Fw==
+carbon-components-react@^7.10.2:
+  version "7.10.2"
+  resolved "https://registry.yarnpkg.com/carbon-components-react/-/carbon-components-react-7.10.2.tgz#90e00155623a62728428cd15f31bcafe48aa9511"
+  integrity sha512-kgV2xe3PlDBVo8hAMX7AqeESSYOFa4sOU8k5uFVIBABDZW7gCgIeqL1hUKXAcg0AZ4ZfaTRJMlRIii6XT+uElA==
   dependencies:
-    "@carbon/icons-react" "^10.8.2"
+    "@carbon/icons-react" "^10.9.2"
     classnames "2.2.6"
     downshift "^1.31.14"
     flatpickr "4.6.1"
-    focus-trap-react "^6.0.0"
     invariant "^2.2.3"
     lodash.debounce "^4.0.8"
+    lodash.findlast "^4.5.0"
     lodash.isequal "^4.5.0"
     lodash.omit "^4.5.0"
+    lodash.throttle "^4.1.1"
     react-is "^16.8.6"
     warning "^3.0.0"
     window-or-global "^1.0.1"
@@ -4607,21 +4620,6 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
-
-focus-trap-react@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/focus-trap-react/-/focus-trap-react-6.0.0.tgz#3f5a9f68447dd374d22388fb4c50018be83e74a5"
-  integrity sha512-mvEYxmP75PMx0vOqoIAmJHO/qUEvdTAdz6gLlEZyxxODnuKQdnKea2RWTYxghAPrV+ibiIq2o/GTSgQycnAjcw==
-  dependencies:
-    focus-trap "^4.0.2"
-
-focus-trap@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-4.0.2.tgz#4ee2b96547c9ea0e4252a2d4b2cca68944194663"
-  integrity sha512-HtLjfAK7Hp2qbBtLS6wEznID1mPT+48ZnP2nkHzgjpL4kroYHg0CdqJ5cTXk+UO5znAxF5fRUkhdyfgrhh8Lzw==
-  dependencies:
-    tabbable "^3.1.2"
-    xtend "^4.0.1"
 
 follow-redirects@1.5.10:
   version "1.5.10"
@@ -6696,6 +6694,11 @@ lodash.debounce@^4.0.8:
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
 
+lodash.findlast@^4.5.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.findlast/-/lodash.findlast-4.6.0.tgz#ea8bb78cf2e7e7804fc8aeb7d1953e07fe31fbc8"
+  integrity sha1-6ou3jPLn54BPyK630ZU+B/4x+8g=
+
 lodash.isequal@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
@@ -6730,6 +6733,11 @@ lodash.templatesettings@^4.0.0:
   integrity sha512-stgLz+i3Aa9mZgnjr/O+v9ruKZsPsndy7qPZOchbqk2cnTU1ZaldKK+v7m54WoKIyxiuMZTKT2H81F8BeAc3ZQ==
   dependencies:
     lodash._reinterpolate "^3.0.0"
+
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
 
 lodash.uniq@^4.5.0:
   version "4.5.0"
@@ -9019,10 +9027,15 @@ react-i18next@^11.3.3:
     "@babel/runtime" "^7.3.1"
     html-parse-stringify2 "2.0.1"
 
-react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
+react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4:
   version "16.13.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.0.tgz#0f37c3613c34fe6b37cd7f763a0d6293ab15c527"
   integrity sha512-GFMtL0vHkiBv9HluwNZTggSn/sCyEt9n02aM0dSAjGGyqyNlAyftYm4phPxdvCigG15JreC5biwxCgTAJZ7yAA==
+
+react-is@^16.8.6:
+  version "16.13.1"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
+  integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
 react-lifecycles-compat@^3.0.4:
   version "3.0.4"
@@ -10502,11 +10515,6 @@ symbol-tree@^3.2.2:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-tabbable@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-3.1.2.tgz#f2d16cccd01f400e38635c7181adfe0ad965a4a2"
-  integrity sha512-wjB6puVXTYO0BSFtCmWQubA/KIn7Xvajw0x0l6eJUudMG/EAiJvIUnyNX6xO4NpGrJ16lbD0eUseB9WxW0vlpQ==
-
 table@^5.2.3:
   version "5.4.6"
   resolved "https://registry.yarnpkg.com/table/-/table-5.4.6.tgz#1292d19500ce3f86053b05f0e8e7e4a3bb21079e"
@@ -11505,7 +11513,7 @@ xmlchars@^2.1.1:
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.2.0.tgz#060fe1bcb7f9c76fe2a17db86a9bc3ab894210cb"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
 
-xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
+xtend@^4.0.0, xtend@~4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==

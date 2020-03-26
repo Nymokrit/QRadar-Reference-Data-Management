@@ -1,5 +1,5 @@
 import * as APIHelper from '../../Util/APIHelper';
-import * as RefDataHelper from '../RefDataHelper';
+
 import ReferenceData from './ReferenceData';
 
 class ReferenceSet extends ReferenceData {
@@ -7,52 +7,47 @@ class ReferenceSet extends ReferenceData {
         super(props, 'set');
     }
 
-    async importItems(entries) {
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            const text = reader.result;
-            const data = {
-                bulkAddSeparator: entries.bulkAddSeparator,
-                bulkAddData: { value: text, },
-            };
-            this.bulkAddItems(data);
-        };
-
-        reader.readAsText(entries.file.value);
-    }
-
-    exportItems() {
-        RefDataHelper.download(this.props.name, this.state.allEntries);
-    }
-
     // Entry should consist of an JS Object of the form {value: 'someVal'}
-    async addItem(entry) {
+    addItem = async (entry) => {
         if (!entry['value'].value) {
             this.props.showError('Cannot add an empty value');
             return;
         }
-        const username = await RefDataHelper.defaultEntryComment();
-        const parsedEntry = { value: entry['value'].value, source: entry['source'].value || username, };
 
-        super.addItem(parsedEntry);
+        this.props.displayLoadingModal(true);
+        const username = await this.defaultEntryComment();
+        const [value, source] = [entry['value'].value, entry['source'].value || username,];
+
+        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { value, source });
+
+        if (response.error) {
+            this.props.showError(response.message);
+        } else {
+            if (response.number_of_elements > this.state.tableData.length) { // only update the table, if the entry actually has been added
+                let updateData = this.state.allEntries;
+                updateData.push({ value, source, id: value, first_seen: Date.now(), last_seen: Date.now() });
+                this.tableChanged('new', updateData);
+                this.updateMetaData(response);
+            }
+        }
+        this.props.displayLoadingModal(false);
     }
 
     // Entries should be an array containing the values to be deleted
-    async deleteItem(entries) {
-        console.log(entries);
+    deleteItem = async (entries) => {
         if (!entries || !entries.length) return;
         this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
-        for (const value of entries) {
-            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, value.id);
-            updateData = this.updateData(updateData, { value: value.id, }, false);
+        for (const entry of entries) {
+            const value = entry.id
+            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, value);
+            updateData = updateData.filter(e => e.value !== value);
         }
 
-        if (response.error) {
-            this.props.showError(response.message);
+        if (response.error || response.number_of_elements >= this.state.tableData.length) {
+            this.props.showError(response.message || 'Unspecified error while trying to delete value');
         } else {
             this.tableChanged('new', updateData);
             this.updateMetaData(response);
@@ -60,50 +55,76 @@ class ReferenceSet extends ReferenceData {
         this.props.displayLoadingModal(false);
     }
 
-    async bulkAddItems(entries) {
-        // const regexEntries = new RegExp(entries.bulkAddSeparator.value, 'g');
-        this.props.displayLoadingModal(true);
 
+    importItems = async (entries) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const text = reader.result;
+            let data = text.replace(/\r?\n/g, entries.bulkAddSeparator.value) // Remove new lines 
+                .split(entries.bulkAddSeparator.value) // split based on input value
+                .map(value => value.trim()) // remove whitespace
+                .filter(value => value); // remove empty values
+            data = [...new Set(data),]; // remove duplicates
+
+            this.bulkAdd(data);
+        };
+
+        reader.readAsText(entries.file.value);
+    }
+
+    bulkAddItems = async (entries) => {
         let data = entries.bulkAddData.value
             .replace(/\r?\n/g, entries.bulkAddSeparator.value) // Remove new lines 
             .split(entries.bulkAddSeparator.value) // split based on input value
             .map(value => value.trim()) // remove whitespace
             .filter(value => value); // remove empty values
         data = [...new Set(data),]; // remove duplicates
-        const newData = data.map(elem => ({ value: elem, id: elem, source: 'reference data api', }));
+
+        this.bulkAdd(data);
+    }
+
+    /**
+     * Data is expected to be a regular json object. The data is first uploaded to QRadar and upon success the table is updated locally.
+     * This might potentially lead to inconsistencies as we mirror the 'expected' state which does not necessarily match the 'real' state. 
+     * A potential workaround would be to directly reload the full map, however, this might be resource intensive so we accept potential temporary inconsistencies
+     * as they can be resolved by clicking the reload button if necessary.
+     * {"value1","value2","value3",}
+     */
+    bulkAdd = async (data) => {
+        this.props.displayLoadingModal(true);
+
         const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
 
         if (response.error) {
             this.props.showError(response.message);
         } else {
-            let oldData = this.state.allEntries;
-            oldData.push(...newData);
+            let tableData = this.state.allEntries;
+
+            for (const value of data) {
+                tableData.push({ value, id: value, source: 'reference data api', first_seen: Date.now(), last_seen: Date.now() });
+            }
             // remove new duplicate values
-            oldData = oldData
-                .filter((entry, index, self) =>
-                    index === self.findIndex((e) => (
-                        e.value === entry.value
-                    ))
-                );
-            this.tableChanged('new', oldData);
+            tableData = this.removeDuplicates(tableData);
+
+            this.tableChanged('new', tableData);
             this.updateMetaData(response);
         }
         this.props.displayLoadingModal(false);
     }
 
-    updateData(currentState, value, isAdd) {
-        let updateData = currentState;
-        if (isAdd) {
-            const indexOfValue = updateData.findIndex((entry) => (value.value === entry.value));
-            // value is not yet in ref set
-            if (indexOfValue === -1) updateData.push({ value: value.value, id: value.value, source: value.source, });
-        }
-        else updateData = updateData.filter(e => e.value !== value.value);
+    exportItems = () => this.download(this.props.name, this.state.allEntries);
 
-        return updateData;
+    removeDuplicates = (data) => {
+        return data
+            .filter((entry, index, self) =>
+                index === self.findIndex((e) => (
+                    e.value === entry.value
+                ))
+            );
     }
 
-    parseResponseData(response) {
+    parseResponseData = (response) => {
         const data = [];
         if (response.number_of_elements > 0) {
             response.data.forEach(element => {
@@ -116,7 +137,7 @@ class ReferenceSet extends ReferenceData {
         return data;
     }
 
-    testValue(entry, searchText, isRegexSearch) {
+    testValue = (entry, searchText, isRegexSearch) => {
         if (!entry.value) return false;
         let matches = false;
         if (isRegexSearch) matches = entry.value.match(searchText);

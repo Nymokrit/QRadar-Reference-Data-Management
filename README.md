@@ -25,3 +25,17 @@ Content-Type: QRadar Application
 Tag Words: Dependency Management, Tuning
 
 ## Application Documentation
+
+```
+QRadar.rest({
+            httpMethod: "GET",
+            path: "/api/gui_app_framework/named_services",
+            onComplete: function() {
+                let services = JSON.parse(this.responseText);
+                let service = QRadar.getNamedService(services, 'reference_data_service', 1);
+                let endpoint = QRadar.getNamedServiceEndpoint(service, 'data');
+                restArgs = QRadar.buildNamedServiceEndpointRestArgs({}, endpoint, {'type':'sets','name':'early_warning'});
+                window.openWindow(restArgs.path)
+            }
+ })
+ ```

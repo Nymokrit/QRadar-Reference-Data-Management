@@ -29,6 +29,10 @@
 .error-alert {
     width: 80%;
     max-width: 80% !important;
+
+    .bx--inline-notification__text-wrapper {
+        display: unset;
+    }
 }
 
 button {
@@ -42,6 +46,13 @@ button {
 
     &.right {
         right: 10px;
+    }
+
+    &.reload {
+        position: relative;
+        float: right;
+        padding-left: 2px !important;
+        padding-right: 10px !important;
     }
 
     &.delete {
@@ -82,9 +93,11 @@ button {
     }
 }
 
+
+
 .bx--data-table {
     td {
-        word-break: break-all !important;
+        word-break: initial !important;
     }
 }
 
@@ -126,6 +139,34 @@ button {
         }
     }
 }
+
+.rule-wizard-frame {
+    width: 800px;
+    height: 750px;
+    padding: 0px;
+}
+
+.rule-wizard-modal {
+
+    .bx--modal-header {
+        display: none;
+    }
+
+    .bx--modal-content {
+        margin: 0px;
+        padding: 0px !important;
+
+        &>:last-child {
+            padding-bottom: 0px !important;
+        }
+    }
+
+    .bx--modal-container {
+        width: 800px;
+        padding: 0px !important;
+    }
+}
+
 
 .separator {
     margin: 100px;

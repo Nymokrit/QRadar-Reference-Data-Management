@@ -10,8 +10,8 @@
         "name": "reference_data_service",
         "version": "1.0",
         "endpoints": [{
-            "name": "data",
-            "path": "#/data/{type}/{name}",
+            "name": "view",
+            "path": "#/data/view/{type}/{name}",
             "http_method": "GET",
             "parameters": [{
                 "location": "PATH",
@@ -22,6 +22,16 @@
                 "name": "name",
                 "definition": "String"
             }]
+        }, {
+            "name": "create",
+            "path": "#/data/create/{type}",
+            "http_method": "GET",
+            "parameters": [{
+                "location": "PATH",
+                "name": "type",
+                "definition": "String",
+                "options": ["sets", "maps", "tables", "map_of_sets"]
+            }]
         }],
         "command": "echo 1"
     }],
@@ -30,5 +40,5 @@
         "memory": 100
     },
     "name": "Reference Data Management",
-    "version": "2.0.4"
+    "version": "2.0.2"
 }

@@ -13,7 +13,7 @@ import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
 import * as APIHelper from '../Util/APIHelper';
 
-// import { Translation as t } from 'react-i18next';
+import i18n from '../I18n/i18n';
 
 class App extends Component {
   constructor(props) {
@@ -21,41 +21,29 @@ class App extends Component {
 
     this.refDataMapping = { 'maps': ReferenceMap, 'sets': ReferenceSet, 'map_of_sets': ReferenceMapOfSets, 'tables': ReferenceTable, };
     const refData = {
-      'sets': { key: 'sets', label: 'Reference Sets', nodes: {}, isOpen: false, },
-      'maps': { key: 'maps', label: 'Reference Maps', nodes: {}, isOpen: false, },
-      'map_of_sets': { key: 'map_of_sets', label: 'Reference Map of Sets', nodes: {}, isOpen: false, },
-      'tables': { key: 'tables', label: 'Reference Tables', nodes: {}, isOpen: false, },
+      'sets': { key: 'sets', label: i18n.t('data.sidebar.type', { type: 'Set' }), nodes: {}, },
+      'maps': { key: 'maps', label: i18n.t('data.sidebar.type', { type: 'Map' }), nodes: {}, },
+      'map_of_sets': { key: 'map_of_sets', label: i18n.t('data.sidebar.type', { type: 'Map of Sets' }), nodes: {}, },
+      'tables': { key: 'tables', label: i18n.t('data.sidebar.type', { type: 'Table' }), nodes: {}, },
     };
 
-    this.state = { refData, errorMessages: [], displayError: false, loadingModalOpen: false, };
-
-    this.menuItemClicked = this.menuItemClicked.bind(this);
-    this.createEntry = this.createEntry.bind(this);
-    this.entryCreated = this.entryCreated.bind(this);
-    this.deleteEntry = this.deleteEntry.bind(this);
-    this.displayLoadingModal = this.displayLoadingModal.bind(this);
-    this.showError = this.showError.bind(this);
-    this.getRefData = this.getRefData.bind(this);
-
+    this.state = { refData, errorMessages: [], loading: false, };
     this.getRefData();
   }
 
-  menuItemClicked(e, event) {
-    e.stopPropagation();
-    this.updateHash(event.key);
-    // event contains information about the currently selected api (e.g. event.key == 'sets/testRefSet')
-    this.setState({
-      atHome: false,
-      createNew: false,
-    });
+  menuItemClicked = (e, item) => {
+    e && e.stopPropagation();
+    this.updateHash('view/' + item.key); // (e.g. item.key == 'sets/testRefSet')
+    this.setState({ updated: true, });
   }
 
-  createEntry(e, type) {
+  createEntry = (e, type) => {
     e.stopPropagation();
-    this.setState({ createNew: true, createNewReferenceEntryType: type, });
+    this.updateHash('create/' + type);
+    this.setState({ updated: true, });
   }
 
-  async entryCreated(entries) {
+  entryCreated = async (entries, type) => {
     this.displayLoadingModal(true);
     const mappedEntries = {};
     // RefSet, RefMap and RefMoS can be created identically, refTable requires some more preprocessing
@@ -77,55 +65,47 @@ class App extends Component {
       mappedEntries[key] = entries[key].value;
     }
 
-    const response = await APIHelper.createReferenceData(this.state.createNewReferenceEntryType, mappedEntries);
+    const response = await APIHelper.createReferenceData(type, mappedEntries);
     if (response.error) {
       this.showError(response.message);
     } else {
-      const api = this.state.createNewReferenceEntryType + '/' + mappedEntries.name;
-      this.updateHash(api);
-      this.setState({
-        createNew: false,
-        atHome: false,
-      });
-
-      this.getRefData();
+      const key = type + '/' + response.name
+      this.state.refData[type].nodes[response.name] = { label: response.name, size: 0, datatype: type, key: key, };
+      // pretend we clicked directly on the newly created data entry to open the entry
+      this.menuItemClicked(undefined, { key })
     }
     this.displayLoadingModal(false);
   }
 
-  async deleteEntry() {
+  deleteEntry = async () => {
     const save = window.confirm('Do you really want to delete this entry');
     if (save) {
       this.displayLoadingModal(true);
+      const [api, action, type, name] = this.parseHash();
 
       const deleteEntryCallback = (response) => {
         if (response.error) {
           this.showError(response.message);
         } else {
           this.updateHash('');
-          this.setState({ atHome: true, });
-          this.getRefData();
+          delete this.state.refData[type].nodes[name]; // remove menu entry
+          this.setState({ updated: true });
         }
         this.displayLoadingModal(false);
       };
-      const [api, type, name] = this.parseHash();
       await APIHelper.deleteReferenceData(type, name, deleteEntryCallback);
     } else return;
   }
 
-  displayLoadingModal(state) {
-    this.setState({ loadingModalOpen: state, });
-  }
-
-  showError(message) {
+  showError = (message) => {
     const messages = this.state.errorMessages;
     if (!message) message = 'An unspecified error occured';
     message = Array.isArray(message) ? message : [message,];
     messages.push(...message);
-    this.setState({ displayError: true, errorMessages: messages, });
+    this.setState({ errorMessages: messages, });
   }
 
-  async getRefData() {
+  getRefData = async () => {
     // const overviewData = [];
     const data = this.state.refData;
     for (const key in data) {
@@ -138,41 +118,32 @@ class App extends Component {
       data[key].size = response.length;
       data[key].datatype = key.replace(/_/g, ' ');
       response.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
-      response.forEach(element => {
-        const newEntry = { label: element.name, size: element.number_of_elements, datatype: key, key: key + '/' + element.name, };
-        data[key].nodes[element.name] = newEntry;
-      });
+      response.forEach(element => { data[key].nodes[element.name] = { label: element.name, size: element.number_of_elements, datatype: key, key: key + '/' + element.name, } });
     }
     this.setState({ refData: data, });
   }
 
   parseHash = () => {
-    const api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{type}/{name}
-    const [_, type, name] = api.split('/');
-    return [api, type, name];
+    const api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{action}/{type}/{name}
+    const [_, action, type, name] = api.split('/');
+    return [type + '/' + name, action, type, name];
   }
 
-  updateHash = (api) => {
-    window.location.hash = '/data/' + api;
-  }
+  updateHash = (api) => window.location.hash = '/data/' + api
+  displayLoadingModal = (open) => this.setState({ loading: open, })
 
   render() {
-    // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
-
     let type = '';
     let api = '';
+    let action = '';
     let name = '';
-    let size; // undefined when directly accessing a ref data link like "#/data/sets/early_warning"
+    if (window.location.hash.includes('#/data/')) [api, action, type, name] = this.parseHash()
 
-    if (window.location.hash.includes('#/data/')) {
-      [api, type, name] = this.parseHash()
-    }
 
+    // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
     const ReferenceDataComponent = this.refDataMapping[type];
     return (
-      <SplitterLayout
-        secondaryInitialSize={84}
-        percentage>
+      <SplitterLayout secondaryInitialSize={84} percentage>
         <Sidebar
           menuItemAction={this.menuItemClicked}
           showError={this.showError}
@@ -180,36 +151,33 @@ class App extends Component {
           refData={this.state.refData}
         />
         <div id='content'>
-          {this.state.displayError && <InlineNotification
-            kind='error'
-            className='error-alert'
-            onCloseButtonClick={(e) => { this.setState({ displayError: false, errorMessages: [], }); }}
-            title='Error'
-          >
-            {this.state.errorMessages.map(message => <span key={message} className='error-alert-message'>{message}<br /></span>)}
-          </InlineNotification>}
-          <Loading active={this.state.loadingModalOpen} withOverlay />
-          {this.state.createNew ?
-            <NewEntry
-              type={this.state.createNewReferenceEntryType}
-              save={this.entryCreated}
-            />
-            :
-            (!ReferenceDataComponent ?
-              <React.Fragment></React.Fragment>
+          <Loading active={this.state.loading} withOverlay />
+          {
+            this.state.errorMessages.length > 0 &&
+            <InlineNotification
+              kind='error'
+              className='error-alert'
+              onCloseButtonClick={(e) => { this.setState({ errorMessages: [], }); }}
+              title='Error'
+            >
+              {this.state.errorMessages.map(message => <span key={message} className='error-alert-message'>{message}<br /></span>)}
+            </InlineNotification>
+          }
+          {
+            action === 'create' ?
+              <NewEntry type={type} save={(e) => this.entryCreated(e, type)} />
               :
+              ReferenceDataComponent &&
               <ReferenceDataComponent
                 key={api}
                 api={api}
                 name={name}
                 type={type}
-                size={size}
                 deleteEntry={this.deleteEntry}
                 dataUpdated={this.getRefData}
                 displayLoadingModal={this.displayLoadingModal}
                 showError={this.showError}
               />
-            )
           }
         </div>
       </SplitterLayout>

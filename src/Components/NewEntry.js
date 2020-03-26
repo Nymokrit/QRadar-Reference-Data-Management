@@ -4,6 +4,7 @@ import * as EntryDefinitions from '../Definitions/ReferenceDataCreateEntryDefini
 
 import { Button, TextInput, Form, FormGroup, Dropdown, FormLabel, Tooltip } from 'carbon-components-react';
 import { Delete16 } from '@carbon/icons-react';
+import i18n from '../I18n/i18n';
 
 
 class NewEntry extends Component {
@@ -42,7 +43,7 @@ class NewEntry extends Component {
     render() {
         return (
             <Form>
-                <FormGroup legendText={'Add new Reference ' + this.typeLookup[this.state.type] + ' to Database'} />
+                <FormGroup legendText={i18n.t('data.new.title', {type:this.typeLookup[this.state.type]})} />
                 {Object.keys(this.state.entries).map((key) => {
                     let inputField;
                     switch (this.state.entries[key].type) {
@@ -70,7 +71,7 @@ class NewEntry extends Component {
                         </FormGroup>
                     );
                 })}
-                <Button kind='primary' size='small' onClick={() => this.props.save(this.state.entries)} >Create</Button>
+                <Button kind='primary' size='small' onClick={() => this.props.save(this.state.entries)} >{i18n.t('data.new.create')}</Button>
             </Form>);
     }
 }
@@ -132,7 +133,7 @@ class ListInput extends Component {
                     )
                     )
                 }
-                <Button kind='tertiary' size='small' onClick={(e) => this.addInnerKey(e)}>Add Inner Key</Button>
+                <Button kind='tertiary' size='small' onClick={(e) => this.addInnerKey(e)}>{i18n.t('data.new.add.key.inner')}</Button>
             </div>
         );
     }

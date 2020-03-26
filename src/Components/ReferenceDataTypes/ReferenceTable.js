@@ -1,5 +1,5 @@
 import * as APIHelper from '../../Util/APIHelper';
-import * as RefDataHelper from '../RefDataHelper';
+
 import ReferenceData from './ReferenceData';
 
 class ReferenceTable extends ReferenceData {
@@ -7,7 +7,40 @@ class ReferenceTable extends ReferenceData {
         super(props, 'table');
     }
 
-    clickAddItem() {
+    importItems = async (entries) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const text = reader.result;
+            const tuples = text
+                .split(/\r?\n/g)
+                .map(value => value.trim())
+                .filter(value => value);
+
+            const data = {};
+            for (const tuple of tuples) {
+                const [key, innerKey, value,] = tuple.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+                if (!data.hasOwnProperty(key)) {
+                    data[key] = {};
+                }
+                data[key][innerKey] = value;
+            }
+            this.bulkAdd(data);
+        };
+
+        reader.readAsText(entries.file.value);
+    }
+
+    exportItems = () => {
+        const entries = [];
+        // Get a flat map of key/value pairs that we can dump afterwards
+        for (const entry of this.state.allEntries) {
+            entries.push(...entry.values);
+        }
+        this.download(this.props.name, entries, true, true);
+    }
+
+    clickAddItem = () => {
         const inners = {};
         if (this.state.metaData) {
             for (const key in this.state.metaData.key_name_types) {
@@ -20,17 +53,17 @@ class ReferenceTable extends ReferenceData {
         this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: entryDefinition, });
     }
 
-
-
     // Entry should consist of an JS Object of the form {value: 'someVal'}
-    async addItem(entry) {
+    addItem = async (entry) => {
         this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
-        const outer_key = entry.outer_key.value;
-        const source = entry.source.value;
+        const [outer_key, source] = [entry.outer_key.value, entry.source.value];
 
-        updateData = this.updateData(updateData, { outer_key: outer_key, values: [], }, true, true);
+        // Check if Key already exists in table
+        const keyIndex = updateData.findIndex((value) => (value.key === outer_key));
+        if (keyIndex === -1) updateData.push({ key: outer_key, values: [], id: outer_key, });
+
         this.tableChanged('new', updateData);
 
         delete entry.outer_key;
@@ -44,21 +77,30 @@ class ReferenceTable extends ReferenceData {
         this.updateMetaData(response);
         this.props.displayLoadingModal(false);
     }
+
     // Entries should be an array containing the values to be deleted
-    async deleteItem(entries) {
+    deleteItem = async (entries) => {
         if (!entries || !entries.length) return;
         this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
 
-        for (const outer_key of entries) {
+        /* Due to the API limitations, we cannot simply delete a key but we need to specify
+         * the inner_key and the value we want to delete as well. Hence, we iterate through each inner_key
+         * and delete the value. If all values have been deleted successfully, we can remove the outer key
+         * Known issue: If a key is empty (which shouldn't happen but can), it cannot be deleted 
+         * Workaround for the user: Add a value to that key and delete it afterwards
+         */
+        for (const entry of entries) {
+            const outer_key = entry.id;
             const keyIndex = updateData.findIndex((value) => (value.key === outer_key));
-            for (const inner_map of updateData[keyIndex].values) {
-                response = await APIHelper.deleteReferenceDataInnerEntry(this.props.type, this.props.name, outer_key, inner_map.key, { value: inner_map.value, });
+            for (const inner_entry of updateData[keyIndex].values) {
+                response = await APIHelper.deleteReferenceDataInnerEntry(this.props.type, this.props.name, outer_key, inner_entry.key, { value: inner_entry.value, });
 
                 if (response.error) this.props.showError(response.message);
-                else updateData = this.updateData(updateData, { outer_key: outer_key, }, false, true);
+                else updateData[keyIndex].values = updateData[keyIndex].values.filter(e => e.key !== inner_entry.key);
             }
+            if (updateData[keyIndex].values.length === 0) updateData.splice(keyIndex, 1);
         }
 
         if (response.error) {
@@ -70,30 +112,36 @@ class ReferenceTable extends ReferenceData {
         this.props.displayLoadingModal(false);
     }
 
-    async addInnerItem(key, entries, asSub) {
-        if (!asSub) this.props.displayLoadingModal(true);
-        const outer_key = key.key;
-        const inner_key = entries.key.value;
-        const value = entries.value.value;
-        const username = await RefDataHelper.defaultEntryComment();
-        const source = entries.source.value || username;
+    addInnerItem = async (key, entries, asSub) => {
+        this.props.displayLoadingModal(true);
+        const username = await this.defaultEntryComment();
+        const [outer_key, inner_key, value, source] = [key.key, entries.key.value, entries.value.value, entries.source.value || username];
+        let updateData = this.state.allEntries;
 
         const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { outer_key: outer_key, inner_key: inner_key, value: value, source: source, });
 
-        const updateData = this.updateData(this.state.allEntries, { outer_key: outer_key, inner_key: inner_key, value: value, source: source, }, true);
-
         if (response.error) {
             this.props.showError(response.message);
         } else {
+            const keyIndex = updateData.findIndex((value) => (value.key === outer_key));
+            const innerKeyIndex = updateData[keyIndex].values.findIndex((value) => (value.key === inner_key));
+
+            const entry = { outer_key, key: inner_key, value, source, id: inner_key, first_seen: Date.now(), last_seen: Date.now() }
+            // If the inner key is not yet defined for that specific outer key, we can simply add it
+            if (innerKeyIndex === -1) updateData[keyIndex].values.push(entry);
+            else updateData[innerKeyIndex].values[innerKeyIndex] = entry;
+
             this.updateMetaData(response);
             this.tableChanged('new', updateData);
         }
 
+        // We utilize this method to add keys from the addItem method as well. If this is used
+        // we need to pass the response through and keep the loading modal open
         if (asSub) return response;
-        this.props.displayLoadingModal(false);
+        else this.props.displayLoadingModal(false);
     }
 
-    async deleteInnerItem(outer_key, entries) {
+    deleteInnerItem = async (outer_key, entries) => {
         if (!entries || !entries.length) return;
         this.props.displayLoadingModal(true);
         let response;
@@ -101,11 +149,13 @@ class ReferenceTable extends ReferenceData {
 
         for (const entry of entries) {
             const inner_key = entry.id;
-            const indexOfOuterKey = updateData.findIndex((value) => (value.key === outer_key));
-            const indexOfInnerKey = updateData[indexOfOuterKey].values.findIndex((value) => value.key === inner_key);
-            response = await APIHelper.deleteReferenceDataInnerEntry(this.props.type, this.props.name, outer_key, inner_key, { value: updateData[indexOfOuterKey].values[indexOfInnerKey].value, });
+            const keyIndex = updateData.findIndex((value) => (value.key === outer_key));
+            const innerKeyIndex = updateData[keyIndex].values.findIndex((value) => value.key === inner_key);
+            response = await APIHelper.deleteReferenceDataInnerEntry(this.props.type, this.props.name, outer_key, inner_key, { value: updateData[keyIndex].values[innerKeyIndex].value, });
+            if (response.error) this.props.showError(response.message);
+            else updateData[keyIndex].values.splice(innerKeyIndex, 1);
 
-            updateData = this.updateData(updateData, { outer_key: outer_key, inner_key: inner_key, }, false, false);
+            if (updateData[keyIndex].values.length === 0) updateData.splice(keyIndex, 1);
         }
 
         if (response.error) {
@@ -117,49 +167,45 @@ class ReferenceTable extends ReferenceData {
         this.props.displayLoadingModal(false);
     }
 
-    /**
-     * 
-     * @param {Object} updateData The object into which new data should be appended
-     * @param {Object} entries The new data to append, usually {outer_key, inner_key, value} or {outer_key, values} with values=[{inner_key, value}]
-     * @param {bool} isAdd If the entry should be added or removed
-     * @param {bool} isOuterKey If the entry comes from addItem (true) or addInnerItem (false)
-     */
-    updateData(updateData, entries, isAdd, isOuterKey) {
-        if (isOuterKey) {
-            if (isAdd) {
-                // Check if Key already exists in table
-                const indexOfOuterKey = updateData.findIndex((value) => (value.key === entries.outer_key));
-                if (indexOfOuterKey === -1) {
-                    updateData.push({ key: entries.outer_key, values: entries.values, id: entries.outer_key, });
-                } else {
-                    // If it already exists we skip it
-                    // This method is only used to add outer keys, inner keys are added individually
-                    return;
-                }
-            }
-            else updateData = updateData.filter(e => e.key !== entries.outer_key);
+    bulkAddItems = async (entries) => {
+        const tuples = entries.bulkAddData.value
+            .split(/\r?\n/g)
+            .map(value => value.trim())
+            .filter(value => value);
 
-        } else {
-            const indexOfOuterKey = updateData.findIndex((value) => (value.key === entries.outer_key));
-            if (indexOfOuterKey === -1) {
-                console.log('Something went wrong, couldn\'t find index of outer key in table when trying to delete inner key');
-            } else {
-                const indexOfInnerKey = updateData[indexOfOuterKey].values.findIndex((value) => (value.key === entries.inner_key));
-                if (isAdd) {
-                    // If the inner key is not yet defined for that specific outer key, we can simply add it
-                    if (indexOfInnerKey === -1)
-                        updateData[indexOfOuterKey].values.push({ outer_key: entries.outer_key, key: entries.inner_key, value: entries.value, id: entries.inner_key, source: entries.source, });
-                    else
-                        updateData[indexOfInnerKey].values[indexOfInnerKey] = { outer_key: entries.outer_key, key: entries.inner_key, value: entries.value, id: entries.inner_key, source: entries.source, };
-                }
-                else updateData[indexOfOuterKey].values.splice(indexOfInnerKey, 1);
+        const data = {};
+
+        for (const tuple of tuples) {
+            const [key, innerKey, value,] = tuple.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+            if (!data.hasOwnProperty(key)) {
+                data[key] = {};
             }
+            data[key][innerKey] = value;
         }
-
-        return updateData;
+        this.bulkAdd(data);
     }
 
-    parseResponseData(response) {
+    /**
+     * {"key1":{"col1":"Data11","col2":"Data12","col3":"Data13","col4":"Data14"},
+     *  "key2":{"col1":"Data21","col2":"Data22","col3":"Data23","col4":"Data24"},
+     *  }
+     */
+    bulkAdd = async (data) => {
+        this.props.displayLoadingModal(true);
+
+        const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, data);
+
+        if (response.error) {
+            this.props.showError(response.message);
+        } else {
+            this.updateMetaData(response);
+        }
+        await this.loadData(this.props.type, true);
+        this.props.displayLoadingModal(false);
+    }
+
+
+    parseResponseData = (response) => {
         let data = [];
         if (response.number_of_elements > 0) {
             // for each key, append key/id attributes to each value because we will need that in the table operations of the 'inner table'
@@ -179,69 +225,8 @@ class ReferenceTable extends ReferenceData {
         return data;
     }
 
-    async importItems(entries) {
-        const reader = new FileReader();
 
-        reader.onloadend = () => {
-            const text = reader.result;
-            const data = {
-                bulkAddEntriesSeparator: entries.bulkAddEntriesSeparator,
-                bulkAddKeyValueSeparator: entries.bulkAddKeyValueSeparator,
-                bulkAddData: { value: text, },
-            };
-            this.bulkAddItems(data);
-        };
-
-        reader.readAsText(entries.file.value);
-    }
-
-    async bulkAddItems(entries) {
-        // const regexEntries = new RegExp(entries.bulkAddEntriesSeparator.value, 'g');
-        // const regexKeyValue = new RegExp(entries.bulkAddKeyValueSeparator.value, 'g');
-        this.props.displayLoadingModal(true);
-
-        const tuples = entries.bulkAddData.value
-            .replace(/\r?\n/g, entries.bulkAddEntriesSeparator.value) // Remove new lines 
-            .split(entries.bulkAddEntriesSeparator.value)
-            .map(value => value.trim())
-            .filter(value => value);
-
-
-        const newData = {};
-
-
-        for (const tuple of tuples) {
-            const [key, innerKey, value,] = tuple.split(entries.bulkAddKeyValueSeparator.value).map(value => value.trim()).filter(x => x);
-            if (!newData.hasOwnProperty(key)) {
-                newData[key] = {};
-            }
-            newData[key][innerKey] = value;
-            // newData.push({ key: key, value: value, id: key, source: 'reference data api', });
-        }
-
-
-        const response = await APIHelper.bulkAddReferenceDataEntry(this.props.type, this.props.name, newData);
-
-        if (response.error) {
-            this.props.showError(response.message);
-        } else {
-            // this.tableChanged('new', oldData);
-            this.updateMetaData(response);
-        }
-        this.loadData(this.props.type, true);
-        this.props.displayLoadingModal(false);
-    }
-
-    exportItems() {
-        const entries = [];
-        // Get a flat map of key/value pairs that we can dump afterwards
-        for (const entry of this.state.allEntries) {
-            entries.push(...entry.values);
-        }
-        RefDataHelper.download(this.props.name, entries, true, true);
-    }
-
-    testValue(entry, searchText, isRegexSearch) {
+    testValue = (entry, searchText, isRegexSearch) => {
         try {
             let matches = false;
             if (isRegexSearch) matches = entry.key.match(searchText);
