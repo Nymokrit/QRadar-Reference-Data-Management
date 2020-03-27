@@ -1,4 +1,5 @@
 import * as APIHelper from '../../Util/APIHelper';
+import parseCSV from '../../Util/CSV';
 
 import ReferenceData from './ReferenceData';
 
@@ -9,10 +10,7 @@ class ReferenceSet extends ReferenceData {
 
     // Entry should consist of an JS Object of the form {value: 'someVal'}
     addItem = async (entry) => {
-        if (!entry['value'].value) {
-            this.props.showError('Cannot add an empty value');
-            return;
-        }
+        if (!entry['value'].value) return;
 
         this.props.displayLoadingModal(true);
         const username = await this.defaultEntryComment();
@@ -61,16 +59,22 @@ class ReferenceSet extends ReferenceData {
 
         reader.onloadend = () => {
             const text = reader.result;
-            let data = text.replace(/\r?\n/g, entries.bulkAddSeparator.value) // Remove new lines 
-                .split(entries.bulkAddSeparator.value) // split based on input value
-                .map(value => value.trim()) // remove whitespace
-                .filter(value => value); // remove empty values
-            data = [...new Set(data),]; // remove duplicates
+            let tuples = parseCSV(text, entries.bulkAddSeparator.value);
+            // we can safely ignore headers if they are present
+            // since we just care about the correct format of the values, i.e. one per line
+            if (entries.containsHeaders.value) tuples = tuples.slice(1);
+
+            const data = [];
+            for (const tuple of tuples) {
+                const [value,] = tuple;
+                data.push(value);
+            }
 
             this.bulkAdd(data);
         };
 
-        reader.readAsText(entries.file.value);
+        if (entries.file && entries.file.value)
+            reader.readAsText(entries.file.value);
     }
 
     bulkAddItems = async (entries) => {

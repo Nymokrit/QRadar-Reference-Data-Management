@@ -1,4 +1,5 @@
 import * as APIHelper from '../../Util/APIHelper';
+import parseCSV from '../../Util/CSV';
 
 import ReferenceData from './ReferenceData';
 
@@ -17,6 +18,8 @@ class ReferenceMapOfSets extends ReferenceData {
             .filter(value => value); // remove empty values
 
         values = [...new Set(values),];
+
+        if (values.length === 0) return;
 
         const key = entry.keyAddDataKey.value;
         const data = { [key]: values, };
@@ -107,7 +110,7 @@ class ReferenceMapOfSets extends ReferenceData {
         for (const entry of entries) {
             const value = entry.id;
             const keyIndex = updateData.findIndex((value) => (value.key === key));
-            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, key, { value: value, });
+            response = await APIHelper.deleteReferenceDataEntry(this.props.type, this.props.name, key, { value, });
             if (response.error) this.props.showError(response.message)
             else updateData[keyIndex].values = updateData[keyIndex].values.filter(e => e.value !== value);
 
@@ -128,14 +131,13 @@ class ReferenceMapOfSets extends ReferenceData {
 
         reader.onloadend = () => {
             const text = reader.result;
-            const pairs = text
-                .split(/\r?\n/g)
-                .map(value => value.trim())
-                .filter(value => value);
+            let tuples = parseCSV(text, entries.bulkAddSeparator.value);
+
+            if (entries.containsHeaders.value) tuples = tuples.slice(1);
 
             const data = {};
-            for (const pair of pairs) {
-                const [key, value,] = pair.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+            for (const tuple of tuples) {
+                const [key, value,] = tuple;
                 if (!data.hasOwnProperty(key)) {
                     data[key] = [];
                 }
@@ -145,12 +147,13 @@ class ReferenceMapOfSets extends ReferenceData {
             this.bulkAdd(data);
         };
 
-        reader.readAsText(entries.file.value);
+        if (entries.file && entries.file.value)
+            reader.readAsText(entries.file.value);
     }
 
     exportItems = () => {
         const entries = [];
-        // Get a flat map of key/value pairs that we can dump afterwards
+        // Get a flat map of key/value tuples that we can dump afterwards
         for (const entry of this.state.allEntries) {
             entries.push(...entry.values);
         }
@@ -158,14 +161,14 @@ class ReferenceMapOfSets extends ReferenceData {
     }
 
     bulkAddItems = async (entries) => {
-        const pairs = entries.bulkAddData.value
+        const tuples = entries.bulkAddData.value
             .split(/\r?\n/g)
             .map(value => value.trim())
             .filter(value => value);
 
         const data = {};
-        for (const pair of pairs) {
-            const [key, value,] = pair.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+        for (const tuple of tuples) {
+            const [key, value,] = tuple.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
             if (!data.hasOwnProperty(key)) {
                 data[key] = [];
             }

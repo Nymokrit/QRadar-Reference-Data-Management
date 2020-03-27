@@ -1,5 +1,8 @@
 
 import * as APIHelper from '../../Util/APIHelper';
+import parseCSV from '../../Util/CSV';
+
+
 import ReferenceData from './ReferenceData';
 
 class ReferenceMap extends ReferenceData {
@@ -9,10 +12,7 @@ class ReferenceMap extends ReferenceData {
 
     // Entry should consist of an JS Object of the form {key: 'someKey', value: 'someVal'}
     addItem = async (entry) => {
-        if (!entry['value'].value || !entry['key'].value) {
-            this.props.showError('Cannot add an empty value');
-            return;
-        }
+        if (!entry['value'].value || !entry['key'].value) return;
 
         this.props.displayLoadingModal(true);
         const username = await this.defaultEntryComment();
@@ -60,35 +60,35 @@ class ReferenceMap extends ReferenceData {
 
         reader.onloadend = () => {
             const text = reader.result;
-            const pairs = text
-                .split(/\r?\n/g) // each line is interpreted as one key=value pair
-                .map(value => value.trim())
-                .filter(value => value);
+            let tuples = parseCSV(text, entries.bulkAddSeparator.value);
+
+            if (entries.containsHeaders.value) tuples = tuples.slice(1);
 
             const data = {};
-            for (const pair of pairs) {
-                const [key, value,] = pair.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+            for (const tuple of tuples) {
+                const [key, value,] = tuple;
                 data[key] = value;
             }
 
             this.bulkAdd(data);
         };
 
-        reader.readAsText(entries.file.value);
+        if (entries.file && entries.file.value)
+            reader.readAsText(entries.file.value);
     }
     /**
      * Split all items and remove empty ones + leading/trailing whitespace. The perform bulk add
      * This is extracted into a second method bulkAdd to reuse the function for the import
      */
     bulkAddItems = async (entries) => {
-        const pairs = entries.bulkAddData.value
-            .split(/\r?\n/g) // each line is interpreted as one key=value pair
+        const tuples = entries.bulkAddData.value
+            .split(/\r?\n/g) // each line is interpreted as one key=value tuple
             .map(value => value.trim())
             .filter(value => value);
 
         const data = {};
-        for (const pair of pairs) {
-            const [key, value,] = pair.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
+        for (const tuple of tuples) {
+            const [key, value,] = tuple.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
             data[key] = value;
         }
 

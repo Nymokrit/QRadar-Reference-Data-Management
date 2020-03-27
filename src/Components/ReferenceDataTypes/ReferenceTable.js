@@ -1,43 +1,11 @@
 import * as APIHelper from '../../Util/APIHelper';
+import parseCSV from '../../Util/CSV';
 
 import ReferenceData from './ReferenceData';
 
 class ReferenceTable extends ReferenceData {
     constructor(props) {
         super(props, 'table');
-    }
-
-    importItems = async (entries) => {
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            const text = reader.result;
-            const tuples = text
-                .split(/\r?\n/g)
-                .map(value => value.trim())
-                .filter(value => value);
-
-            const data = {};
-            for (const tuple of tuples) {
-                const [key, innerKey, value,] = tuple.split(entries.bulkAddSeparator.value).map(value => value.trim()).filter(x => x);
-                if (!data.hasOwnProperty(key)) {
-                    data[key] = {};
-                }
-                data[key][innerKey] = value;
-            }
-            this.bulkAdd(data);
-        };
-
-        reader.readAsText(entries.file.value);
-    }
-
-    exportItems = () => {
-        const entries = [];
-        // Get a flat map of key/value pairs that we can dump afterwards
-        for (const entry of this.state.allEntries) {
-            entries.push(...entry.values);
-        }
-        this.download(this.props.name, entries, true, true);
     }
 
     clickAddItem = () => {
@@ -55,11 +23,12 @@ class ReferenceTable extends ReferenceData {
 
     // Entry should consist of an JS Object of the form {value: 'someVal'}
     addItem = async (entry) => {
-        this.props.displayLoadingModal(true);
         let response;
         let updateData = this.state.allEntries;
         const [outer_key, source] = [entry.outer_key.value, entry.source.value];
+        if (!outer_key) return;
 
+        this.props.displayLoadingModal(true);
         // Check if Key already exists in table
         const keyIndex = updateData.findIndex((value) => (value.key === outer_key));
         if (keyIndex === -1) updateData.push({ key: outer_key, values: [], id: outer_key, });
@@ -113,12 +82,14 @@ class ReferenceTable extends ReferenceData {
     }
 
     addInnerItem = async (key, entries, asSub) => {
-        this.props.displayLoadingModal(true);
         const username = await this.defaultEntryComment();
         const [outer_key, inner_key, value, source] = [key.key, entries.key.value, entries.value.value, entries.source.value || username];
         let updateData = this.state.allEntries;
 
-        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { outer_key: outer_key, inner_key: inner_key, value: value, source: source, });
+        if (!outer_key || !inner_key || !value) return;
+
+        this.props.displayLoadingModal(true);
+        const response = await APIHelper.addReferenceDataEntry(this.props.type, this.props.name, { outer_key, inner_key, value, source, });
 
         if (response.error) {
             this.props.showError(response.message);
@@ -165,6 +136,42 @@ class ReferenceTable extends ReferenceData {
             this.updateMetaData(response);
         }
         this.props.displayLoadingModal(false);
+    }
+
+    importItems = async (entries) => {
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const text = reader.result;
+            let tuples = parseCSV(text, entries.bulkAddSeparator.value);
+            // we can safely ignore headers if they are present
+            // since we just care about the correct format of the values and interpret them statically as
+            // outer_key, inner_key, value, ...rest
+            if (entries.containsHeaders.value) tuples = tuples.slice(1);
+
+            const data = {};
+            for (const tuple of tuples) {
+                // we only care about the first couple values, so the ...rest is ignored (i.e. source, first_seen..)
+                const [key, innerKey, value, /* ...rest */] = tuple;
+                if (!data.hasOwnProperty(key)) {
+                    data[key] = {};
+                }
+                data[key][innerKey] = value;
+            }
+            this.bulkAdd(data);
+        };
+
+        if (entries.file && entries.file.value)
+            reader.readAsText(entries.file.value);
+    }
+
+    exportItems = () => {
+        const entries = [];
+        // Get a flat map of key/value pairs that we can dump afterwards
+        for (const entry of this.state.allEntries) {
+            entries.push(...entry.values);
+        }
+        this.download(this.props.name, entries, true, true);
     }
 
     bulkAddItems = async (entries) => {

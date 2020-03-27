@@ -2,7 +2,7 @@
 // This will parse a delimited string into an array of
 // arrays. The default delimiter is the comma, but this
 // can be overriden in the second argument.
-export function parseCSV(strData, strDelimiter) {
+export default function parseCSV(strData, strDelimiter) {
     // Check to see if the delimiter is defined. If not,
     // then default to comma.
     strDelimiter = (strDelimiter || ",");
@@ -46,11 +46,9 @@ export function parseCSV(strData, strDelimiter) {
             strMatchedDelimiter.length &&
             strMatchedDelimiter !== strDelimiter
         ) {
-
             // Since we have reached a new row of data,
             // add an empty row to our data array.
             arrData.push([]);
-
         }
 
         var strMatchedValue;
@@ -68,18 +66,17 @@ export function parseCSV(strData, strDelimiter) {
             );
 
         } else {
-
             // We found a non-quoted value.
             strMatchedValue = arrMatches[3];
 
         }
 
-
         // Now that we have our value string, let's add
-        // it to the data array.
-        arrData[arrData.length - 1].push(strMatchedValue);
+        // it to the data array but trim leading/trailing whitespace.
+        arrData[arrData.length - 1].push(strMatchedValue.trim());
     }
 
-    // Return the parsed data.
-    return (arrData);
+    const arrDataWithoutEmptyLines = arrData.filter(line=>line.some(value=>value));
+    // Return the parsed data but remove empty rows
+    return (arrDataWithoutEmptyLines);
 }

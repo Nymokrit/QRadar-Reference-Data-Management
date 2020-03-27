@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FormLabel, Tooltip, Modal, TextInput, TextArea, FileUploaderDropContainer, StructuredListWrapper, StructuredListBody, StructuredListRow } from 'carbon-components-react';
+import { Checkbox, FormLabel, Tooltip, Modal, TextInput, TextArea, FileUploaderDropContainer, StructuredListWrapper, StructuredListBody, StructuredListRow } from 'carbon-components-react';
 import i18n from '../I18n/i18n';
 
 /**
@@ -28,8 +28,11 @@ class InputModal extends Component {
         if (files) {
             entries[target].value = files.addedFiles[0];
             filename = files.addedFiles[0].name;
+        } else if (entries[target].type === 'checkbox') {
+            entries[target].value = event;
+        } else {
+            entries[target].value = event.target.value;
         }
-        else entries[target].value = event.target.value;
         this.setState({ entries: entries, filename: filename, });
     }
 
@@ -68,6 +71,7 @@ class InputModal extends Component {
                                         file: <FileUploaderDropContainer id={key} multiple={false} labelText={this.state.filename || defaultFileUploadText} onAddFiles={(e, files) => this.handleChange(e, key, files)} />,
                                         text: <TextInput id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
                                         textarea: <TextArea id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
+                                        checkbox: <Checkbox defaultChecked id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />
                                     }[this.state.entries[key].type]
                                 }
                             </StructuredListRow>
