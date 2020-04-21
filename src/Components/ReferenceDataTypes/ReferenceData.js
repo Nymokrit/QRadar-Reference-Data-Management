@@ -142,9 +142,9 @@ class ReferenceData extends Component {
         if (hasInnerKey) exportString += 'key,';
         exportString += 'value,first_seen,last_seen,source\n';
         for (const value of content) {
-            if (hasOuterKey) exportString += '"' + value.outer_key.replace(/"/g, '""') + '",';
-            if (hasInnerKey) exportString += '"' + value.key.replace(/"/g, '""') + '",';
-            exportString += '"' + value.value.replace(/"/g, '""') + '","' + value.first_seen + '","' + value.last_seen + '","' + value.source.replace(/"/g, '""') + '"\n';
+            if (hasOuterKey) exportString += '"' + (value.outer_key || '').replace(/"/g, '""') + '",';
+            if (hasInnerKey) exportString += '"' + (value.key || '').replace(/"/g, '""') + '",';
+            exportString += '"' + (value.value || '').replace(/"/g, '""') + '","' + value.first_seen + '","' + value.last_seen + '","' + (value.source || '').replace(/"/g, '""') + '"\n';
         }
 
         const blob = new Blob([exportString,], { type: "text/csv", });
@@ -289,7 +289,7 @@ class ReferenceData extends Component {
                     <DataTableCarbon
                         tableChanged={this.tableChanged}
                         data={this.state.tableData}
-                        headers={this.headers[this.type]}
+                        headers={this.state.headers || this.headers[this.type]}
                         type={this.type}
                         addItem={this.clickAddItem}
                         bulkAddItem={this.clickBulkAddItem}
@@ -307,7 +307,7 @@ class ReferenceData extends Component {
                     :
                     <DataTableSkeleton rowCount={Math.min(10, this.props.size + 1 || 1)} columnCount={this.headers[this.type].length} />
                 }
-                <div className='separator'></div>
+                <div id='separator'></div>
                 <Dependents dependents={this.state.dependents} loaded={this.state.dependentsLoaded} editRule={this.showEditRuleModal} />
             </React.Fragment>
         );

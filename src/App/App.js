@@ -11,13 +11,18 @@ import ReferenceMap from '../Components/ReferenceDataTypes/ReferenceMap';
 import ReferenceMapOfSets from '../Components/ReferenceDataTypes/ReferenceMapOfSets';
 import ReferenceTable from '../Components/ReferenceDataTypes/ReferenceTable';
 import NewEntry from '../Components/NewEntry';
+import SearchEntries from '../Components/SearchEntries';
 import * as APIHelper from '../Util/APIHelper';
 
+import { ui01, ui05 } from '@carbon/themes';
 import i18n from '../I18n/i18n';
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    this.supportedActions = ['create', 'view', 'search'];
+    this.supportedTypes = ['maps', 'sets', 'map_of_sets', 'tables'];
 
     this.refDataMapping = { 'maps': ReferenceMap, 'sets': ReferenceSet, 'map_of_sets': ReferenceMapOfSets, 'tables': ReferenceTable, };
     const refData = {
@@ -28,7 +33,28 @@ class App extends Component {
     };
 
     this.state = { refData, errorMessages: [], loading: false, };
+
+    this.updateTheme();
     this.getRefData();
+  }
+
+  /**
+   * Trivial implementation for changing to Dark Theme. We include both, light and dark in the App by default
+   * The inner table must be overwritten with a new color as the default interferes with the outer table
+   */
+  updateTheme = (change) => {
+    let theme = localStorage.getItem("theme") || 'dark';
+
+    const root = document.documentElement;
+    
+    if (change) {
+      theme = theme == 'light' ? 'dark' : 'light';
+      localStorage.setItem("theme", theme);
+    }
+
+    const innerTableColor = theme == 'light' ? ui01 : ui05;
+    root.classList = [theme];
+    root.style.setProperty('--color-inner-table', innerTableColor);
   }
 
   menuItemClicked = (e, item) => {
@@ -40,6 +66,12 @@ class App extends Component {
   createEntry = (e, type) => {
     e.stopPropagation();
     this.updateHash('create/' + type);
+    this.setState({ updated: true, });
+  }
+
+  searchAll = (e, type) => {
+    e.stopPropagation();
+    this.updateHash('search/' + type);
     this.setState({ updated: true, });
   }
 
@@ -78,10 +110,11 @@ class App extends Component {
   }
 
   deleteEntry = async () => {
-    const save = window.confirm('Do you really want to delete this entry');
+    const [action, type, name] = this.parseHash();
+
+    const save = window.confirm(`Do you really want to delete "${name}"`);
     if (save) {
       this.displayLoadingModal(true);
-      const [api, action, type, name] = this.parseHash();
 
       const deleteEntryCallback = (response) => {
         if (response.error) {
@@ -126,19 +159,20 @@ class App extends Component {
   parseHash = () => {
     const api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{action}/{type}/{name}
     const [_, action, type, name] = api.split('/');
-    return [type + '/' + name, action, type, name];
+
+    if (!this.supportedActions.includes(action) || !this.supportedTypes.includes(type)) return ['', '', ''];
+    return [action, type, name];
   }
 
-  updateHash = (api) => window.location.hash = '/data/' + api
+  updateHash = (api) => {
+    window.location.hash = '/data/' + api;
+    this.setState({ errorMessages: [] });
+  }
   displayLoadingModal = (open) => this.setState({ loading: open, })
 
   render() {
-    let type = '';
-    let api = '';
-    let action = '';
-    let name = '';
-    if (window.location.hash.includes('#/data/')) [api, action, type, name] = this.parseHash()
-
+    let [action, type, name] = ['', '', '',];
+    if (window.location.hash.includes('#/data/')) [action, type, name] = this.parseHash()
 
     // Need to reassign this.state.refDataType because a React Component needs to start with a capital letter
     const ReferenceDataComponent = this.refDataMapping[type];
@@ -148,7 +182,9 @@ class App extends Component {
           menuItemAction={this.menuItemClicked}
           showError={this.showError}
           createEntry={this.createEntry}
+          searchAll={this.searchAll}
           refData={this.state.refData}
+          updateTheme={this.updateTheme}
         />
         <div id='content'>
           <Loading active={this.state.loading} withOverlay />
@@ -156,7 +192,7 @@ class App extends Component {
             this.state.errorMessages.length > 0 &&
             <InlineNotification
               kind='error'
-              className='error-alert'
+              id='error-alert'
               onCloseButtonClick={(e) => { this.setState({ errorMessages: [], }); }}
               title='Error'
             >
@@ -167,17 +203,20 @@ class App extends Component {
             action === 'create' ?
               <NewEntry type={type} save={(e) => this.entryCreated(e, type)} />
               :
-              ReferenceDataComponent &&
-              <ReferenceDataComponent
-                key={api}
-                api={api}
-                name={name}
-                type={type}
-                deleteEntry={this.deleteEntry}
-                dataUpdated={this.getRefData}
-                displayLoadingModal={this.displayLoadingModal}
-                showError={this.showError}
-              />
+              action === 'search' ?
+                <SearchEntries type={type} open={this.menuItemClicked} displayLoadingModal={this.displayLoadingModal} showError={this.showError} />
+                :
+                ReferenceDataComponent &&
+                <ReferenceDataComponent
+                  key={`${type}/${name}`}
+                  api={`${type}/${name}`}
+                  name={name}
+                  type={type}
+                  deleteEntry={this.deleteEntry}
+                  dataUpdated={this.getRefData}
+                  displayLoadingModal={this.displayLoadingModal}
+                  showError={this.showError}
+                />
           }
         </div>
       </SplitterLayout>

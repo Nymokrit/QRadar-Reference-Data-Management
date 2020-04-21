@@ -44,7 +44,7 @@ function Dependents(props) {
                                                     ?
                                                     <Link href='#' onClick={e => { e.preventDefault(); props.editRule(props.dependents[row.id].dependent_id) }}>{cell.value}</Link>
                                                     :
-                                                    <Link>{cell.value}</Link>
+                                                    <label>{cell.value}</label>
                                             }
                                         </TableCell>
                                     ))}

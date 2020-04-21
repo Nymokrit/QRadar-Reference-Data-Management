@@ -23,6 +23,20 @@ const {
 } = DataTable;
 
 const dateFormatter = (input) => dateformat(input, 'dd/mmm/yyyy, hh:MM:ss TT')
+/*
+const dateFormatter = (input) => {
+    const date = new Date(input);
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1 // month is zero indexed
+    const day = date.getDate()
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const seconds = date.getSeconds()
+
+    const formatted = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`
+    return formatted;
+}
+*/
 
 class DataTableCarbon extends Component {
     formatters = { 'first_seen': dateFormatter, 'last_seen': dateFormatter }
@@ -66,10 +80,9 @@ class DataTableCarbon extends Component {
             this.state.firstRowIndex + this.state.currentPageSize
         );
 
-
         const expandRow = (row) => {
             return (
-                <div className='inner-table'>
+                <div id='inner-table'>
                     <DataTableCarbon
                         innerTable={true}
                         data={row.values}
@@ -150,10 +163,9 @@ class DataTableCarbon extends Component {
                                         <TableRow key={row.id}  {...getRowProps({ row, })}>
                                             <TableSelectRow {...getSelectionProps({ row, })} />
                                             {row.cells.map(cell => {
-                                                const [_, key] = cell.id.split(':');
+                                                const key = cell.id.substring(cell.id.lastIndexOf(':') + 1);
                                                 let value = cell.value;
-                                                if (key in this.formatters)
-                                                    value = this.formatters[key](value);
+                                                if (key in this.formatters) value = this.formatters[key](value);
 
                                                 return <TableCell key={cell.id}>{value}</TableCell>
                                             })}

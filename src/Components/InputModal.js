@@ -62,7 +62,7 @@ class InputModal extends Component {
                 primaryButtonText={i18n.t('data.table.elements.add.save')}
                 secondaryButtonText={i18n.t('data.table.elements.add.close')}
             >
-                <StructuredListWrapper className='input-modal'>
+                <StructuredListWrapper id='input-modal'>
                     <StructuredListBody>
                         {Object.keys(this.state.entries).map((key) =>
                             <StructuredListRow className='input-modal-entry'>

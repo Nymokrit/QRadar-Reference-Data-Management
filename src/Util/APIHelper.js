@@ -18,6 +18,7 @@ async function sendAPIRequest(method, path, query, data, headers) {
     const httpClient = axios.create();
     const _headers = Object.assign({}, Config.axiosHeaders, (headers ? headers : {}));
     _headers['Version'] = '8';
+    _headers['Allow-hidden'] = 'true';
     httpClient.defaults.timeout = 600000;
 
     const r = Math.ceil(Math.random() * 1000); // RandomInt for timing on console so no duplicates occur
@@ -67,6 +68,13 @@ export async function checkTaskStatus(taskAPI, initialResponse, callback, isDepe
 
 export async function loadReferenceData(type) {
     const api = `/reference_data/${type}`;
+    const method = 'GET';
+
+    return await sendAPIRequest(method, api);
+}
+
+export async function searchAllData(type, value) {
+    const api = `/reference_data/${type}/search?value=${encodeURIComponent(value)}`;
     const method = 'GET';
 
     return await sendAPIRequest(method, api);

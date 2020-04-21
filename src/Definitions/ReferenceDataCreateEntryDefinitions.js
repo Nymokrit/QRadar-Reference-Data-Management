@@ -34,7 +34,7 @@ export const tables = {
     timeout_type: { value: 'FIRST_SEEN', type: 'select', label: i18n.t('data.new.timeout'), options: timeoutOptions, help: 'Optional: The value based on which new data expires from the Table', },
     time_to_live: { value: '', type: 'date', options: timeOptions, label: i18n.t('data.new.ttl'), help: 'Optional: If given, the entries of the Table expire', },
     key_label: { value: i18n.t('data.new.key.outer'), label: i18n.t('data.new.key'), type: 'text', help: 'Required: The label of the keys in the new Table' },
-    element_type: { value: 'ALN', type: 'select', label: i18n.t('data.new.key.type'), options: typeOptions, help: 'Required: The data type of the Outer Keys in the new Table', },
+    element_type: { value: 'ALN', type: 'select', label: i18n.t('data.new.key.type'), options: typeOptions, help: 'Required: The fallback data type of the Inner Keys in the new Table', },
     inner_labels: {
         label: 'Inner Keys',
         options: typeOptions,
@@ -56,7 +56,7 @@ export const setBulkAddItems = {
 
 export const setImportItems = {
     'file': { label: i18n.t('data.table.elements.add.file'), value: '', type: 'file', },
-    'bulkAddSeparator': { label: 'Separator', value: ',', help: i18n.t('data.table.elements.add.separator.help'), type: 'text', },
+    'bulkAddSeparator': { label: 'Separator', value: ',', help: i18n.t('data.table.elements.file.separator.help'), type: 'text', },
     'containsHeaders': { label: 'CSV contains headers', value: true, help: 'Whether the CSV has a headers row or not', type: 'checkbox', },
 };
 
@@ -68,13 +68,13 @@ export const mapAddItem = {
 
 export const mapBulkAddItems = {
     'bulkAddData': { label: i18n.t('data.table.elements.add.entries'), value: '', type: 'textarea', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', type: 'text', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', type: 'text',  help: 'Example Format: Key1,Value1\\nKey2,Value2\\nKey3,Value3, ...', },
 };
 
 export const mapImportItems = {
     'file': { label: i18n.t('data.table.elements.add.file'), value: '', type: 'file', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', type: 'text', },
-    'containsHeaders': { label: 'CSV contains headers', value: true, help: 'Whether the CSV has a headers row or not', type: 'checkbox', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', type: 'text', help: 'Example Format: Key1,Value1\\nKey2,Value2\\nKey3,Value3, ...' },
+    'containsHeaders': { label: 'CSV contains headers', value: true, help: 'Whether the CSV has a headers row (key,value,first_seen...) or not', type: 'checkbox', },
 };
 
 export const map_of_setsAddItem = {
@@ -90,13 +90,13 @@ export const map_of_setsAddInnerItem = {
 
 export const map_of_setsImportItems = {
     'file': { label: i18n.t('data.table.elements.add.file'), value: '', type: 'file', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Key1,Value1\nKey1,Value2\nKey2,Value3, ...', type: 'text', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Key1,Value1\\nKey1,Value2\\nKey2,Value3, ...', type: 'text', },
     'containsHeaders': { label: 'CSV contains headers', value: true, help: 'Whether the CSV has a headers row or not', type: 'checkbox', },
 };
 
 export const map_of_setsBulkAddItems = {
     'bulkAddData': { label: i18n.t('data.table.elements.add.entries'), value: '', type: 'textarea', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Key1,Value1\nKey1,Value2\nKey2,Value3, ...', type: 'text', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Key1,Value1\\nKey1,Value2\\nKey2,Value3, ...', type: 'text', },
 };
 
 export const tableAddItem = { // Dynamically overwriten in ReferenceTable.js
@@ -113,11 +113,11 @@ export const tableAddInnerItem = {
 
 export const tableImportItems = {
     'file': { label: i18n.t('data.table.elements.add.file'), value: '', type: 'file', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value\n...', type: 'text', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value\\n...', type: 'text', },
     'containsHeaders': { label: 'CSV contains headers', value: true, help: 'Whether the CSV has a headers row or not', type: 'checkbox', },
 };
 
 export const tableBulkAddItems = {
     'bulkAddData': { label: i18n.t('data.table.elements.add.entries'), value: '', type: 'textarea', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value\n...', type: 'text', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value\\n...', type: 'text', },
 };

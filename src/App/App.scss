@@ -1,34 +1,43 @@
+// $color-inner-table: #e5e5e5;
+@import '~carbon-components/scss/globals/scss/_vars.scss';
+
+:root {
+    --color-inner-table: #{$ui-05};
+    --color-inner-table-border: #{$ui-03};
+}
+
+
 #content {
     padding: 10px;
 }
 
-.menu {
-    padding: 20px 10px 20px 10px;
+#menu {
+    padding: 5px 10px 20px 10px;
 
-    .btn-create-new {
-        margin-bottom: 1rem;
+    .btn-sidebar {
+        margin-bottom: 0.7rem !important;
     }
 
-    &-title {
+    .menu-title {
         >div {
             padding-right: unset;
         }
     }
 
-    &-entry {
+    .menu-entry {
         width: 100%;
-        max-width: unset !important;
+        max-width: unset;
 
         &-badge {
-            height: 1.1rem !important;
-            min-width: 1.5rem !important;
+            height: 1.1rem;
+            min-width: 1.5rem;
         }
     }
 }
 
-.error-alert {
+#error-alert {
     width: 80%;
-    max-width: 80% !important;
+    max-width: 80%;
 
     .bx--inline-notification__text-wrapper {
         display: unset;
@@ -56,15 +65,19 @@ button {
     }
 
     &.delete {
-        position: absolute;
-        min-width: 150px;
-        padding-right: 5px;
+        position: absolute !important;
+        min-width: 150px !important;
+        padding-right: 5px !important;
     }
 
     &.btn {
+        &-search-all {
+            margin-top: 0.5rem !important;
+        }
+
         &-table {
-            padding-right: 1rem;
-            position: relative;
+            padding-right: 1rem !important;
+            position: relative !important;
 
             // We want the first button in a row to not have the | so we use ~ to match for every following
             ~button {
@@ -93,7 +106,15 @@ button {
     }
 }
 
+.create-new-dropdown {
+    width: 125px !important;
+}
 
+#switch-theme {
+    margin-right: -7px;
+    margin-top: -2px;
+    float:right;
+}
 
 .bx--data-table {
     td {
@@ -103,14 +124,13 @@ button {
 
 .inner-keys {
     .input-group {
-        margin-bottom: 10px;
-        display: flex;
-        align-items: stretch;
+        margin-bottom: 10px !important;
+        display: flex !important;
+        align-items: stretch !important;
 
         button.delete-inner-key {
             height: unset !important;
             border-radius: 0;
-            height: calc(1.5em + 0.75rem + 2px);
         }
     }
 }
@@ -120,19 +140,19 @@ button {
     padding-bottom: 0px;
 }
 
-.meta-data {
-    width: 50% !important;
+#meta-data {
+    width: 50%;
 
-    &-entry {
-        padding-top: 0.4rem !important;
-        padding-bottom: 0.4rem !important;
+    .meta-data-entry {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
     }
 }
 
-.input-modal {
-    margin-bottom: 10px !important;
+#input-modal {
+    margin-bottom: 10px;
 
-    &-entry {
+    .input-modal-entry {
         label {
             margin-top: 10px;
             margin-bottom: 3px;
@@ -149,7 +169,7 @@ button {
 .rule-wizard-modal {
 
     .bx--modal-header {
-        display: none;
+        display: none !important;
     }
 
     .bx--modal-content {
@@ -167,8 +187,12 @@ button {
     }
 }
 
+.layout-pane {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
 
-.separator {
+#separator {
     margin: 100px;
 }
 
@@ -176,47 +200,42 @@ button {
     display: none !important;
 }
 
-$color-inner-table: #e5e5e5;
-
 .bx--expandable-row:not(.bx--parent-row) td {
-    background-color: $color-inner-table !important;
+    background-color: var(--color-inner-table) !important;
 }
 
-.inner-table {
+#inner-table {
     .bx--toolbar-content {
-        background-color: $color-inner-table !important;
+        background-color: var(--color-inner-table);
     }
 
     th.bx--table-column-checkbox {
         vertical-align: middle;
-        padding-top: unset !important;
     }
 
     table * {
-        background-color: $color-inner-table !important;
+        background-color: var(--color-inner-table);
 
         &:hover:not(th) {
-            background-color: $color-inner-table !important;
+            background-color: var(--color-inner-table);
         }
 
         th {
-            border-color: darken($color-inner-table, 8) !important;
+            border-color: var(--color-inner-table-border);
 
             ~:hover {
-                border-color: darken($color-inner-table, 8) !important;
+                border-color: var(--color-inner-table-border);
             }
         }
     }
 
     td.bx--table-column-checkbox {
         ~td {
-            padding-left: 1.25rem !important;
+            padding-left: 1.25rem;
         }
     }
 
     .bx--pagination {
-        background-color: $color-inner-table !important;
+        background-color: var(--color-inner-table);
     }
-
-
 }

@@ -18,7 +18,7 @@ class ReferenceTable extends ReferenceData {
 
         const entryDefinition = { 'outer_key': { label: this.state.metaData.key_label || 'Key', value: '', type: 'text', }, ...inners, source: { label: 'Comment', value: '', type: 'text', help: 'Optional: A comment to add to the new data entry' }, };
 
-        this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: entryDefinition, });
+        this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: entryDefinition });
     }
 
     // Entry should consist of an JS Object of the form {value: 'someVal'}
@@ -230,6 +230,49 @@ class ReferenceTable extends ReferenceData {
             data = Object.keys(response.data).map(i => ({ key: i, values: Object.values(response.data[i]), id: i, }));
         }
         return data;
+    }
+
+    tableChangedXX = (type, options) => {
+        const headers = [{ key: 'key', header: 'IoC' }];
+        const knownHeaders = ['key'];
+        if (this.state.metaData) {
+            for (const key in this.state.metaData.key_name_types) {
+                headers.push({ key: key, header: key });
+                knownHeaders.push(key);
+            }
+        }
+
+        let allEntries = this.state.allEntries;
+        let searchText = this.state.searchText;
+        if (type === 'search' && options) searchText = options.searchText;
+        if (type === 'new' && options) allEntries = options;
+
+
+        const tableData = [];
+        let isRegexSearch = false;
+        try { // Check if the current expression can be parsed as regex, if not, we try string matching
+            searchText = new RegExp(searchText, 'gi');
+            isRegexSearch = true;
+        } catch (e) { }
+
+        let i = 0;
+        for (const entry of allEntries) {
+            const matches = this.testValue(entry, searchText, isRegexSearch);
+            if (matches) {
+                //entry['index'] = i++; // required unique key for dataTable
+                const tEntry = { key: entry.key, id: entry.key, index: i++ }
+                for (const value of entry.values) {
+                    tEntry[value.key] = value.value;
+                    if (!knownHeaders.includes(value.key)) {
+                        headers.push({ key: value.key, header: value.key });
+                        knownHeaders.push(value.key);
+                    }
+                }
+                tableData.push(tEntry);
+            }
+        }
+        console.log(tableData, headers);
+        this.setState({ tableData, searchText, allEntries, headers });
     }
 
 

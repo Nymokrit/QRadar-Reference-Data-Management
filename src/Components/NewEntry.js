@@ -119,7 +119,7 @@ function ListInput(props) {
             {
                 Object.keys(entries).map(entry => (
                     <div className='input-group' key={entry}>
-                        <Dropdown items={props.options} selectedItem={entries[entry].type} onChange={(e) => handleDropdownChange(e, entry, 'type')} />
+                        <Dropdown className='create-new-dropdown'  items={props.options} selectedItem={entries[entry].type} onChange={(e) => handleDropdownChange(e, entry, 'type')} />
                         <TextInput key={entry} value={entries[entry].label} onChange={(e) => handleChange(e, entry, 'label')} />
                         <Button kind='danger' size='small' hasIconOnly renderIcon={Delete16} iconDescription='Delete' tooltipPosition='bottom' className='delete-inner-key' onClick={(e) => removeInnerKey(entry)}></Button>
                     </div>
@@ -154,7 +154,7 @@ function TimeInput(props) {
         <div className='inner-keys'>
             <div className='input-group'>
                 <TextInput value={label} onChange={(e) => handleChange(e)} />
-                <Dropdown selectedItem={type} onChange={(e) => handleDropdownChange(e)} items={props.options} />
+                <Dropdown className='create-new-dropdown' selectedItem={type} onChange={(e) => handleDropdownChange(e)} items={props.options} />
             </div>
         </div>
     );
