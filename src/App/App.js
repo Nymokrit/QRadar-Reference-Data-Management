@@ -158,7 +158,9 @@ class App extends Component {
 
   parseHash = () => {
     const api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{action}/{type}/{name}
-    const [_, action, type, name] = api.split('/');
+    let [_, action, type, ...name] = api.split('/');
+    
+    name = name.join('/') // EdgeCase where 'name' contains '/'
 
     if (!this.supportedActions.includes(action) || !this.supportedTypes.includes(type)) return ['', '', ''];
     return [action, type, name];
