@@ -12,9 +12,12 @@ const {
 
 function Dependents(props) {
     let dependents;
-    if (props.dependents && props.dependents.length > 0)
-        dependents = props.dependents.map((dependent, i) => ({ id: i, dependent: '(' + dependent.dependent_type + ') ' + dependent.dependent_name }));
-    else
+    if (props.dependents && props.dependents.length > 0) {
+        // Remove duplicate entries from the API
+        dependents = props.dependents.filter((value, index, self) => self.findIndex(temp => (temp.dependent_id === value.dependent_id)) === index);
+        // map to a readable format
+        dependents = dependents.map((dependent, i) => ({ id: i, dependent: '(' + dependent.dependent_type + ') ' + dependent.dependent_name }));
+    } else
         dependents = [{ id: '0', dependent: i18n.t('data.dependents.none'), },];
 
     return (
