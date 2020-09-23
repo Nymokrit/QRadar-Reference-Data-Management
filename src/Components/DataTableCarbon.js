@@ -113,7 +113,7 @@ class DataTableCarbon extends Component {
                 }) => (
                         <TableContainer>
                             <TableToolbar>
-                                <TableBatchActions {...getBatchActionProps()} translateWithId={(id, state = {}) => i18n.t(id, { totalSelected: state.totalSelected })}>
+                                <TableBatchActions {...getBatchActionProps()} shouldShowBatchActions={selectedRows.length} translateWithId={(id, state = {}) => i18n.t(id, { totalSelected: state.totalSelected })}>
                                     <TableBatchAction renderIcon={Delete24} onClick={(e) => this.props.deleteItem(selectedRows)}>{i18n.t('data.table.elements.delete')}</TableBatchAction>
                                 </TableBatchActions>
                                 <TableToolbarContent>
@@ -128,7 +128,7 @@ class DataTableCarbon extends Component {
                                     }
                                 </TableToolbarContent>
                             </TableToolbar>
-                            <Table {...getTableProps()}>
+                            <Table {...getTableProps()} >
                                 <TableHead>
                                     <TableRow>
                                         { /* Providing props `ariaLabel`, `isExpanded` and `onExpand` only to make linting happy */}
@@ -142,6 +142,7 @@ class DataTableCarbon extends Component {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+                                    {/* For expandable Rows*/}
                                     {this.props.expandable && rows.map(row => (
                                         <React.Fragment key={row.id} >
                                             <TableExpandRow {...getRowProps({ row, })}>
@@ -160,13 +161,12 @@ class DataTableCarbon extends Component {
                                         </React.Fragment>
                                     ))}
                                     {!this.props.expandable && rows.map(row => (
-                                        <TableRow key={row.id}  {...getRowProps({ row, })}>
+                                        <TableRow key={row.id} {...getRowProps({ row, })}>
                                             <TableSelectRow {...getSelectionProps({ row, })} />
                                             {row.cells.map(cell => {
                                                 const key = cell.id.substring(cell.id.lastIndexOf(':') + 1);
                                                 let value = cell.value;
                                                 if (key in this.formatters) value = this.formatters[key](value);
-
                                                 return <TableCell key={cell.id}>{value}</TableCell>
                                             })}
                                         </TableRow>
