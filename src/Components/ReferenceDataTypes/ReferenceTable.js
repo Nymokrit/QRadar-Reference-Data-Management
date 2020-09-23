@@ -165,13 +165,24 @@ class ReferenceTable extends ReferenceData {
             reader.readAsText(entries.file.value);
     }
 
-    exportItems = () => {
+    exportItems = (selection) => {
         const entries = [];
-        // Get a flat map of key/value pairs that we can dump afterwards
-        for (const entry of this.state.allEntries) {
-            entries.push(...entry.values);
+        if (selection.experimentalFormat.value === true) {
+            for (const entry of this.state.allEntries) {
+                let temp = { key: entry.id };
+                for (const value of entry.values) {
+                    temp[value.key] = value.value;
+                }
+                entries.push(temp);
+            }
+            this.downloadTable(this.props.name, entries, Object.keys(this.state.metaData.key_name_types).sort());
+        } else {
+            // Get a flat map of key/value tuples that we can dump afterwards
+            for (const entry of this.state.allEntries) {
+                entries.push(...entry.values);
+            }
+            this.download(this.props.name, entries, true, true);
         }
-        this.download(this.props.name, entries, true, true);
     }
 
     bulkAddItems = async (entries) => {

@@ -60,6 +60,7 @@ i18n
                     'data.table.elements.add.separator.help': 'New lines are implicit separators',
                     'data.table.elements.add.source.help': 'Optional: A comment to add to the new data entry',
                     'data.table.elements.add.title': 'Add Entry',
+                    'data.table.elements.export.title': 'Download Entries',
                     'data.table.elements.add.entries': 'Entries',
                     'data.table.elements.add.save': 'Save',
                     'data.table.elements.add.close': 'Close',

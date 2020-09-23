@@ -68,7 +68,7 @@ export const mapAddItem = {
 
 export const mapBulkAddItems = {
     'bulkAddData': { label: i18n.t('data.table.elements.add.entries'), value: '', type: 'textarea', },
-    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', type: 'text',  help: 'Example Format: Key1,Value1\\nKey2,Value2\\nKey3,Value3, ...', },
+    'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', type: 'text', help: 'Example Format: Key1,Value1\\nKey2,Value2\\nKey3,Value3, ...', },
 };
 
 export const mapImportItems = {
@@ -115,9 +115,19 @@ export const tableImportItems = {
     'file': { label: i18n.t('data.table.elements.add.file'), value: '', type: 'file', },
     'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value\\n...', type: 'text', },
     'containsHeaders': { label: 'CSV contains headers', value: true, help: 'Whether the CSV has a headers row or not', type: 'checkbox', },
+    'experimentalFormat': {
+        label: 'Use new experimental format for upload', value: true, type: 'checkbox', help: 'Structures the uploadable table in a more intuitive table format instead of the internal QRadar representation. Please download the existing table first to see the valid format and keep the new data in that format as well'
+    },
 };
 
 export const tableBulkAddItems = {
     'bulkAddData': { label: i18n.t('data.table.elements.add.entries'), value: '', type: 'textarea', },
     'bulkAddSeparator': { label: 'Key-Value Separator', value: ',', help: 'Example Format: Parent Key, Inner Key, Value\\n...', type: 'text', },
+};
+
+export const tableExportItems = {
+    'experimentalFormat': {
+        label: 'Use new experimental format for download', value: true, type: 'checkbox', help: 'Structures the downloadable table in a more intuitive table format instead of the internal QRadar representation. It\'s more intuitive but contains fewer details (e.g. no source) and is error prone if the table is un- or semi-structured)'
+    },
+    /* 'FormatHelp': { value: '', type: 'helpText', }, */
 };

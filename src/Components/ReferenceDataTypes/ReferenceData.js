@@ -11,6 +11,7 @@ import DataTableCarbon from '../DataTableCarbon';
 import Dependents from '../Dependents';
 import InputModal from '../InputModal';
 import { DataTableSkeleton, Modal } from 'carbon-components-react';
+import i18n from '../../I18n/i18n';
 
 let username;
 
@@ -151,6 +152,19 @@ class ReferenceData extends Component {
         fileSaver.saveAs(blob, `${name}.csv`);
     }
 
+    downloadTable(name, content, keys) {
+        let exportString = '"key","' + keys.join('","') + '"\n';
+        for (const entry of content) {
+            for (const key in entry) {
+                exportString += '"' + (entry[key] || '').replace(/"/g, '""') + '",'
+            }
+            exportString += '\n';
+        }
+
+        const blob = new Blob([exportString,], { type: "text/csv", });
+        fileSaver.saveAs(blob, `${name}.csv`);
+    }
+
     reload = async () => {
         this.props.displayLoadingModal(true);
         await this.loadData(true);
@@ -158,10 +172,11 @@ class ReferenceData extends Component {
     }
 
     // Add handlers for click on buttons to display inputModal and register 'onSave' action
-    clickAddItem = () => { this.setState({ showInputModal: true, modalSave: this.addItem, modalInputDefinition: EntryDefinitions[this.type + 'AddItem'], }); }
-    clickAddInnerItem = (key) => { this.setState({ showInputModal: true, modalSave: (e) => this.addInnerItem(key, e), modalInputDefinition: EntryDefinitions[this.type + 'AddInnerItem'], }); }
-    clickBulkAddItem = () => { this.setState({ showInputModal: true, modalSave: this.bulkAddItems, modalInputDefinition: EntryDefinitions[this.type + 'BulkAddItems'], }); }
-    clickImportItems = () => { this.setState({ showInputModal: true, modalSave: this.importItems, modalInputDefinition: EntryDefinitions[this.type + 'ImportItems'], }); }
+    clickAddItem = () => { this.setState({ showInputModal: true, modalTitle: i18n.t('data.table.elements.add.title'), modalSave: this.addItem, modalInputDefinition: EntryDefinitions[this.type + 'AddItem'], }); }
+    clickAddInnerItem = (key) => { this.setState({ showInputModal: true, modalTitle: i18n.t('data.table.elements.add.title'), modalSave: (e) => this.addInnerItem(key, e), modalInputDefinition: EntryDefinitions[this.type + 'AddInnerItem'], }); }
+    clickBulkAddItem = () => { this.setState({ showInputModal: true, modalTitle: i18n.t('data.table.elements.add.title'), modalSave: this.bulkAddItems, modalInputDefinition: EntryDefinitions[this.type + 'BulkAddItems'], }); }
+    clickImportItems = () => { this.setState({ showInputModal: true, modalTitle: i18n.t('data.table.elements.add.title'), modalSave: this.importItems, modalInputDefinition: EntryDefinitions[this.type + 'ImportItems'], }); }
+    clickExportItems = () => { this.setState({ showInputModal: true, modalTitle: i18n.t('data.table.elements.export.title'), modalSave: this.exportItems, modalInputDefinition: EntryDefinitions[this.type + 'ExportItems'], }); }
     clickDeleteItem = (selectedRow) => { this.deleteItem(selectedRow); }
     clickDeleteInnerItem = (outer_key, selectedRows) => { this.deleteInnerItem(outer_key, selectedRows); }
 
@@ -187,6 +202,7 @@ class ReferenceData extends Component {
                 tableData.push(entry);
             }
         }
+        console.log(tableData);
         this.setState({ tableData, searchText, allEntries, });
     }
 
@@ -222,7 +238,7 @@ class ReferenceData extends Component {
                             clearInterval(tryRegisterListeners);
                         } catch (err) {
                             // if registering listeners didn't work, we try again in one second
-                            if (counter++ >= 20) { // we only try 20 times
+                            if (counter++ >= 60) { // we only try 60 times
                                 clearInterval(tryRegisterListeners); // if after ten tries we fail, we will not try again (prevent memory leaks);
                                 console.log('Something went wrong with registering the close handlers for the frame. Frame can be closed by clicking in the window background');
                                 console.log(err);
@@ -266,6 +282,7 @@ class ReferenceData extends Component {
                 <InputModal
                     modal={this.state.showInputModal}
                     save={this.state.modalSave}
+                    title={this.state.modalTitle}
                     entries={JSON.parse(JSON.stringify(this.state.modalInputDefinition))}
                     closeModal={(e) => this.setState(prevState => ({ showInputModal: !prevState.showInputModal, }))}
                 />
@@ -294,7 +311,7 @@ class ReferenceData extends Component {
                         addItem={this.clickAddItem}
                         bulkAddItem={this.clickBulkAddItem}
                         importItems={this.clickImportItems}
-                        exportItems={this.exportItems}
+                        exportItems={this.type == 'table' ? this.clickExportItems : this.exportItems}
                         deleteItem={this.clickDeleteItem}
                         searchText={this.state.searchText}
 
