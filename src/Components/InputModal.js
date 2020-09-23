@@ -9,7 +9,6 @@ import i18n from '../I18n/i18n';
 class InputModal extends Component {
     constructor(props) {
         super(props);
-        console.log(this.props);
 
         this.state = {
             entries: this.props.entries,
@@ -20,7 +19,6 @@ class InputModal extends Component {
 
     componentDidUpdate() {
         // We need this because the modal needs to reset entries definitions after each show/close
-        console.log(this.props);
         if (this.props.modal !== this.state.show) this.setState({ entries: JSON.parse(JSON.stringify(this.props.entries)), show: this.props.modal, filename: '', });
     }
 
