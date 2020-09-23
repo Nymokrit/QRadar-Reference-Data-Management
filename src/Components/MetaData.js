@@ -29,7 +29,7 @@ function MetaData(props) {
                 props.data.name ?
                     <StructuredListWrapper id='meta-data'>
                         <StructuredListHead><StructuredListRow head>
-                            <StructuredListCell head className='meta-data-title'>{props.data.name}<Button className='reload' onClick={props.reload} kind='ghost' size='small' tooltipPosition='bottom' renderIcon={Renew16} iconDescription='Refresh' /></StructuredListCell>
+                            <StructuredListCell head className='meta-data-title'>{props.data.name}<Button className='reload' aria-label='reload' onClick={props.reload} kind='ghost' size='small' tooltipPosition='bottom' renderIcon={Renew16} iconDescription='Refresh' /></StructuredListCell>
                         </StructuredListRow>
                         </StructuredListHead>
                         <StructuredListBody>

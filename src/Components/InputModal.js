@@ -9,6 +9,7 @@ import i18n from '../I18n/i18n';
 class InputModal extends Component {
     constructor(props) {
         super(props);
+        console.log(this.props);
 
         this.state = {
             entries: this.props.entries,
@@ -19,6 +20,7 @@ class InputModal extends Component {
 
     componentDidUpdate() {
         // We need this because the modal needs to reset entries definitions after each show/close
+        console.log(this.props);
         if (this.props.modal !== this.state.show) this.setState({ entries: JSON.parse(JSON.stringify(this.props.entries)), show: this.props.modal, filename: '', });
     }
 
@@ -58,7 +60,7 @@ class InputModal extends Component {
                 open={this.props.modal}
                 onRequestSubmit={() => { this.props.save(this.state.entries); this.props.closeModal() }}
                 onRequestClose={this.props.closeModal}
-                modalHeading={i18n.t('data.table.elements.add.title')}
+                modalHeading={this.props.title}
                 primaryButtonText={i18n.t('data.table.elements.add.save')}
                 secondaryButtonText={i18n.t('data.table.elements.add.close')}
             >
@@ -71,7 +73,8 @@ class InputModal extends Component {
                                         file: <FileUploaderDropContainer id={key} multiple={false} labelText={this.state.filename || defaultFileUploadText} onAddFiles={(e, files) => this.handleChange(e, key, files)} />,
                                         text: <TextInput id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
                                         textarea: <TextArea id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
-                                        checkbox: <Checkbox defaultChecked id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />
+                                        checkbox: <Checkbox defaultChecked id={key} labelText={this.label(key)} value={this.state.entries[key].value} onChange={(e) => this.handleChange(e, key)} />,
+                                        helpText: <div dangerouslySetInnerHTML={{ '__html': this.state.entries[key].value }} />
                                     }[this.state.entries[key].type]
                                 }
                             </StructuredListRow>

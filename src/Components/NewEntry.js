@@ -48,7 +48,7 @@ class NewEntry extends Component {
                     let inputField;
                     switch (this.state.entries[key].type) {
                         case 'select':
-                            inputField = <Dropdown selectedItem={this.state.entries[key].value} onChange={(e) => this.handleDropdownChange(e, key)} items={this.state.entries[key].options} />;
+                            inputField = <Dropdown id={key} selectedItem={this.state.entries[key].value} onChange={(e) => this.handleDropdownChange(e, key)} items={this.state.entries[key].options} />;
                             break;
                         case 'list':
                             inputField = <ListInput options={this.state.entries[key].options} label={this.state.entries[key].label} values={this.state.entries[key].values} />;
@@ -61,7 +61,7 @@ class NewEntry extends Component {
                     }
 
                     return (
-                        <FormGroup key={key}>
+                        <FormGroup key={key} legendText={key}>
                             {this.state.entries[key].help ?
                                 <Tooltip direction='right' triggerText={this.state.entries[key].label}>{this.state.entries[key].help}</Tooltip>
                                 :
@@ -119,7 +119,7 @@ function ListInput(props) {
             {
                 Object.keys(entries).map(entry => (
                     <div className='input-group' key={entry}>
-                        <Dropdown className='create-new-dropdown'  items={props.options} selectedItem={entries[entry].type} onChange={(e) => handleDropdownChange(e, entry, 'type')} />
+                        <Dropdown className='create-new-dropdown' items={props.options} selectedItem={entries[entry].type} onChange={(e) => handleDropdownChange(e, entry, 'type')} />
                         <TextInput key={entry} value={entries[entry].label} onChange={(e) => handleChange(e, entry, 'label')} />
                         <Button kind='danger' size='small' hasIconOnly renderIcon={Delete16} iconDescription='Delete' tooltipPosition='bottom' className='delete-inner-key' onClick={(e) => removeInnerKey(entry)}></Button>
                     </div>

@@ -19,7 +19,7 @@ function Sidebar(props) {
     }
 
     return (
-        <div id='menu' >
+        <div id='menu' role='region' aria-label='sidebar'>
             <Button kind='ghost' small defaultToggled id='switch-theme' onClick={() => props.updateTheme(true)}>Switch Theme</Button>
             <Search type='text' labelText={i18n.t('data.sidebar.search')} placeHolderText={i18n.t('data.sidebar.search')} light onChange={searchInputChanged} value={searchText} />
             <Accordion>

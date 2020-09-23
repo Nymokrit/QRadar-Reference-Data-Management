@@ -46,7 +46,7 @@ class App extends Component {
     let theme = localStorage.getItem("theme") || 'dark';
 
     const root = document.documentElement;
-    
+
     if (change) {
       theme = theme == 'light' ? 'dark' : 'light';
       localStorage.setItem("theme", theme);
@@ -159,7 +159,7 @@ class App extends Component {
   parseHash = () => {
     const api = decodeURI(window.location.hash.substring('#/data'.length)); // API is the part after #/data/{action}/{type}/{name}
     let [_, action, type, ...name] = api.split('/');
-    
+
     name = name.join('/') // EdgeCase where 'name' contains '/'
 
     if (!this.supportedActions.includes(action) || !this.supportedTypes.includes(type)) return ['', '', ''];
@@ -188,7 +188,7 @@ class App extends Component {
           refData={this.state.refData}
           updateTheme={this.updateTheme}
         />
-        <div id='content'>
+        <div id='content' role="main">
           <Loading active={this.state.loading} withOverlay />
           {
             this.state.errorMessages.length > 0 &&

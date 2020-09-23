@@ -97,6 +97,7 @@ class DataTableCarbon extends Component {
 
         return (
             <DataTable
+                role='table'
                 useZebraStyles={true}
                 isSortable
                 rows={data}
@@ -128,7 +129,7 @@ class DataTableCarbon extends Component {
                                     }
                                 </TableToolbarContent>
                             </TableToolbar>
-                            <Table {...getTableProps()} >
+                            <Table {...getTableProps()}>
                                 <TableHead>
                                     <TableRow>
                                         { /* Providing props `ariaLabel`, `isExpanded` and `onExpand` only to make linting happy */}
@@ -174,6 +175,7 @@ class DataTableCarbon extends Component {
                                 </TableBody>
                             </Table>
                             <Pagination
+                                role='navigation'
                                 key={this.state.currentPage * this.props.data.length * this.state.updatePagination}
                                 page={this.state.currentPage}
                                 pageSize={this.state.currentPageSize}

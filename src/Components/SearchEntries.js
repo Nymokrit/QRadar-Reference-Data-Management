@@ -37,7 +37,7 @@ function SearchEntries(props) {
     return (
         <div id='searchAll'>
             <Form>
-                <FormGroup>
+                <FormGroup legendText='search sets'>
                     <TextInput type='text' value={searchText} onChange={searchInputChanged} labelText={i18n.t('data.search.all.input')} placeholder={i18n.t('data.search.all.placeholder')} />
                     <Button kind='primary' size='small' className='btn-search-all' onClick={search}>{i18n.t('data.search.all.button')}</Button>
                 </FormGroup>

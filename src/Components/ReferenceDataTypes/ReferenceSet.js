@@ -21,12 +21,15 @@ class ReferenceSet extends ReferenceData {
         if (response.error) {
             this.props.showError(response.message);
         } else {
-            if (response.number_of_elements > this.state.tableData.length) { // only update the table, if the entry actually has been added
-                let updateData = this.state.allEntries;
+            let updateData = this.state.allEntries;
+            if (response.number_of_elements > this.state.tableData.length) { 
                 updateData.push({ value, source, id: value, first_seen: Date.now(), last_seen: Date.now() });
-                this.tableChanged('new', updateData);
-                this.updateMetaData(response);
+            } else { // if number of elements didn't change, and there was no error, then an existing entry must have been changed
+                let index = updateData.findIndex((v) => value === v.value);
+                updateData[index].source = source;
             }
+            this.tableChanged('new', updateData);
+            this.updateMetaData(response);
         }
         this.props.displayLoadingModal(false);
     }
@@ -44,7 +47,7 @@ class ReferenceSet extends ReferenceData {
             updateData = updateData.filter(e => e.value !== value);
         }
 
-        if (response.error || response.number_of_elements >= this.state.tableData.length) {
+        if (response.error) {
             this.props.showError(response.message || 'Unspecified error while trying to delete value');
         } else {
             this.tableChanged('new', updateData);
